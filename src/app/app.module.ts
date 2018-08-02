@@ -12,19 +12,20 @@ import { FuseModule } from '@fuse/fuse.module';
 import { FuseSharedModule } from '@fuse/shared.module';
 import { FuseProgressBarModule, FuseSidebarModule, FuseThemeOptionsModule } from '@fuse/components';
 
-import { fuseConfig } from 'app/fuse-config';
+import { fuseConfig } from './fuse-config';
 
-import { AppComponent } from 'app/app.component';
-import { LayoutModule } from 'app/layout/layout.module';
+import { AppComponent } from './app.component';
+import { LayoutModule } from './modules/layout/layout.module';
+import { ServicesConfig } from './app-config/services.config';
 
 const appRoutes: Routes = [
     {
-        path        : 'pages',
-        loadChildren: './main/pages/pages.module#PagesModule'
+        path        : 'security',
+        loadChildren: './modules/main/security/security.module#SecurityModule'
     },
     {
         path      : '**',
-        loadChildren: './main/pages/pages.module#PagesModule'
+        loadChildren: './modules/main/security/security.module#SecurityModule'
     }
 ];
 
@@ -59,7 +60,8 @@ const appRoutes: Routes = [
     ],
     bootstrap   : [
         AppComponent
-    ]
+    ],
+    providers: [ServicesConfig]
 })
 export class AppModule
 {

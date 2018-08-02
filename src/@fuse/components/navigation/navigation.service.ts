@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 
-import { FuseNavigationItem } from '@fuse/types';
+import { FuseNavigationItem } from '../../types';
 
 @Injectable({
     providedIn: 'root'
