@@ -4,6 +4,7 @@ import { ServicesConfig } from '../app-config/services.config';
 import { Observable, of, Subject } from 'rxjs';
 import { ResponseModel } from '../models/response.model';
 import { tap, catchError } from 'rxjs/operators';
+import { UsuarioModel } from '../models/usuario.model';
 
 @Injectable({
   providedIn: 'root'
@@ -22,6 +23,22 @@ export class SecurityService {
       tap((response: ResponseModel) => this.log(`Resultado del servicio login = ${response.res_service}`)),
       catchError(this.handleError<ResponseModel>('login'))
     );
+  }
+
+  getUserLoged(): UsuarioModel {
+    let dataUsuario = new UsuarioModel();
+    const dataLoginSession = sessionStorage.getItem('usuario_circular');
+    const dataLoginLocal = localStorage.getItem('usuario_circular');
+
+    if (dataLoginSession != null) {      
+      dataUsuario = JSON.parse(dataLoginSession);
+    }
+
+    if (dataLoginLocal != null) {      
+      dataUsuario = JSON.parse(dataLoginLocal);
+    }
+
+    return dataUsuario;
   }
 
   // tslint:disable-next-line:typedef

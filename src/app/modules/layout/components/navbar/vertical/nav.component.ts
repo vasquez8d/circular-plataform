@@ -7,6 +7,8 @@ import { FuseConfigService } from '@fuse/services/config.service';
 import { FuseNavigationService } from '@fuse/components/navigation/navigation.service';
 import { FusePerfectScrollbarDirective } from '@fuse/directives/fuse-perfect-scrollbar/fuse-perfect-scrollbar.directive';
 import { FuseSidebarService } from '@fuse/components/sidebar/sidebar.service';
+import { SecurityService } from '../../../../../services/security.service';
+import { UsuarioModel } from '../../../../../models/usuario.model';
 
 @Component({
     selector     : 'navbar-vertical-nav',
@@ -19,10 +21,10 @@ export class NavbarVerticalStyle1Component implements OnInit, OnDestroy
     fuseConfig: any;
     fusePerfectScrollbarUpdateTimeout: any;
     navigation: any;
-
     // Private
     private _fusePerfectScrollbar: FusePerfectScrollbarDirective;
     private _unsubscribeAll: Subject<any>;
+    private user = new UsuarioModel();
 
     /**
      * Constructor
@@ -36,7 +38,8 @@ export class NavbarVerticalStyle1Component implements OnInit, OnDestroy
         private _fuseConfigService: FuseConfigService,
         private _fuseNavigationService: FuseNavigationService,
         private _fuseSidebarService: FuseSidebarService,
-        private _router: Router
+        private _router: Router,
+        private securityService: SecurityService
     )
     {
         // Set the private defaults
@@ -98,7 +101,9 @@ export class NavbarVerticalStyle1Component implements OnInit, OnDestroy
      * On init
      */
     ngOnInit(): void
-    {
+    {        
+        this.user = this.securityService.getUserLoged();        
+
         this._router.events
             .pipe(
                 filter((event) => event instanceof NavigationEnd),

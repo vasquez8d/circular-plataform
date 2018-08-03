@@ -3,16 +3,14 @@ import { Injectable } from '@angular/core';
 @Injectable()
 export class ServicesConfig {
 
-    private ServerUrl = 'https://pqcnj1fxjj.execute-api.us-east-1.amazonaws.com/Desarrollo';
-
     private publishUrl = 'https://www.circular.pe/';
 
     urlAuthUser(): string {
-        return this.ServerUrl;
+        return 'https://pqcnj1fxjj.execute-api.us-east-1.amazonaws.com/Desarrollo';
     }
 
-    urlPayment(): string {
-        return this.ServerUrl + '/payment';
+    urlProducts(): string {
+        return 'https://mofy4cwezf.execute-api.us-east-1.amazonaws.com/Desarrollo';
     }
 
     currentUrl(): string {

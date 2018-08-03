@@ -22,24 +22,31 @@
             <img src="assets/images/logos/logo_completo.png">
             <div style="margin-top: 20px;" class="title">Ingresa tus credenciales</div>
             <form name="loginForm" [formGroup]="loginForm" novalidate>
-
+                
+                    <mat-error *ngIf="loginIncorrect_email">
+                        {{ login_incorrect_message }}
+                    </mat-error>
                 <mat-form-field>
                     <input matInput placeholder="Correo electrónico" formControlName="user_email">
                     <mat-error *ngIf="loginForm.get('user_email').hasError('required')">
-                        Email is required
+                        Correo electrónico es requerido.
                     </mat-error>
                     <mat-error
                         *ngIf="!loginForm.get('user_email').hasError('required') &&
                                 loginForm.get('user_email').hasError('user_email')">
-                        Please enter a valid email address
+                        Por favor ingresa un correo electrónico válido.
                     </mat-error>
                 </mat-form-field>
 
+                    <mat-error *ngIf="loginIncorrect_password">
+                        {{ login_incorrect_message }}
+                    </mat-error>
                 <mat-form-field>
                     <input matInput type="password" placeholder="Contraseña" formControlName="user_password">
                     <mat-error>
-                        Password is required
+                        La contraseña es requerida.
                     </mat-error>
+
                 </mat-form-field>
 
                 <div class="remember-forgot-password" fxLayout="row" fxLayout.xs="column"

@@ -8,6 +8,9 @@ import { FuseConfigService } from '@fuse/services/config.service';
 import { FuseSidebarService } from '@fuse/components/sidebar/sidebar.service';
 
 import { navigation } from '../../../../services/navigation/navigation';
+import { SecurityService } from '../../../../services/security.service';
+import { UsuarioModel } from '../../../../models/usuario.model';
+import { Router } from '../../../../../../node_modules/@angular/router';
 
 @Component({
     selector   : 'toolbar',
@@ -25,6 +28,8 @@ export class ToolbarComponent implements OnInit, OnDestroy
     selectedLanguage: any;
     userStatusOptions: any[];
 
+    private user = new UsuarioModel();
+
     // Private
     private _unsubscribeAll: Subject<any>;
 
@@ -38,7 +43,9 @@ export class ToolbarComponent implements OnInit, OnDestroy
     constructor(
         private _fuseConfigService: FuseConfigService,
         private _fuseSidebarService: FuseSidebarService,
-        private _translateService: TranslateService
+        private _translateService: TranslateService,
+        private securityService: SecurityService,
+        private router: Router
     )
     {
         // Set the defaults
@@ -108,7 +115,8 @@ export class ToolbarComponent implements OnInit, OnDestroy
             });
 
         // Set the selected language from default languages
-        this.selectedLanguage = _.find(this.languages, {'id': this._translateService.currentLang});
+        this.selectedLanguage = _.find(this.languages, {'id': this._translateService.currentLang});        
+        this.user = this.securityService.getUserLoged();        
     }
 
     /**
@@ -158,5 +166,11 @@ export class ToolbarComponent implements OnInit, OnDestroy
 
         // Use the selected language for translations
         this._translateService.use(lang.id);
+    }
+
+    logout(): void {
+        sessionStorage.removeItem('usuario_circular');
+        localStorage.removeItem('usuario_circular');
+        this.router.navigateByUrl('security/login');
     }
 }
