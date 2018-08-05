@@ -13,6 +13,10 @@ export class ServicesConfig {
         return 'https://mofy4cwezf.execute-api.us-east-1.amazonaws.com/Desarrollo';
     }
 
+    urlCategorias(): string {
+        return 'https://58b0ltmaxd.execute-api.us-east-1.amazonaws.com/Desarrollo';
+    }
+
     currentUrl(): string {
         return this.publishUrl;
     }

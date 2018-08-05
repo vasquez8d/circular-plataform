@@ -4,46 +4,24 @@ import { ServicesConfig } from '../app-config/services.config';
 import { Observable, of, Subject } from 'rxjs';
 import { ResponseModel } from '../models/response.model';
 import { tap, catchError } from 'rxjs/operators';
-import { UsuarioModel } from '../models/usuario.model';
 
 @Injectable({
   providedIn: 'root'
 })
-export class SecurityService {
+export class CategorysService {
   private httpOptions = { headers: new HttpHeaders({ 'Content-Type': 'application/json' }) };
-  private loginUrl = `${this.globalValues.urlAuthUser()}/login`;
+  private listarCatgUrl = `${this.globalValues.urlCategorias()}/list`;
 
   constructor(
     private httpClient: HttpClient,
     private globalValues: ServicesConfig
   ) { }
 
-  login(credentials): Observable<ResponseModel> {
-    return this.httpClient.post<ResponseModel>(this.loginUrl, credentials, this.httpOptions).pipe(
+  obtenerCategorias(): Observable<ResponseModel> {
+    return this.httpClient.get<ResponseModel>(this.listarCatgUrl, this.httpOptions).pipe(
       tap((response: ResponseModel) => this.log(`Resultado del servicio login = ${response.res_service}`)),
       catchError(this.handleError<ResponseModel>('login'))
     );
-  }
-
-  getUserLoged(): UsuarioModel {
-    let dataUsuario = new UsuarioModel();
-    const dataLoginSession = sessionStorage.getItem('usuario_circular');
-    const dataLoginLocal = localStorage.getItem('usuario_circular');
-
-    if (dataLoginSession != null) {      
-      dataUsuario = JSON.parse(dataLoginSession);
-    }
-
-    if (dataLoginLocal != null) {      
-      dataUsuario = JSON.parse(dataLoginLocal);
-    }
-
-    return dataUsuario;
-  }
-
-  getUserLogedId(): string {
-    const dataUser = this.getUserLoged();
-    return dataUser.user_email;
   }
 
   // tslint:disable-next-line:typedef
@@ -57,4 +35,5 @@ export class SecurityService {
   private log(message: string): void {
     console.log('UserService: ' + message);
   }
+
 }

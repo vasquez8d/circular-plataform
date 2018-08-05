@@ -1,14 +1,14 @@
 <div id="products" class="page-layout carded fullwidth inner-scroll">
 
     <!-- TOP BACKGROUND -->
-    <div class="top-bg mat-cyan-bg"></div>
+    <div class="top-bg mat-light-green-bg"></div>
     <!-- / TOP BACKGROUND -->
 
     <!-- CENTER -->
     <div class="center">
 
         <!-- HEADER -->
-        <div class="header mat-cyan-bg"
+        <div class="header mat-light-green-bg"
              fxLayout="column" fxLayoutAlign="center center"
              fxLayout.gt-xs="row" fxLayoutAlign.gt-xs="space-between center">
 
@@ -86,20 +86,20 @@
                     <mat-header-cell *matHeaderCellDef fxHide mat-sort-header fxShow.gt-md>Categoría</mat-header-cell>
                     <mat-cell *matCellDef="let product" fxHide fxShow.gt-md>
                         <p class="category text-truncate">
-                            {{product.prod_categoria}}
+                            {{product.prod_categoria.catg_nombre}}
                         </p>
                     </mat-cell>
                 </ng-container>
 
                 <!-- Price Column -->
-                <ng-container matColumnDef="prod_precio_dia">
+                <!-- <ng-container matColumnDef="prod_precio_dia">
                     <mat-header-cell *matHeaderCellDef mat-sort-header fxHide fxShow.gt-xs>Precio/día</mat-header-cell>
                     <mat-cell *matCellDef="let product" fxHide fxShow.gt-xs>
                         <p class="price text-truncate">
                             S/. {{product.prod_precio_dia}}
                         </p>
                     </mat-cell>
-                </ng-container>
+                </ng-container> -->
 
                 <!-- Quantity Column -->
                 <ng-container matColumnDef="prod_est_alquiler">

@@ -14,6 +14,7 @@ export class EcommerceProductService implements Resolve<any>
     onProductChanged: BehaviorSubject<any>;
     private detailsUrl = `${this.globalValues.urlProducts()}/details`;
     private UpdateUrl = `${this.globalValues.urlProducts()}/update`;
+    private CreateUrl = `${this.globalValues.urlProducts()}/create`;
     /**
      * Constructor
      *
@@ -80,12 +81,17 @@ export class EcommerceProductService implements Resolve<any>
         });
     }
 
-    actualizarProducto(producto, ArrayRangos): Observable<ResponseModel> {
-        // producto.prod_rango_precios = ArrayRangos;
-        console.log(producto);
+    actualizarProducto(producto): Observable<ResponseModel> {
         return this._httpClient.post<ResponseModel>(this.UpdateUrl, producto).pipe(
-            tap((response: ResponseModel) => this.log(`Resultado del servicio login = ${response.res_service}`)),
-            catchError(this.handleError<ResponseModel>('login'))
+            tap((response: ResponseModel) => this.log(`Resultado del actualizar producto = ${response.res_service}`)),
+            catchError(this.handleError<ResponseModel>('actualizar producto'))
+        );
+    }
+
+    registrarProducto(producto): Observable<ResponseModel> {
+        return this._httpClient.post<ResponseModel>(this.CreateUrl, producto).pipe(
+            tap((response: ResponseModel) => this.log(`Resultado del registrarProducto = ${response.res_service}`)),
+            catchError(this.handleError<ResponseModel>('registrarProducto'))
         );
     }
 

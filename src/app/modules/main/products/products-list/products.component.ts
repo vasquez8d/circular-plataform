@@ -19,7 +19,7 @@ import { EcommerceProductsService } from '../../../../services/products.service'
 export class EcommerceProductsComponent implements OnInit
 {
     dataSource: FilesDataSource | null;
-    displayedColumns = ['prod_id', 'prod_nombre', 'prod_categoria', 'prod_precio_dia', 'prod_est_alquiler', 'prod_est_registro'];
+    displayedColumns = ['prod_id', 'prod_nombre', 'prod_categoria', 'prod_est_alquiler', 'prod_est_registro'];
 
     @ViewChild(MatPaginator)
     paginator: MatPaginator;
@@ -196,9 +196,9 @@ export class FilesDataSource extends DataSource<any>
                 case 'prod_categoria':
                     [propertyA, propertyB] = [a.prod_categoria, b.prod_categoria];
                     break;
-                case 'prod_precio_dia':
-                    [propertyA, propertyB] = [a.prod_precio_dia, b.prod_precio_dia];
-                    break;
+                // case 'prod_precio_dia':
+                //     [propertyA, propertyB] = [a.prod_precio_dia, b.prod_precio_dia];
+                //     break;
                 case 'prod_est_alquiler':
                     [propertyA, propertyB] = [a.prod_est_alquiler, b.prod_est_alquiler];
                     break;

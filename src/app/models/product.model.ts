@@ -8,7 +8,7 @@ export class Product
     prod_desc: string;
     prod_tags: string[];
     prod_slug: string;
-    prod_categoria: string;
+    prod_categoria: any;
     prod_rango_precios: {
         rango: string,
         precio: string
@@ -21,7 +21,9 @@ export class Product
     prod_est_registro: string;
     prod_fec_registro: string;
     prod_usu_registro: string;
-
+    prod_usu_actualiza: string;
+    prod_fec_actualiza: string;
+    catg_id: string;
     /**
      * Constructor
      *

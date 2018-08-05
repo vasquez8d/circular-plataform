@@ -9,7 +9,7 @@ export const navigation: FuseNavigation[] = [
         children: [
             {
                 id      : 'products',
-                title   : 'Bienes',
+                title   : 'Artículos',
                 type    : 'item',
                 icon    : 'shopping_basket',
                 url: '/products'

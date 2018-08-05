@@ -6,9 +6,12 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 import { fuseAnimations } from '@fuse/animations';
-import { FuseUtils } from '@fuse/utils';
 import { EcommerceProductService } from '../../../../services/product.service';
 import { Product } from '../../../../models/product.model';
+import { CategorysService } from '../../../../services/categorys.service';
+import { SecurityService } from '../../../../services/security.service';
+import { RegistroUtil } from '../../../../utils/registro.util';
+import { Router } from '../../../../../../node_modules/@angular/router';
 
 @Component({
     selector     : 'e-commerce-product',
@@ -23,7 +26,7 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
     pageType: string;
     productForm: FormGroup;
     rangoPreciosArrayForm: FormArray;
-    
+    listadoCategorias = [];
     // Private
     private _unsubscribeAll: Subject<any>;
 
@@ -39,7 +42,11 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
         private _ecommerceProductService: EcommerceProductService,
         private _formBuilder: FormBuilder,
         private _location: Location,
-        private _matSnackBar: MatSnackBar
+        private _matSnackBar: MatSnackBar,
+        private categoryService: CategorysService,
+        private registroUtil: RegistroUtil,
+        private securityService: SecurityService,
+        private router: Router
     )
     {
         // Set the default
@@ -58,6 +65,7 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
      */
     ngOnInit(): void
     {
+        this.cargarCategorias();
         this.rangoPreciosArrayForm = new FormArray(
             [
             ]
@@ -80,6 +88,14 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
 
                 this.productForm = this.createProductForm();
             });
+    }
+
+    cargarCategorias(): void{
+        this.categoryService.obtenerCategorias().subscribe(
+            data => {
+                this.listadoCategorias = data.data_result.Items;
+            }
+        );
     }
 
     /**
@@ -112,14 +128,13 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
                 }
             );
             this.rangoPreciosArrayForm.push(formGroup);
-        });
-
+        });       
         return this._formBuilder.group({            
             prod_nombre         : [this.product.prod_nombre],
             prod_desc           : [this.product.prod_desc],
             prod_tags           : [this.product.prod_tags],
             prod_slug           : [this.product.prod_slug],
-            prod_categoria      : [this.product.prod_categoria],
+            catg_id             : [this.product.prod_categoria.catg_id],
             prod_rango_precios  : [this.rangoPreciosArrayForm],
             prod_dir_entrega    : [this.product.prod_dir_entrega],
             prod_hora_entrega   : [this.product.prod_hora_entrega],
@@ -146,16 +161,48 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
         this.rangoPreciosArrayForm.removeAt(this.rangoPreciosArrayForm.value.findIndex(x => x.precio === rango.value.precio));
     }
 
+    addTagProduct(event): void {
+        const input = event.input;
+        const value = event.value;
+        if ( value )
+        {
+            this.product.prod_tags.push(value);
+        }
+        if ( input )
+        {
+            input.value = '';
+        }
+    }
+
+    removeTagProduct(tagProduct): void {
+        const index = this.product.prod_tags.indexOf(tagProduct);
+        if ( index >= 0 )
+        {
+            this.product.prod_tags.splice(index, 1);
+        }
+    }
+
     /**
      * Save product
      */
     saveProduct(): void
-    {
-        const dataEdit = this.productForm.value;
-        const dataArrayRangos = dataEdit.prod_rango_precios.value;
-        this._ecommerceProductService.actualizarProducto(dataEdit, dataArrayRangos).subscribe(
+    {      
+        const productSave: Product = new Product();
+        productSave.prod_id = this.product.prod_id;
+        productSave.prod_nombre = this.productForm.value.prod_nombre;
+        productSave.prod_desc = this.productForm.value.prod_desc;
+        productSave.prod_dir_entrega = this.productForm.value.prod_dir_entrega;
+        productSave.prod_hora_entrega = this.productForm.value.prod_hora_entrega;
+        productSave.prod_dir_recibe = this.productForm.value.prod_dir_recibe;
+        productSave.prod_hora_recibe = this.productForm.value.prod_hora_recibe;
+        productSave.prod_tags = this.productForm.value.prod_tags;
+        productSave.prod_est_alquiler = 'Disponible';
+        productSave.prod_fec_actualiza = this.registroUtil.obtenerFechaCreacion();
+        productSave.prod_usu_actualiza = this.securityService.getUserLogedId();
+        productSave.prod_categoria = this.obtenerCategoriaSeleccionada();
+        productSave.prod_rango_precios = this.rangoPreciosArrayForm.value;        
+        this._ecommerceProductService.actualizarProducto(productSave).subscribe(
             data => {
-                console.log(data);
                 this._matSnackBar.open('Artículo actualizado', 'OK', {
                     verticalPosition: 'top',
                     duration: 3000
@@ -164,28 +211,47 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
         );
     }
 
+    obtenerCategoriaSeleccionada(): any {
+        const catg_id = this.productForm.value.catg_id;
+        let catg_nombre = '';
+        this.listadoCategorias.forEach(element => {
+            if (element.catg_id === catg_id) {
+                catg_nombre = element.catg_nombre;
+            }
+        });
+        return {
+            catg_id: catg_id,
+            catg_nombre: catg_nombre
+        };
+    }
+
     /**
      * Add product
      */
     addProduct(): void
     {
-        // const data = this.productForm.getRawValue();
-        // data.handle = FuseUtils.handleize(data.name);
-
-        // this._ecommerceProductService.addProduct(data)
-        //     .then(() => {
-
-        //         // Trigger the subscription with new data
-        //         this._ecommerceProductService.onProductChanged.next(data);
-
-        //         // Show the success message
-        //         this._matSnackBar.open('Product added', 'OK', {
-        //             verticalPosition: 'top',
-        //             duration        : 2000
-        //         });
-
-        //         // Change the location with new one
-        //         this._location.go('apps/e-commerce/products/' + this.product.prod_id + '/' + this.product.prod_slug);
-        //     });
+        const productSave: Product = new Product();
+        productSave.prod_nombre = this.productForm.value.prod_nombre;
+        productSave.prod_desc = this.productForm.value.prod_desc;
+        productSave.prod_tags = this.productForm.value.prod_tags;
+        productSave.prod_slug = this.registroUtil.obtenerSlugPorNombre(productSave.prod_nombre);
+        productSave.prod_categoria = this.obtenerCategoriaSeleccionada();
+        productSave.prod_rango_precios = this.rangoPreciosArrayForm.value;
+        productSave.prod_dir_entrega = this.productForm.value.prod_dir_entrega;
+        productSave.prod_hora_entrega = this.productForm.value.prod_hora_entrega;
+        productSave.prod_dir_recibe = this.productForm.value.prod_dir_recibe;
+        productSave.prod_hora_recibe = this.productForm.value.prod_hora_recibe;
+        productSave.prod_est_alquiler = 'Disponible';
+        productSave.prod_fec_registro = this.registroUtil.obtenerFechaCreacion();
+        productSave.prod_usu_registro = this.securityService.getUserLogedId();               
+        this._ecommerceProductService.registrarProducto(productSave).subscribe(
+            data => {
+                this._matSnackBar.open('Artículo registrado', 'OK', {
+                    verticalPosition: 'top',
+                    duration: 3000
+                });                
+                this.router.navigateByUrl('/products');
+            }
+        );
     }
 }

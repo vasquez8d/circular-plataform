@@ -1,14 +1,14 @@
 <div id="product" class="page-layout carded fullwidth inner-scroll">
 
     <!-- TOP BACKGROUND -->
-    <div class="top-bg mat-cyan-bg"></div>
+    <div class="top-bg mat-light-green-bg"></div>
     <!-- / TOP BACKGROUND -->
 
     <!-- CENTER -->
     <div class="center">
 
         <!-- HEADER -->
-        <div class="header mat-cyan-bg" fxLayout="row" fxLayoutAlign="space-between center">
+        <div class="header mat-light-green-bg" fxLayout="row" fxLayoutAlign="space-between center">
 
             <!-- APP TITLE -->
             <div fxLayout="row" fxLayoutAlign="start center">
@@ -69,49 +69,46 @@
 
                                 <mat-form-field class="w-100-p">
                                     <input matInput
-                                           name="name"
+                                           name="prod_nombre"
                                            formControlName="prod_nombre"
                                            placeholder="Nombre del artículo"
                                            required>
                                 </mat-form-field>
+                                <mat-form-field class="w-100-p">
+                                    <textarea matInput
+                                           name="prod_desc"
+                                           formControlName="prod_desc"
+                                           placeholder="Descripción del artículo"
+                                           required
+                                           rows="3">
+                                    </textarea>
+                                </mat-form-field>
+                                <mat-form-field class="w-50-p">
+                                    <mat-select placeholder="Categoría del artículo" formControlName="catg_id"
+                                        required>
+                                        <mat-option *ngFor="let categ of listadoCategorias" [value]="categ.catg_id">
+                                            {{categ.catg_nombre}}
+                                        </mat-option>
+                                    </mat-select>  
+                                </mat-form-field>                                
+                              
+                                <mat-form-field class="w-100-p">
 
-                                <!-- <mat-form-field class="w-100-p">
+                                    <mat-chip-list #tagList name="prod_tags" formControlName="prod_tags">
 
-                                    <mat-chip-list #categoryList name="categories" formControlName="categories">
-
-                                        <mat-chip *ngFor="let category of product.categories"
-                                                  [removable]="true" (removed)="product.removeCategory(category)">
-                                            {{category}}
-                                            <mat-icon matChipRemove>cancel</mat-icon>
-                                        </mat-chip>
-
-                                        <input placeholder="Categories"
-                                               [matChipInputFor]="categoryList"
-                                               [matChipInputAddOnBlur]="true"
-                                               (matChipInputTokenEnd)="product.addCategory($event)"/>
-
-                                    </mat-chip-list>
-
-                                </mat-form-field> -->
-
-                                <!-- <mat-form-field class="w-100-p">
-
-                                    <mat-chip-list #tagList name="tags" formControlName="tags">
-
-                                        <mat-chip *ngFor="let tag of product.tags"
-                                                  [removable]="true" (removed)="product.removeTag(tag)">
+                                        <mat-chip *ngFor="let tag of product.prod_tags"
+                                                  [removable]="true" (removed)="removeTagProduct(tag)">
                                             {{tag}}
                                             <mat-icon matChipRemove>cancel</mat-icon>
                                         </mat-chip>
 
-                                        <input placeholder="Tags"
+                                        <input placeholder="Tags del artículo"
                                                [matChipInputFor]="tagList"
                                                [matChipInputAddOnBlur]="true"
-                                               (matChipInputTokenEnd)="product.addTag($event)"/>
-
+                                               (matChipInputTokenEnd)="addTagProduct($event)"/>
                                     </mat-chip-list>
 
-                                </mat-form-field> -->
+                                </mat-form-field>
 
                             </div>
 
@@ -146,15 +143,13 @@
                                                     <input matInput
                                                         name="name"
                                                         formControlName="rango"
-                                                        placeholder="Rango de días"
-                                                        required>
+                                                        placeholder="Rango de días">
                                                 </mat-form-field>
                                                 <mat-form-field class="w-20-p">
                                                     <input matInput
                                                         name="name"
                                                         formControlName="precio"
-                                                        placeholder="Precio"
-                                                        required>
+                                                        placeholder="Precio">
                                                 </mat-form-field>  
                                                 <button (click)="eliminarRangoPrecio(rango)" mat-fab>
                                                     <mat-icon aria-label="Agregar precio">exposure_neg_1</mat-icon>                                    
@@ -167,75 +162,44 @@
                                                 </button>                                                              
                             </div>
                         </mat-tab>
-                                    <!-- <mat-form-field class="w-100-p">
-                                        <input matInput
-                                            name="comparedPrice"
-                                            formControlName="comparedPrice"
-                                            placeholder="Compared Price" type="number">
-                                        <span matPrefix>$&nbsp;</span>
-                                        <mat-hint align="start">Add a compare price to show next to the real price
-                                        </mat-hint>
-                                    </mat-form-field> -->                                    
-                                
-                        <!-- <mat-tab label="Inventory">
-                            <div class="tab-content p-24" fusePerfectScrollbar>
 
-                                <mat-form-field class="w-100-p">
-                                    <input matInput
-                                           name="sku"
-                                           formControlName="sku"
-                                           placeholder="SKU">
-                                </mat-form-field>
-
-                                <mat-form-field class="w-100-p">
-                                    <input matInput
-                                           name="quantity"
-                                           formControlName="quantity"
-                                           placeholder="Quantity" type="number">
-                                </mat-form-field>
-                            </div>
-                        </mat-tab> -->
-
-                        <!-- <mat-tab label="Shipping">
+                        <mat-tab label="Direcciones">
                             <div class="tab-content p-24" fusePerfectScrollbar fxLayout="column">
+                                <div class="py-16" fxLayout="row">
+                                    <mat-form-field fxFlex>
+                                        <input matInput
+                                               name="prod_dir_entrega"
+                                               formControlName="prod_dir_entrega"
+                                               placeholder="Dirección de entrega"
+                                               required>
+                                    </mat-form-field>
+                                    <mat-form-field fxFlex>
+                                        <input matInput
+                                               name="prod_hora_entrega"
+                                               formControlName="prod_hora_entrega"
+                                               placeholder="Hora de entrega"
+                                               required>
+                                    </mat-form-field>
+                                </div>
 
                                 <div class="py-16" fxLayout="row">
                                     <mat-form-field fxFlex>
                                         <input matInput
-                                               name="Width"
-                                               formControlName="width"
-                                               placeholder="Width">
+                                               name="prod_dir_recibe"
+                                               formControlName="prod_dir_recibe"
+                                               placeholder="Dirección de recepción"
+                                               required>
                                     </mat-form-field>
                                     <mat-form-field fxFlex>
                                         <input matInput
-                                               name="Height"
-                                               formControlName="height"
-                                               placeholder="Height">
-                                    </mat-form-field>
-                                    <mat-form-field fxFlex>
-                                        <input matInput
-                                               name="Depth"
-                                               formControlName="depth"
-                                               placeholder="Depth">
+                                               name="prod_hora_recibe"
+                                               formControlName="prod_hora_recibe"
+                                               placeholder="Hora de recepción"
+                                               required>
                                     </mat-form-field>
                                 </div>
-
-                                <mat-form-field class="w-100-p">
-                                    <input matInput
-                                           name="Weight"
-                                           formControlName="weight"
-                                           placeholder="Weight">
-                                </mat-form-field>
-
-                                <mat-form-field class="w-100-p">
-                                    <input matInput
-                                           name="extraShippingFee"
-                                           formControlName="extraShippingFee"
-                                           placeholder="Extra Shipping Fee" type="number">
-                                    <span matPrefix>$&nbsp;</span>
-                                </mat-form-field>
                             </div>
-                        </mat-tab> -->
+                        </mat-tab>
 
                     </mat-tab-group>
                 </form>

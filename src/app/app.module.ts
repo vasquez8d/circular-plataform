@@ -19,6 +19,7 @@ import { LayoutModule } from './modules/layout/layout.module';
 import { ServicesConfig } from './app-config/services.config';
 import { InMemoryWebApiModule } from '../../node_modules/angular-in-memory-web-api';
 import { FakeDbService } from './fake-db/fake-db.service';
+import { LoginGuard } from './guards/login.guard';
 
 const appRoutes: Routes = [
     {
@@ -27,6 +28,7 @@ const appRoutes: Routes = [
     },
     {
         path        : 'products',
+        canActivate : [LoginGuard],
         loadChildren: './modules/main/products/products.module#ProductsModule'
     },    
     {
@@ -70,7 +72,7 @@ const appRoutes: Routes = [
     bootstrap   : [
         AppComponent
     ],
-    providers: [ServicesConfig]
+    providers: [ServicesConfig, LoginGuard]
 })
 export class AppModule
 {

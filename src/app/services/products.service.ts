@@ -56,7 +56,7 @@ export class EcommerceProductsService implements Resolve<any>
         return new Promise((resolve, reject) => {
             this._httpClient.get(this.listUrl)
                 .subscribe((response: any) => {                    
-                    this.products = response.data_result.Items;                    
+                    this.products = response.data_result.Items;                 
                     this.onProductsChanged.next(this.products);
                     resolve(response);
                 }, reject);
