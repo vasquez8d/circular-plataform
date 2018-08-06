@@ -30,7 +30,17 @@ const appRoutes: Routes = [
         path        : 'products',
         canActivate : [LoginGuard],
         loadChildren: './modules/main/products/products.module#ProductsModule'
-    },    
+    }, 
+    {
+        path        : 'lenders',
+        canActivate : [LoginGuard],
+        loadChildren: './modules/main/lenders/lenders.module#LenderModule'
+    },
+    {
+        path        : 'borrowers',
+        canActivate : [LoginGuard],
+        loadChildren: './modules/main/borrowers/borrowers.module#BorrowerModule'
+    },           
     {
         path        : '**',
         loadChildren: './modules/main/security/security.module#SecurityModule'

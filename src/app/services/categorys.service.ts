@@ -10,7 +10,7 @@ import { tap, catchError } from 'rxjs/operators';
 })
 export class CategorysService {
   private httpOptions = { headers: new HttpHeaders({ 'Content-Type': 'application/json' }) };
-  private listarCatgUrl = `${this.globalValues.urlCategorias()}/list`;
+  private listarCatgUrl = `${this.globalValues.urlCategorys()}/list`;
 
   constructor(
     private httpClient: HttpClient,

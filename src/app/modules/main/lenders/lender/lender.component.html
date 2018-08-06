@@ -1,0 +1,266 @@
+<div id="product" class="page-layout carded fullwidth inner-scroll">
+
+    <!-- TOP BACKGROUND -->
+    <div class="top-bg mat-amber-bg"></div>
+    <!-- / TOP BACKGROUND -->
+
+    <!-- CENTER -->
+    <div class="center">
+
+        <!-- HEADER -->
+        <div class="header mat-amber-bg" fxLayout="row" fxLayoutAlign="space-between center">
+
+            <!-- APP TITLE -->
+            <div fxLayout="row" fxLayoutAlign="start center">
+
+                <button mat-icon-button class="mr-0 mr-sm-16" [routerLink]="'/lenders'">
+                    <mat-icon>arrow_back</mat-icon>
+                </button>
+
+                <!-- <div class="product-image mr-8 mr-sm-16" [@animate]="{value:'*',params:{delay:'50ms',scale:'0.2'}}">
+                    <img *ngIf="product.images[0]" [src]="product.images[0].url">
+                    <img *ngIf="!product.images[0]" [src]="'assets/images/ecommerce/product-image-placeholder.png'">
+                </div> -->
+
+                <div fxLayout="column" fxLayoutAlign="start start"
+                     [@animate]="{value:'*',params:{delay:'100ms',x:'-25px'}}">
+                    <div class="h2" *ngIf="pageType ==='edit'">
+                        {{lender.lndr_nombres}}
+                    </div>
+                    <div class="h2" *ngIf="pageType ==='new'">
+                        Nuevo Prestamista
+                    </div>
+                    <div class="subtitle secondary-text">
+                        <span>Detalles del prestamista</span>
+                    </div>
+                </div>
+            </div>
+            <!-- / APP TITLE -->
+
+            <button mat-raised-button
+                    class="save-product-button mat-white-bg"
+                    [disabled]="lenderForm.invalid"
+                    *ngIf="pageType ==='new'" (click)="addProduct()">
+                <span>Registrar</span>
+            </button>
+
+            <button mat-raised-button
+                    class="save-product-button mat-white-bg"
+                    [disabled]="lenderForm.invalid || lenderForm.pristine"
+                    *ngIf="pageType ==='edit'" (click)="saveProduct()">
+                <span>Guardar</span>
+            </button>
+        </div>
+        <!-- / HEADER -->
+
+        <!-- CONTENT CARD -->
+        <div class="content-card mat-white-bg">
+
+            <!-- CONTENT -->
+            <div class="content">
+
+                <form name="lenderForm" [formGroup]="lenderForm" class="product w-100-p" fxLayout="column" fxFlex>
+
+                    <mat-tab-group>
+
+                        <mat-tab label="Información personal">
+
+                            <div class="tab-content p-24" fusePerfectScrollbar>
+
+                                <mat-form-field class="w-100-p">
+                                    <input matInput
+                                           name="lndr_nombres"
+                                           formControlName="lndr_nombres"
+                                           placeholder="Nombres del prestamista"
+                                           required>
+                                </mat-form-field>
+                                <mat-form-field class="w-100-p">
+                                    <input matInput
+                                           name="lndr_ape_paterno"
+                                           formControlName="lndr_ape_paterno"
+                                           placeholder="Apellido Paterno"
+                                           required>
+                                </mat-form-field>
+                                <mat-form-field class="w-100-p">
+                                    <input matInput
+                                           name="lndr_ape_materno"
+                                           formControlName="lndr_ape_materno"
+                                           placeholder="Apellido Materno"
+                                           required>
+                                </mat-form-field>
+                                <mat-form-field class="w-50-p">
+                                    <mat-select placeholder="Tipo de documento" formControlName="tip_docum_id"
+                                        required>
+                                        <mat-option *ngFor="let tipo of listadoTiposDocumento" [value]="tipo.tip_docum_id">
+                                            {{tipo.tip_docum_nom}}
+                                        </mat-option>
+                                    </mat-select>  
+                                </mat-form-field>                                                            
+                                <mat-form-field class="w-100-p">
+                                    <input matInput
+                                           name="lndr_num_documen"
+                                           formControlName="lndr_num_documen"
+                                           placeholder="Número de documento"
+                                           required>
+                                </mat-form-field> 
+                            </div>
+
+                        </mat-tab>
+
+                        <mat-tab label="Documentos adjuntos">
+                            <div class="tab-content p-24" fusePerfectScrollbar>
+                                <div fxLayout="row wrap" fxLayoutAlign="start start">
+
+                                    <!-- <div *ngIf="product.images.length === 0"
+                                         class="product-image" fxlayout="row" fxLayoutAlign="center center">
+                                        <img class="media"
+                                             [src]="'assets/images/ecommerce/product-image-placeholder.png'">
+                                    </div> -->
+
+                                    <div *ngFor="let image of listImages">
+                                        <div *ngIf="listImages.length > 0" class="product-image" fxlayout="row" fxLayoutAlign="center center">                                            
+                                                <img (click)="viewImageComplete(image)" class="media" src="data:image/jpg;base64,{{image.data}}">                                       
+                                        </div>
+                                        <mat-form-field class="w-90-p">
+                                            <input matInput
+                                                   placeholder="Descripción del documento"
+                                                   [value]="image.desc.image_desc"
+                                                   required>
+                                        </mat-form-field> 
+                                    </div>
+                                    
+                                    <button (click)="uploadDocument()" mat-fab>
+                                        <mat-icon aria-label="Agregar precio">exposure_plus_1</mat-icon>                                    
+                                    </button>
+
+                                    <!-- <button (click)="fileInput.click()" mat-fab>
+                                        <mat-icon aria-label="Agregar precio">exposure_plus_1</mat-icon>                                    
+                                    </button>  
+                                    <div class="file-uploader">
+                                        <input accept="image/x-png,image/jpeg" (change)="handleFileInput($event)" 
+                                        hidden type="file" #fileInput/>
+                                    </div> -->
+                                </div>
+                            </div>
+                        </mat-tab>
+
+                        <mat-tab label="Información de contácto">
+
+                            <div class="tab-content p-24" fusePerfectScrollbar>
+
+                                <mat-form-field class="w-100-p">
+                                    <input matInput
+                                           name="lndr_num_celular"
+                                           formControlName="lndr_num_celular"
+                                           placeholder="Número de contácto"
+                                           required>
+                                </mat-form-field>
+                                <mat-form-field class="w-100-p">
+                                    <input matInput
+                                           name="lndr_email"
+                                           formControlName="lndr_email"
+                                           placeholder="Correo electrónico"
+                                           required>
+                                </mat-form-field>
+
+                                <mat-form-field class="w-30-p">
+                                    <input matInput
+                                           name="lndr_ubigeo_dpt"
+                                           formControlName="lndr_ubigeo_dpt"
+                                           placeholder="Departamento"
+                                           readonly>
+                                </mat-form-field>                                                           
+                                <mat-form-field class="w-30-p">
+                                    <input matInput
+                                           name="lndr_ubigeo_prv"
+                                           formControlName="lndr_ubigeo_prv"
+                                           placeholder="Provincia"
+                                           readonly>
+                                </mat-form-field>
+                                <mat-form-field class="w-40-p">
+                                    <mat-select id="cboxDistrito" placeholder="Distrito" formControlName="lndr_ubigeo_dst_id"
+                                        required>
+                                        <mat-option *ngFor="let distrito of listadoDistritosLima" [value]="distrito.dst_id">
+                                            {{distrito.dst_nombre}}
+                                        </mat-option>
+                                    </mat-select>  
+                                </mat-form-field> 
+                            </div>
+
+                        </mat-tab>
+
+                        <mat-tab *ngIf="pageType ==='edit'" label="Información de registro">
+
+                            <div class="tab-content p-24" fusePerfectScrollbar>
+
+                                <mat-form-field class="w-100-p">
+                                    <input matInput
+                                           name="lndr_est_registro"
+                                           formControlName="lndr_est_registro"
+                                           placeholder="Estado de registro"
+                                           readonly>
+                                </mat-form-field>
+                                <mat-form-field class="w-50-p">
+                                    <input matInput
+                                           name="lndr_fec_registro"
+                                           formControlName="lndr_fec_registro"
+                                           placeholder="Fecha de registro"
+                                           readonly>
+                                </mat-form-field>
+                                <mat-form-field class="w-50-p">
+                                    <input matInput
+                                           name="lndr_usu_registro"
+                                           formControlName="lndr_usu_registro"
+                                           placeholder="Usuario de registro"
+                                           readonly>
+                                </mat-form-field>                                                            
+                                <mat-form-field *ngIf="lender.lndr_fec_actualiza != null" class="w-50-p">
+                                    <input matInput
+                                           name="lndr_fec_actualiza"
+                                           formControlName="lndr_fec_actualiza"
+                                           placeholder="Fecha de actualización"
+                                           readonly>
+                                </mat-form-field> 
+                                <mat-form-field *ngIf="lender.lndr_usu_actualiza != null" class="w-50-p">
+                                    <input matInput
+                                           name="lndr_usu_actualiza"
+                                           formControlName="lndr_usu_actualiza"
+                                           placeholder="Usuario de actualización"
+                                           readonly>
+                                </mat-form-field>                                 
+                            </div>
+
+                        </mat-tab>
+
+                        <!-- <mat-tab label="Product Images">
+                            <div class="tab-content p-24" fusePerfectScrollbar>
+                                <div fxLayout="row wrap" fxLayoutAlign="start start">
+
+                                    <div *ngIf="product.images.length === 0"
+                                         class="product-image" fxlayout="row" fxLayoutAlign="center center">
+                                        <img class="media"
+                                             [src]="'assets/images/ecommerce/product-image-placeholder.png'">
+                                    </div>
+
+                                    <div *ngFor="let image of product.images">
+                                        <div *ngIf="product.images.length > 0"
+                                             class="product-image" fxlayout="row" fxLayoutAlign="center center">
+                                            <img class="media" [src]="image.url">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </mat-tab> -->
+
+                    </mat-tab-group>
+                </form>
+
+            </div>
+            <!-- / CONTENT -->
+
+        </div>
+        <!-- / CONTENT CARD -->
+
+    </div>
+    <!-- / CENTER -->
+</div>

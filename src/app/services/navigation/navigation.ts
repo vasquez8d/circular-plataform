@@ -13,6 +13,20 @@ export const navigation: FuseNavigation[] = [
                 type    : 'item',
                 icon    : 'shopping_basket',
                 url: '/products'
+            },
+            {
+                id      : 'products',
+                title   : 'Prestamistas',
+                type    : 'item',
+                icon    : 'face',
+                url: '/lenders'
+            },
+            {
+                id      : 'products',
+                title   : 'Prestatarios',
+                type    : 'item',
+                icon    : 'insert_emoticon',
+                url: '/borrowers'
             }
         ]
     },

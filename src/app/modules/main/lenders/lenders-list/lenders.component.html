@@ -1,0 +1,149 @@
+<div id="products" class="page-layout carded fullwidth inner-scroll">
+
+    <!-- TOP BACKGROUND -->
+    <div class="top-bg mat-amber-bg"></div>
+    <!-- / TOP BACKGROUND -->
+
+    <!-- CENTER -->
+    <div class="center">
+
+        <!-- HEADER -->
+        <div class="header mat-amber-bg"
+             fxLayout="column" fxLayoutAlign="center center"
+             fxLayout.gt-xs="row" fxLayoutAlign.gt-xs="space-between center">
+
+            <!-- APP TITLE -->
+            <div class="logo my-12 m-sm-0"
+                 fxLayout="row" fxLayoutAlign="start center">
+                <mat-icon class="logo-icon mr-16" [@animate]="{value:'*',params:{delay:'50ms',scale:'0.2'}}">
+                    face
+                </mat-icon>
+                <span class="logo-text h1" [@animate]="{value:'*',params:{delay:'100ms',x:'-25px'}}">
+                    Prestamistas
+                </span>
+            </div>
+            <!-- / APP TITLE -->
+
+            <!-- SEARCH -->
+            <div class="search-input-wrapper mx-24 m-md-0"
+                 fxFlex="1 0 auto" fxLayout="row" fxLayoutAlign="start center">
+                <label for="search" class="mr-8">
+                    <mat-icon class="secondary-text">search</mat-icon>
+                </label>
+                <mat-form-field floatLabel="never" fxFlex="1 0 auto">
+                    <input id="search" matInput #filter placeholder="Buscar un prestamista">
+                </mat-form-field>
+            </div>
+            <!-- / SEARCH -->
+
+            <button mat-raised-button
+                    [routerLink]="'/lenders/lender/new'"
+                    class="add-product-button mat-white-bg my-12 mt-sm-0">
+                <span>Agregar un prestamista</span>
+            </button>
+
+        </div>
+        <!-- / HEADER -->
+
+        <!-- CONTENT CARD -->
+        <div class="content-card mat-white-bg">
+
+            <mat-table class="products-table"
+                       #table [dataSource]="dataSource"
+                       matSort
+                       [@animateStagger]="{value:'50'}"
+                       fusePerfectScrollbar>
+
+                <!-- ID Column -->
+                <ng-container matColumnDef="lndr_id">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header>Código</mat-header-cell>
+                    <mat-cell *matCellDef="let lender">
+                        <p class="text-truncate">{{lender.lndr_id}}</p>
+                    </mat-cell>
+                </ng-container>
+
+                <!-- Image Column -->
+                <!-- <ng-container matColumnDef="image">
+                    <mat-header-cell *matHeaderCellDef></mat-header-cell>
+                    <mat-cell *matCellDef="let product">
+                        <img class="product-image"
+                             *ngIf="product.images[0]" [alt]="product.name"
+                             [src]="product.images[0].url"/>
+                        <img *ngIf="!product.images[0]" [src]="'assets/images/ecommerce/product-image-placeholder.png'">
+                    </mat-cell>
+                </ng-container> -->
+
+                <ng-container matColumnDef="lndr_num_documen">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header>N° Documento</mat-header-cell>
+                    <mat-cell *matCellDef="let lender">
+                        <p class="text-truncate">{{lender.lndr_num_documen}}</p>
+                    </mat-cell>
+                </ng-container>
+
+                <!-- Name Column -->
+                <ng-container matColumnDef="lndr_nombres">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header>Nombres</mat-header-cell>
+                    <mat-cell *matCellDef="let lender">
+                        <p class="text-truncate">{{lender.lndr_nombres}}</p>
+                    </mat-cell>
+                </ng-container>
+
+                <!-- Category Column -->
+                <ng-container matColumnDef="lndr_ape_paterno">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header>Ap. Paterno</mat-header-cell>
+                    <mat-cell *matCellDef="let lender">
+                        <p class="text-truncate">{{lender.lndr_ape_paterno}}</p>
+                    </mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="lndr_ape_materno">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header>Ap. Materno</mat-header-cell>
+                    <mat-cell *matCellDef="let lender">
+                        <p class="text-truncate">{{lender.lndr_ape_materno}}</p>
+                    </mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="lndr_email">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header>Correo Electrónico</mat-header-cell>
+                    <mat-cell *matCellDef="let lender">
+                        <p class="text-truncate">{{lender.lndr_email}}</p>
+                    </mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="lndr_num_celular">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header>N° Contacto</mat-header-cell>
+                    <mat-cell *matCellDef="let lender">
+                        <p class="text-truncate">{{lender.lndr_num_celular}}</p>
+                    </mat-cell>
+                </ng-container>
+
+                <!-- Active Column -->
+                <ng-container matColumnDef="lndr_est_registro">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header fxHide fxShow.gt-xs>Estado</mat-header-cell>
+                    <mat-cell *matCellDef="let lender" fxHide fxShow.gt-xs>
+                        {{lender.lndr_est_registro}}
+                    </mat-cell>
+                </ng-container>
+
+                <mat-header-row *matHeaderRowDef="displayedColumns; sticky:true"></mat-header-row>
+
+                <mat-row *matRowDef="let lender; columns: displayedColumns;"
+                         class="product"
+                         matRipple
+                         [routerLink]="'/lenders/lender/'+lender.lndr_id+'/'+lender.lndr_slug">
+                </mat-row>
+
+            </mat-table>
+
+            <mat-paginator #paginator
+                           [length]="dataSource.filteredData.length"
+                           [pageIndex]="0"
+                           [pageSize]="10"
+                           [pageSizeOptions]="[5, 10, 25, 100]">
+            </mat-paginator>
+
+        </div>
+        <!-- / CONTENT CARD -->
+    </div>
+    <!-- / CENTER -->
+</div>

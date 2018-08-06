@@ -1,0 +1,32 @@
+.file_input_div {
+    margin: auto;
+    width: 250px;
+    height: 40px;
+  }
+  
+  .file_input {
+    float: left;
+  }
+  
+  #file_input_text_div {
+    width: 200px;
+    margin-top: -8px;
+    margin-left: 5px;
+  }
+  
+  .none {
+    display: none;
+  }
+
+  .product-image {
+    overflow: hidden;
+    width: 456px;
+    height: 456px;
+    border: 3px solid rgba(0, 0, 0, 0.12);
+
+    img {
+        height: 100%;
+        width: auto;
+        max-width: none;
+    }
+}

@@ -1,0 +1,15 @@
+<div id="forms" class="page-layout simple fullwidth" fxLayout="column" fusePerfectScrollbar>
+
+    <!-- CONTENT -->
+    <div class="content p-24">
+        <div class="h2 mb-24">{{image.info_image.image_desc}}</div>
+        <div fxLayout="column" fxLayoutAlign="start start" fxLayout.gt-md="row">                            
+                <div fxLayout="row" fxLayoutAlign="start center" fxFlex="1 0 auto">
+                    <div class="product-image" fxlayout="row" fxLayoutAlign="center center">                                            
+                        <img class="media" src="data:image/jpg;base64,{{image.data_image}}">                                       
+                    </div>
+                </div>
+        </div>
+    </div>
+    <!-- / CONTENT -->
+</div>
