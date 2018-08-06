@@ -45,14 +45,24 @@ export class ImageUploadComponent implements OnInit {
             data: dataUpload.imageEncodeBase64,
         };
         this.image.data_image = image.data;
+        this.checkStatusButton();
     }
     checkStatusButton(): void {
-        if (this.image_desc !== ''){
+        const fileName = (<HTMLInputElement>document.getElementById('txtFileName')).value;
+        const fileDesc = (<HTMLInputElement>document.getElementById('txtDescImage')).value;
+        if (fileName !== '' && fileName != null && fileDesc !== '' && fileDesc != null){
             this.saveDocumentStatus = true;
+            this.image_desc = fileDesc;
+        }else{
+            this.saveDocumentStatus = false;
         }
     }
 
     addDocument(): void {
-
+        const data_return = {
+            data_image: this.image.data_image,
+            data_desc: this.image_desc
+        };
+        this.dialogRef.close(data_return);
     }
 }

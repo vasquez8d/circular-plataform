@@ -25,7 +25,7 @@
                                 </span>
                             </mat-form-field> 
                             <mat-form-field class="w-100-p">
-                                    <input matInput placeholder="Descripción del documento" (change)="checkStatusButton()" [value]="image_desc" required>
+                                    <input matInput placeholder="Descripción del documento" id="txtDescImage" (change)="checkStatusButton()" [value]="image_desc" required>
                             </mat-form-field>
                             <button [disabled]="!saveDocumentStatus" (click)="addDocument()" type="button" mat-raised-button color="accent" class="submit-button">
                                 <mat-icon>cloud_upload</mat-icon> Agregar documento

@@ -28,6 +28,9 @@ export class LenderComponent implements OnInit, OnDestroy
     lenderForm: FormGroup;
     listadoDistritosLima = [];
     fileToUpload: File = null;
+
+    public imageUploaded = true;
+
     listImagesUpload = [];
     listadoTiposDocumento = [
         {
@@ -36,6 +39,7 @@ export class LenderComponent implements OnInit, OnDestroy
         }
     ];
     listImages = [];
+    listImagesGuardar = [];
     // Private
     private _unsubscribeAll: Subject<any>;
 
@@ -112,31 +116,31 @@ export class LenderComponent implements OnInit, OnDestroy
         });
     }
 
-    handleFileInput(event): void {
-        const files = event.target.files;
-        const file = files[0];
-      if (files && file) {
-          const reader = new FileReader();
-          reader.onload = this._handleReaderLoaded.bind(this);
-          reader.readAsBinaryString(file);
-      }      
-    }
+    // handleFileInput(event): void {
+    //     const files = event.target.files;
+    //     const file = files[0];
+    //   if (files && file) {
+    //       const reader = new FileReader();
+    //       reader.onload = this._handleReaderLoaded.bind(this);
+    //       reader.readAsBinaryString(file);
+    //   }      
+    // }
 
-    _handleReaderLoaded(readerEvt): void {
-        const binaryString = readerEvt.target.result;
-        const dataUpload = {
-            imageEncodeBase64 : btoa(binaryString)            
-        };
-        const image = {
-            data: dataUpload.imageEncodeBase64,
-            desc: {
-                image_desc: 'Hola Mundo'
-            }
-        };
-        this.listImages.push(image);
-        this.listImagesUpload.push(dataUpload);
-        console.log(this.listImagesUpload);
-    }
+    // _handleReaderLoaded(readerEvt): void {
+    //     const binaryString = readerEvt.target.result;
+    //     const dataUpload = {
+    //         imageEncodeBase64 : btoa(binaryString)            
+    //     };
+    //     const image = {
+    //         data: dataUpload.imageEncodeBase64,
+    //         desc: {
+    //             image_desc: 'Hola Mundo'
+    //         }
+    //     };
+    //     this.listImages.push(image);
+    //     this.listImagesUpload.push(dataUpload);
+    //     console.log(this.listImagesUpload);
+    // }
 
     /**
      * On destroy
@@ -197,6 +201,7 @@ export class LenderComponent implements OnInit, OnDestroy
         LenderSave.lndr_ubigeo = this.obtenerUbigeoDistrito();
         LenderSave.lndr_fec_actualiza = this.registroUtil.obtenerFechaCreacion();
         LenderSave.lndr_usu_actualiza = this.securityService.getUserLogedId();
+
         this._lenderService.updateLender(LenderSave).subscribe(
             data => {
                 this._matSnackBar.open('Prestamista actualizado', 'Aceptar', {
@@ -238,24 +243,59 @@ export class LenderComponent implements OnInit, OnDestroy
         LenderSave.lndr_fec_registro = this.registroUtil.obtenerFechaCreacion();
         LenderSave.lndr_usu_registro = this.securityService.getUserLogedId();
 
-        LenderSave.lndr_url_documen = [
-            {
-                image_key: 'mark_lilly_by_xneetoh-d4lucn4.jpg',
-                image_desc: 'Copia DNI'
-            },
-            {
-                image_key: 'mark_lilly_by_xneetoh-d4lucn4.jpg',
-                image_desc: 'Copia Recivo de agua'
-            }
-        ];
+        // LenderSave.lndr_url_documen = [
+        //     {
+        //         image_key: 'mark_lilly_by_xneetoh-d4lucn4.jpg',
+        //         image_desc: 'Copia DNI'
+        //     },
+        //     {
+        //         image_key: 'mark_lilly_by_xneetoh-d4lucn4.jpg',
+        //         image_desc: 'Copia Recivo de agua'
+        //     }
+        // ];
 
         this._lenderService.createLender(LenderSave).subscribe(
             data => {
-                this._matSnackBar.open('Prestamista registrado', 'Aceptar', {
-                    verticalPosition: 'top',
-                    duration: 3000
-                });
-                this.router.navigateByUrl('/lenders');
+                console.log(data);
+                if (data.res_service === 'ok') {
+                    this._matSnackBar.open('Prestamista registrado', 'Aceptar', {
+                        verticalPosition: 'top',
+                        duration: 3000
+                    });
+                    const listImagesGuardar = [];
+                    this.listImages.forEach(element => {
+                        const dataUpload = {
+                            imageString64: element.data                            
+                        };
+                        this._lenderService.uploadImageS3(dataUpload).subscribe(
+                            responseUpload => {
+                                console.log(responseUpload);                                
+                                const data_image = {
+                                    image_key: responseUpload.data_result.fileName,
+                                    image_desc: element.desc.image_desc
+                                };
+                                listImagesGuardar.push(data_image);
+                                const dataUploadFileName = {
+                                    lndr_id: data.data_result.lndr_id,
+                                    lndr_url_documen: listImagesGuardar
+                                };     
+                                console.log(dataUploadFileName);                         
+                                this._lenderService.uploadFileName(dataUploadFileName).subscribe(
+                                    resultUploadFileName => {
+                                        console.log(resultUploadFileName);
+                                    }
+                                );
+                            }
+                        );
+                    });
+                    
+                    this.router.navigateByUrl('/lenders');
+                } else {
+                    this._matSnackBar.open('Error registrando al prestamista', 'Aceptar', {
+                        verticalPosition: 'top',
+                        duration: 3000                        
+                    });
+                }
             }
         );
     }
@@ -276,8 +316,17 @@ export class LenderComponent implements OnInit, OnDestroy
             data: {
             }
         });
-        dialogRef.afterClosed().subscribe(result => {    
-            console.log(result);        
+        dialogRef.afterClosed().subscribe(result => {
+            if (result){
+                const image = {
+                    data: result.data_image,
+                    desc: {
+                        image_desc: result.data_desc
+                    }
+                };
+                this.listImages.push(image);
+                this.imageUploaded = false;
+            }                 
         });
     }
 }

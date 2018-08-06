@@ -17,8 +17,6 @@ import { fuseConfig } from './fuse-config';
 import { AppComponent } from './app.component';
 import { LayoutModule } from './modules/layout/layout.module';
 import { ServicesConfig } from './app-config/services.config';
-import { InMemoryWebApiModule } from '../../node_modules/angular-in-memory-web-api';
-import { FakeDbService } from './fake-db/fake-db.service';
 import { LoginGuard } from './guards/login.guard';
 
 const appRoutes: Routes = [
@@ -58,10 +56,6 @@ const appRoutes: Routes = [
         RouterModule.forRoot(appRoutes),
 
         TranslateModule.forRoot(),
-        InMemoryWebApiModule.forRoot(FakeDbService, {
-            delay: 0,
-            passThruUnknownUrl: true
-        }),
         // Material moment date module
         MatMomentDateModule,
 

@@ -14,10 +14,10 @@ import { Router } from '../../../../../../node_modules/@angular/router';
 })
 export class Login2Component implements OnInit
 {
-    private loginForm: FormGroup;
-    private loginIncorrect_email = false;
-    private loginIncorrect_password = false;
-    private login_incorrect_message = '';
+    public loginForm: FormGroup;
+    public loginIncorrect_email = false;
+    public loginIncorrect_password = false;
+    public login_incorrect_message = '';
     /**
      * Constructor
      *

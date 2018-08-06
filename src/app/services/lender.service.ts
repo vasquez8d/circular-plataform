@@ -15,7 +15,10 @@ export class LenderService implements Resolve<any>
     private detailsUrl = `${this.globalValues.urlLenders()}/details`;
     private UpdateUrl = `${this.globalValues.urlLenders()}/update`;
     private CreateUrl = `${this.globalValues.urlLenders()}/create`;
-    private getImageS3Url = `${this.globalValues.urlLenders()}/gets3`;
+    private getImageS3Url = `${this.globalValues.urlLenders()}/gets3`; 
+    private uploadImageS3Url = `${this.globalValues.urlLenders()}/upload`;
+    private uploadFileNameUrl = `${this.globalValues.urlLenders()}/updatefilename`;
+
     /**
      * Constructor
      *
@@ -106,6 +109,20 @@ export class LenderService implements Resolve<any>
         );
     }
 
+    uploadImageS3(data): Observable<ResponseModel> {
+        return this._httpClient.post<ResponseModel>(this.uploadImageS3Url, data).pipe(
+            tap((response: ResponseModel) => this.log(`Resultado getImageS3 = ${response.res_service}`)),
+            catchError(this.handleError<ResponseModel>('getImageS3'))
+        );
+    }
+
+    uploadFileName(data): Observable<ResponseModel> {
+        return this._httpClient.post<ResponseModel>(this.uploadFileNameUrl, data).pipe(
+            tap((response: ResponseModel) => this.log(`Resultado getImageS3 = ${response.res_service}`)),
+            catchError(this.handleError<ResponseModel>('getImageS3'))
+        );
+    }
+    
     // tslint:disable-next-line:typedef
     private handleError<T>(operation = 'operation', result?: T) {
         return (error: any): Observable<T> => {

@@ -46,7 +46,7 @@
 
             <button mat-raised-button
                     class="save-product-button mat-white-bg"
-                    [disabled]="lenderForm.invalid || lenderForm.pristine"
+                    [disabled]="lenderForm.invalid || imageUploaded"
                     *ngIf="pageType ==='edit'" (click)="saveProduct()">
                 <span>Guardar</span>
             </button>
@@ -125,7 +125,7 @@
                                             <input matInput
                                                    placeholder="Descripción del documento"
                                                    [value]="image.desc.image_desc"
-                                                   required>
+                                                   readonly>
                                         </mat-form-field> 
                                     </div>
                                     
