@@ -6,7 +6,7 @@ export class ServicesConfig {
     private publishUrl = 'https://www.circular.pe/';
 
     urlAuthUser(): string {
-        return 'https://pqcnj1fxjj.execute-api.us-east-1.amazonaws.com/Desarrollo';
+        return 'https://lnyep59mb1.execute-api.us-east-1.amazonaws.com/dev';
     }
 
     urlProducts(): string {
@@ -17,8 +17,8 @@ export class ServicesConfig {
         return 'https://58b0ltmaxd.execute-api.us-east-1.amazonaws.com/Desarrollo';
     }
 
-    urlLenders(): string {
-        return 'https://59rkafbelf.execute-api.us-east-1.amazonaws.com/Desarrollo';
+    urlUsers(): string {
+        return 'https://pqcnj1fxjj.execute-api.us-east-1.amazonaws.com/dev';
     }
 
     currentUrl(): string {

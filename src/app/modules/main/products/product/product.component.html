@@ -63,6 +63,57 @@
 
                     <mat-tab-group>
 
+                        <mat-tab label="Prestamista">
+
+                            <div class="tab-content p-24" fusePerfectScrollbar>
+
+                                <mat-form-field class="w-100-p">
+                                    <input matInput
+                                           name="prod_nombre"
+                                           formControlName="prod_nombre"
+                                           placeholder="Nombre del artículo"
+                                           required>
+                                </mat-form-field>
+                                <mat-form-field class="w-100-p">
+                                    <textarea matInput
+                                           name="prod_desc"
+                                           formControlName="prod_desc"
+                                           placeholder="Descripción del artículo"
+                                           required
+                                           rows="3">
+                                    </textarea>
+                                </mat-form-field>
+                                <mat-form-field class="w-50-p">
+                                    <mat-select placeholder="Categoría del artículo" formControlName="catg_id"
+                                        required>
+                                        <mat-option *ngFor="let categ of listadoCategorias" [value]="categ.catg_id">
+                                            {{categ.catg_nombre}}
+                                        </mat-option>
+                                    </mat-select>  
+                                </mat-form-field>                                
+                              
+                                <mat-form-field class="w-100-p">
+
+                                    <mat-chip-list #tagList name="prod_tags" formControlName="prod_tags">
+
+                                        <mat-chip *ngFor="let tag of product.prod_tags"
+                                                  [removable]="true" (removed)="removeTagProduct(tag)">
+                                            {{tag}}
+                                            <mat-icon matChipRemove>cancel</mat-icon>
+                                        </mat-chip>
+
+                                        <input placeholder="Tags del artículo"
+                                               [matChipInputFor]="tagList"
+                                               [matChipInputAddOnBlur]="true"
+                                               (matChipInputTokenEnd)="addTagProduct($event)"/>
+                                    </mat-chip-list>
+
+                                </mat-form-field>
+
+                            </div>
+
+                        </mat-tab>
+
                         <mat-tab label="Información">
 
                             <div class="tab-content p-24" fusePerfectScrollbar>

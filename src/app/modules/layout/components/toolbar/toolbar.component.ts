@@ -9,8 +9,8 @@ import { FuseSidebarService } from '@fuse/components/sidebar/sidebar.service';
 
 import { navigation } from '../../../../services/navigation/navigation';
 import { SecurityService } from '../../../../services/security.service';
-import { UsuarioModel } from '../../../../models/usuario.model';
 import { Router } from '../../../../../../node_modules/@angular/router';
+import { UserModel } from '../../../../models/user.model';
 
 @Component({
     selector   : 'toolbar',
@@ -28,7 +28,7 @@ export class ToolbarComponent implements OnInit, OnDestroy
     selectedLanguage: any;
     userStatusOptions: any[];
 
-    public user = new UsuarioModel();
+    public user = new UserModel();
 
     // Private
     private _unsubscribeAll: Subject<any>;

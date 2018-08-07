@@ -8,14 +8,7 @@ export const navigation: FuseNavigation[] = [
         icon    : 'pages',
         children: [
             {
-                id      : 'products',
-                title   : 'Artículos',
-                type    : 'item',
-                icon    : 'shopping_basket',
-                url: '/products'
-            },
-            {
-                id      : 'products',
+                id      : 'lenders',
                 title   : 'Prestamistas',
                 type    : 'item',
                 icon    : 'face',
@@ -23,6 +16,13 @@ export const navigation: FuseNavigation[] = [
             },
             {
                 id      : 'products',
+                title   : 'Artículos',
+                type    : 'item',
+                icon    : 'shopping_basket',
+                url: '/products'
+            },
+            {
+                id      : 'borrowers',
                 title   : 'Prestatarios',
                 type    : 'item',
                 icon    : 'insert_emoticon',

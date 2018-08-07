@@ -8,7 +8,7 @@ import { FuseNavigationService } from '@fuse/components/navigation/navigation.se
 import { FusePerfectScrollbarDirective } from '@fuse/directives/fuse-perfect-scrollbar/fuse-perfect-scrollbar.directive';
 import { FuseSidebarService } from '@fuse/components/sidebar/sidebar.service';
 import { SecurityService } from '../../../../../services/security.service';
-import { UsuarioModel } from '../../../../../models/usuario.model';
+import { UserModel } from '../../../../../models/user.model';
 
 @Component({
     selector     : 'navbar-vertical-nav',
@@ -24,7 +24,7 @@ export class NavbarVerticalStyle1Component implements OnInit, OnDestroy
     // Private
     private _fusePerfectScrollbar: FusePerfectScrollbarDirective;
     private _unsubscribeAll: Subject<any>;
-    public user = new UsuarioModel();
+    public user = new UserModel();
 
     /**
      * Constructor

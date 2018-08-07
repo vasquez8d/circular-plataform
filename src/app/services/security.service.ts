@@ -4,7 +4,7 @@ import { ServicesConfig } from '../app-config/services.config';
 import { Observable, of, Subject } from 'rxjs';
 import { ResponseModel } from '../models/response.model';
 import { tap, catchError } from 'rxjs/operators';
-import { UsuarioModel } from '../models/usuario.model';
+import { UserModel } from '../models/user.model';
 
 @Injectable({
   providedIn: 'root'
@@ -25,8 +25,8 @@ export class SecurityService {
     );
   }
 
-  getUserLoged(): UsuarioModel {
-    let dataUsuario = new UsuarioModel();
+  getUserLoged(): UserModel {
+    let dataUsuario = new UserModel();
     const dataLoginSession = sessionStorage.getItem('usuario_circular');
     const dataLoginLocal = localStorage.getItem('usuario_circular');
 

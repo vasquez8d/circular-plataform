@@ -9,7 +9,7 @@ export class LendersService implements Resolve<any>
 {
     products: any[];
     onProductsChanged: BehaviorSubject<any>;
-    private listUrl = `${this.globalValues.urlLenders()}/list`;
+    private listUrl = `${this.globalValues.urlUsers()}/list`;
     /**
      * Constructor
      *

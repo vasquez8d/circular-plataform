@@ -88,9 +88,9 @@ export class Login2Component implements OnInit
             user_email: dataForm.user_email
         };        
         this.securityService.login(credenciales).subscribe(
-            data => {
-                if (data.data_result.Item != null) {
-                    const dataUsuario = data.data_result.Item;
+            data => {                
+                if (data.data_result.Count > 0) {
+                    const dataUsuario = data.data_result.Items[0];
                     if (dataUsuario.user_password === dataForm.user_password){
                         if (dataForm.user_remember) {
                             localStorage.setItem('usuario_circular', JSON.stringify(dataUsuario));
@@ -98,13 +98,11 @@ export class Login2Component implements OnInit
                             sessionStorage.setItem('usuario_circular', JSON.stringify(dataUsuario));
                         }
                         location.href = '';
-                    } else {
-                        console.log('password');
+                    } else {                        
                         this.loginIncorrect_password = true;
                         this.login_incorrect_message = 'La contraseña es incorrecta.';                        
                     }                   
-                } else{
-                    console.log('usuario');
+                } else{                    
                     this.loginIncorrect_email = true;
                     this.login_incorrect_message = 'El usuario no existe.';
                 }

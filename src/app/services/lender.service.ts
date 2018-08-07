@@ -12,12 +12,12 @@ export class LenderService implements Resolve<any>
     routeParams: any;
     lender: any;
     onProductChanged: BehaviorSubject<any>;
-    private detailsUrl = `${this.globalValues.urlLenders()}/details`;
-    private UpdateUrl = `${this.globalValues.urlLenders()}/update`;
-    private CreateUrl = `${this.globalValues.urlLenders()}/create`;
-    private getImageS3Url = `${this.globalValues.urlLenders()}/gets3`; 
-    private uploadImageS3Url = `${this.globalValues.urlLenders()}/upload`;
-    private uploadFileNameUrl = `${this.globalValues.urlLenders()}/updatefilename`;
+    private detailsUrl = `${this.globalValues.urlUsers()}/details`;
+    private UpdateUrl = `${this.globalValues.urlUsers()}/update`;
+    private CreateUrl = `${this.globalValues.urlUsers()}/create`;
+    private getImageS3Url = `${this.globalValues.urlUsers()}/gets3`; 
+    private uploadImageS3Url = `${this.globalValues.urlUsers()}/upload`;
+    private uploadFileNameUrl = `${this.globalValues.urlUsers()}/updatefilename`;
 
     /**
      * Constructor
