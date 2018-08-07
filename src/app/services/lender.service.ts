@@ -16,8 +16,8 @@ export class LenderService implements Resolve<any>
     private UpdateUrl = `${this.globalValues.urlUsers()}/update`;
     private CreateUrl = `${this.globalValues.urlUsers()}/create`;
     private getImageS3Url = `${this.globalValues.urlUsers()}/gets3`; 
-    private uploadImageS3Url = `${this.globalValues.urlUsers()}/upload`;
-    private uploadFileNameUrl = `${this.globalValues.urlUsers()}/updatefilename`;
+    private uploadImageS3Url = `${this.globalValues.urlUsers()}/uploads3`;
+    private uploadFileNameUrl = `${this.globalValues.urlUsers()}/updates3filename`;
 
     /**
      * Constructor

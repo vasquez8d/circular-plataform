@@ -6,7 +6,7 @@ import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
 import { fuseAnimations } from '@fuse/animations';
 import { FuseUtils } from '@fuse/utils';
 import { takeUntil } from 'rxjs/internal/operators';
-import { LendersService } from '../../../../services/lenders.service';
+import { UsersService } from '../../../../services/users.service';
 
 @Component({
     selector   : 'lenders',
@@ -17,7 +17,7 @@ import { LendersService } from '../../../../services/lenders.service';
 export class LendersComponent implements OnInit
 {
     dataSource: FilesDataSource | null;
-    displayedColumns = ['lndr_id', 'lndr_num_documen', 'lndr_nombres', 'lndr_ape_paterno', 'lndr_ape_materno', 'lndr_email', 'lndr_num_celular', 'lndr_est_registro'];
+    displayedColumns = ['user_id', 'user_num_doc', 'user_names', 'user_full_name1', 'user_full_name2', 'user_email', 'user_num_phone', 'user_stat_reg'];
 
     @ViewChild(MatPaginator)
     paginator: MatPaginator;
@@ -32,7 +32,7 @@ export class LendersComponent implements OnInit
     private _unsubscribeAll: Subject<any>;
 
     constructor(
-        private _lendersService: LendersService,        
+        private _lendersService: UsersService,        
     )
     {
         // Set the private defaults
@@ -79,7 +79,7 @@ export class FilesDataSource extends DataSource<any>
      * @param {MatSort} _matSort
      */
     constructor(
-        private _lendersService: LendersService,
+        private _lendersService: UsersService,
         private _matPaginator: MatPaginator,
         private _matSort: MatSort
     )
@@ -178,35 +178,35 @@ export class FilesDataSource extends DataSource<any>
         {
             return data;
         }
-
+        
         return data.sort((a, b) => {
             let propertyA: number | string = '';
             let propertyB: number | string = '';
             switch ( this._matSort.active )
             {
-                case 'lndr_id':
-                    [propertyA, propertyB] = [a.lndr_id, b.lndr_id];
+                case 'user_id':
+                    [propertyA, propertyB] = [a.user_id, b.user_id];
                     break;
-                case 'lndr_num_documen':
-                    [propertyA, propertyB] = [a.lndr_num_documen, b.lndr_num_documen];
+                case 'user_num_doc':
+                    [propertyA, propertyB] = [a.user_num_doc, b.user_num_doc];
                     break;
-                case 'lndr_nombres':
-                    [propertyA, propertyB] = [a.lndr_nombres, b.lndr_nombres];
+                case 'user_names':
+                    [propertyA, propertyB] = [a.user_names, b.user_names];
                     break;
-                case 'lndr_ape_paterno':
-                    [propertyA, propertyB] = [a.lndr_ape_paterno, b.lndr_ape_paterno];
+                case 'user_full_name1':
+                    [propertyA, propertyB] = [a.user_full_name1, b.user_full_name1];
                     break;
-                case 'lndr_ape_materno':
-                    [propertyA, propertyB] = [a.lndr_ape_materno, b.lndr_ape_materno];
+                case 'user_full_name2':
+                    [propertyA, propertyB] = [a.user_full_name2, b.user_full_name2];
                     break;
-                case 'lndr_email':
-                    [propertyA, propertyB] = [a.lndr_email, b.lndr_email];
+                case 'user_email':
+                    [propertyA, propertyB] = [a.user_email, b.user_email];
                     break;
-                case 'lndr_num_celular':
-                    [propertyA, propertyB] = [a.lndr_num_celular, b.lndr_num_celular];
+                case 'user_num_phone':
+                    [propertyA, propertyB] = [a.user_num_phone, b.user_num_phone];
                     break;     
-                case 'lndr_est_registro':
-                    [propertyA, propertyB] = [a.lndr_est_registro, b.lndr_est_registro];
+                case 'user_stat_reg':
+                    [propertyA, propertyB] = [a.user_stat_reg, b.user_stat_reg];
                     break;                                                        
             }
             const valueA = isNaN(+propertyA) ? propertyA : +propertyA;

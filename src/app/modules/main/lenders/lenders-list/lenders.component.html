@@ -55,10 +55,10 @@
                        fusePerfectScrollbar>
 
                 <!-- ID Column -->
-                <ng-container matColumnDef="lndr_id">
+                <ng-container matColumnDef="user_id">
                     <mat-header-cell *matHeaderCellDef mat-sort-header>Código</mat-header-cell>
                     <mat-cell *matCellDef="let lender">
-                        <p class="text-truncate">{{lender.lndr_id}}</p>
+                        <p class="text-truncate">{{lender.user_id}}</p>
                     </mat-cell>
                 </ng-container>
 
@@ -73,55 +73,55 @@
                     </mat-cell>
                 </ng-container> -->
 
-                <ng-container matColumnDef="lndr_num_documen">
+                <ng-container matColumnDef="user_num_doc">
                     <mat-header-cell *matHeaderCellDef mat-sort-header>N° Documento</mat-header-cell>
                     <mat-cell *matCellDef="let lender">
-                        <p class="text-truncate">{{lender.lndr_num_documen}}</p>
+                        <p class="text-truncate">{{lender.user_num_doc}}</p>
                     </mat-cell>
                 </ng-container>
 
                 <!-- Name Column -->
-                <ng-container matColumnDef="lndr_nombres">
+                <ng-container matColumnDef="user_names">
                     <mat-header-cell *matHeaderCellDef mat-sort-header>Nombres</mat-header-cell>
                     <mat-cell *matCellDef="let lender">
-                        <p class="text-truncate">{{lender.lndr_nombres}}</p>
+                        <p class="text-truncate">{{lender.user_names}}</p>
                     </mat-cell>
                 </ng-container>
 
                 <!-- Category Column -->
-                <ng-container matColumnDef="lndr_ape_paterno">
+                <ng-container matColumnDef="user_full_name1">
                     <mat-header-cell *matHeaderCellDef mat-sort-header>Ap. Paterno</mat-header-cell>
                     <mat-cell *matCellDef="let lender">
-                        <p class="text-truncate">{{lender.lndr_ape_paterno}}</p>
+                        <p class="text-truncate">{{lender.user_full_name1}}</p>
                     </mat-cell>
                 </ng-container>
 
-                <ng-container matColumnDef="lndr_ape_materno">
+                <ng-container matColumnDef="user_full_name2">
                     <mat-header-cell *matHeaderCellDef mat-sort-header>Ap. Materno</mat-header-cell>
                     <mat-cell *matCellDef="let lender">
-                        <p class="text-truncate">{{lender.lndr_ape_materno}}</p>
+                        <p class="text-truncate">{{lender.user_full_name2}}</p>
                     </mat-cell>
                 </ng-container>
 
-                <ng-container matColumnDef="lndr_email">
+                <ng-container matColumnDef="user_email">
                     <mat-header-cell *matHeaderCellDef mat-sort-header>Correo Electrónico</mat-header-cell>
                     <mat-cell *matCellDef="let lender">
-                        <p class="text-truncate">{{lender.lndr_email}}</p>
+                        <p class="text-truncate">{{lender.user_email}}</p>
                     </mat-cell>
                 </ng-container>
 
-                <ng-container matColumnDef="lndr_num_celular">
+                <ng-container matColumnDef="user_num_phone">
                     <mat-header-cell *matHeaderCellDef mat-sort-header>N° Contacto</mat-header-cell>
                     <mat-cell *matCellDef="let lender">
-                        <p class="text-truncate">{{lender.lndr_num_celular}}</p>
+                        <p class="text-truncate">{{lender.user_num_phone}}</p>
                     </mat-cell>
                 </ng-container>
 
                 <!-- Active Column -->
-                <ng-container matColumnDef="lndr_est_registro">
+                <ng-container matColumnDef="user_stat_reg">
                     <mat-header-cell *matHeaderCellDef mat-sort-header fxHide fxShow.gt-xs>Estado</mat-header-cell>
                     <mat-cell *matCellDef="let lender" fxHide fxShow.gt-xs>
-                        {{lender.lndr_est_registro}}
+                        {{lender.user_stat_reg}}
                     </mat-cell>
                 </ng-container>
 
@@ -130,7 +130,7 @@
                 <mat-row *matRowDef="let lender; columns: displayedColumns;"
                          class="product"
                          matRipple
-                         [routerLink]="'/lenders/lender/'+lender.lndr_id+'/'+lender.lndr_slug">
+                         [routerLink]="'/lenders/lender/'+lender.user_id+'/'+lender.user_slug">
                 </mat-row>
 
             </mat-table>

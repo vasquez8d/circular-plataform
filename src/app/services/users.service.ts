@@ -5,7 +5,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { ServicesConfig } from '../app-config/services.config';
 
 @Injectable()
-export class LendersService implements Resolve<any>
+export class UsersService implements Resolve<any>
 {
     products: any[];
     onProductsChanged: BehaviorSubject<any>;
@@ -18,8 +18,7 @@ export class LendersService implements Resolve<any>
     constructor(
         private _httpClient: HttpClient,
         private globalValues: ServicesConfig
-    )
-    {
+    ) {
         // Set the defaults
         this.onProductsChanged = new BehaviorSubject({});
     }
@@ -31,12 +30,11 @@ export class LendersService implements Resolve<any>
      * @param {RouterStateSnapshot} state
      * @returns {Observable<any> | Promise<any> | any}
      */
-    resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<any> | Promise<any> | any
-    {
+    resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<any> | Promise<any> | any {
         return new Promise((resolve, reject) => {
 
             Promise.all([
-                this.getLenders()
+                this.getUsers()
             ]).then(
                 () => {
                     resolve();
@@ -51,12 +49,16 @@ export class LendersService implements Resolve<any>
      *
      * @returns {Promise<any>}
      */
-    getLenders(): Promise<any>
-    {
+    getUsers(): Promise<any> {
         return new Promise((resolve, reject) => {
-            this._httpClient.get(this.listUrl)
-                .subscribe((response: any) => {                    
-                    this.products = response.data_result.Items;                 
+            const dataCateg = {
+                user_categ: {
+                    catg_id: '2' // Categoría Lender                    
+                }
+            };
+            this._httpClient.post(this.listUrl, dataCateg)
+                .subscribe((response: any) => {
+                    this.products = response.data_result.Items;
                     this.onProductsChanged.next(this.products);
                     resolve(response);
                 }, reject);

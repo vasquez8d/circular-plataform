@@ -8,11 +8,11 @@ import { fuseAnimations } from '@fuse/animations';
 import { SecurityService } from '../../../../services/security.service';
 import { RegistroUtil } from '../../../../utils/registro.util';
 import { Router } from '../../../../../../node_modules/@angular/router';
-import { Lender } from '../../../../models/lender.model';
 import * as base64Converter from 'base64-arraybuffer';
 import { ImageViewComponent } from './imageViewer/imageview.component';
 import { LenderService } from '../../../../services/lender.service';
 import { ImageUploadComponent } from './imageUpload/image-upload.component';
+import { UserModel } from '../../../../models/user.model';
 
 @Component({
     selector     : 'lender-app',
@@ -23,7 +23,7 @@ import { ImageUploadComponent } from './imageUpload/image-upload.component';
 })
 export class LenderComponent implements OnInit, OnDestroy
 {
-    lender: Lender;
+    lender: UserModel;
     pageType: string;
     lenderForm: FormGroup;
     listadoDistritosLima = [];
@@ -63,7 +63,7 @@ export class LenderComponent implements OnInit, OnDestroy
     )
     {
         // Set the default
-        this.lender = new Lender();
+        this.lender = new UserModel();
 
         // Set the private defaults
         this._unsubscribeAll = new Subject();
@@ -85,14 +85,14 @@ export class LenderComponent implements OnInit, OnDestroy
             .subscribe(lender => {
                 if ( lender )
                 {
-                    this.lender = new Lender(lender);
+                    this.lender = new UserModel(lender);
                     this.pageType = 'edit';
-                    this.cargarDocumentos(this.lender.lndr_url_documen);
+                    this.cargarDocumentos(this.lender.user_url_documen);
                 }
                 else
                 {
                     this.pageType = 'new';
-                    this.lender = new Lender();
+                    this.lender = new UserModel();
                 }
                 this.lenderForm = this.createLenderForm();
             });
@@ -116,32 +116,6 @@ export class LenderComponent implements OnInit, OnDestroy
         });
     }
 
-    // handleFileInput(event): void {
-    //     const files = event.target.files;
-    //     const file = files[0];
-    //   if (files && file) {
-    //       const reader = new FileReader();
-    //       reader.onload = this._handleReaderLoaded.bind(this);
-    //       reader.readAsBinaryString(file);
-    //   }      
-    // }
-
-    // _handleReaderLoaded(readerEvt): void {
-    //     const binaryString = readerEvt.target.result;
-    //     const dataUpload = {
-    //         imageEncodeBase64 : btoa(binaryString)            
-    //     };
-    //     const image = {
-    //         data: dataUpload.imageEncodeBase64,
-    //         desc: {
-    //             image_desc: 'Hola Mundo'
-    //         }
-    //     };
-    //     this.listImages.push(image);
-    //     this.listImagesUpload.push(dataUpload);
-    //     console.log(this.listImagesUpload);
-    // }
-
     /**
      * On destroy
      */
@@ -164,43 +138,47 @@ export class LenderComponent implements OnInit, OnDestroy
     createLenderForm(): FormGroup
     {  
         return this._formBuilder.group({
-            lndr_id             : [this.lender.lndr_id],            
-            lndr_nombres        : [this.lender.lndr_nombres],
-            lndr_ape_paterno    : [this.lender.lndr_ape_paterno],
-            lndr_ape_materno    : [this.lender.lndr_ape_materno],
-            lndr_email          : [this.lender.lndr_email],
-            lndr_slug           : [this.lender.lndr_slug],
-            lndr_num_celular    : [this.lender.lndr_num_celular],
-            lndr_num_documen    : [this.lender.lndr_num_documen],
-            tip_docum_id        : [this.lender.lndr_tip_documen.tip_docum_id],
-            lndr_ubigeo_dpt     : [this.lender.lndr_ubigeo.ubig_dpt],
-            lndr_ubigeo_prv     : [this.lender.lndr_ubigeo.ubig_prv],
-            lndr_ubigeo_dst_id  : [this.lender.lndr_ubigeo.ubig_id.substr(4, 2)],
-            lndr_est_registro   : [this.lender.lndr_est_registro],
-            lndr_fec_registro   : [this.lender.lndr_fec_registro],
-            lndr_usu_registro   : [this.lender.lndr_usu_registro],
-            lndr_fec_actualiza  : [this.lender.lndr_fec_actualiza],
-            lndr_usu_actualiza  : [this.lender.lndr_usu_actualiza],
+            user_id             : [this.lender.user_id],            
+            user_names          : [this.lender.user_names],
+            user_full_name1     : [this.lender.user_full_name1],
+            user_full_name2     : [this.lender.user_full_name2],
+            user_email          : [this.lender.user_email],            
+            user_num_phone      : [this.lender.user_num_phone],
+            user_num_doc        : [this.lender.user_num_doc],
+            user_tip_doc        : [this.lender.user_tip_doc.tip_docum_id],
+            lndr_ubigeo_dpt     : [this.lender.user_ubigeo.ubig_dpt],
+            lndr_ubigeo_prv     : [this.lender.user_ubigeo.ubig_prv],
+            lndr_ubigeo_dst_id  : [this.lender.user_ubigeo.ubig_id.substr(4, 2)],
+            user_stat_reg       : [this.lender.user_stat_reg],
+            user_date_reg       : [this.lender.user_date_reg],
+            user_usur_reg       : [this.lender.user_usur_reg],
+            user_date_upt       : [this.lender.user_date_upt],
+            user_usur_upt       : [this.lender.user_usur_upt],
         });
     }
 
     /**
      * Save Lender
      */
-    saveProduct(): void
+    saveLender(): void
     {
-        const LenderSave: Lender = new Lender();
-        LenderSave.lndr_id = this.lender.lndr_id;
-        LenderSave.lndr_nombres = this.lenderForm.value.lndr_nombres;
-        LenderSave.lndr_ape_materno = this.lenderForm.value.lndr_ape_materno;
-        LenderSave.lndr_ape_paterno = this.lenderForm.value.lndr_ape_paterno;
-        LenderSave.lndr_num_documen = this.lenderForm.value.lndr_num_documen;
-        LenderSave.lndr_tip_documen = this.obtenerTipoDocumSeleccionado();
-        LenderSave.lndr_num_celular = this.lenderForm.value.lndr_num_celular;
-        LenderSave.lndr_email = this.lenderForm.value.lndr_email;
-        LenderSave.lndr_ubigeo = this.obtenerUbigeoDistrito();
-        LenderSave.lndr_fec_actualiza = this.registroUtil.obtenerFechaCreacion();
-        LenderSave.lndr_usu_actualiza = this.securityService.getUserLogedId();
+        const LenderSave: UserModel = new UserModel();
+        LenderSave.user_id = this.lender.user_id;
+        LenderSave.user_names = this.lenderForm.value.user_names;
+        LenderSave.user_full_name1 = this.lenderForm.value.user_full_name1;
+        LenderSave.user_full_name2 = this.lenderForm.value.user_full_name2;
+        LenderSave.user_slug = this.registroUtil.obtenerSlugPorNombre(LenderSave.user_names + ' ' + LenderSave.user_full_name1);
+        LenderSave.user_num_doc = this.lenderForm.value.user_num_doc;
+        LenderSave.user_tip_doc = this.obtenerTipoDocumSeleccionado();
+        LenderSave.user_num_phone = this.lenderForm.value.user_num_phone;
+        LenderSave.user_email = this.lenderForm.value.user_email;
+        LenderSave.user_ubigeo = this.obtenerUbigeoDistrito();
+        LenderSave.user_date_upt = this.registroUtil.obtenerFechaCreacion();
+        LenderSave.user_usur_upt = this.securityService.getUserLogedId();
+        LenderSave.user_categ = {
+            catg_id: '2',
+            catg_name: 'Lender'
+        };
 
         this._lenderService.updateLender(LenderSave).subscribe(
             data => {
@@ -213,7 +191,7 @@ export class LenderComponent implements OnInit, OnDestroy
     }
 
     obtenerTipoDocumSeleccionado(): any {
-        return this.listadoTiposDocumento.find(x => x.tip_docum_id === this.lenderForm.value.tip_docum_id);
+        return this.listadoTiposDocumento.find(x => x.tip_docum_id === this.lenderForm.value.user_tip_doc);
     }
 
     obtenerUbigeoDistrito(): any {
@@ -228,35 +206,26 @@ export class LenderComponent implements OnInit, OnDestroy
     /**
      * Add product
      */
-    addProduct(): void
+    addLender(): void
     {
-        const LenderSave: Lender = new Lender();        
-        LenderSave.lndr_nombres = this.lenderForm.value.lndr_nombres;
-        LenderSave.lndr_ape_materno = this.lenderForm.value.lndr_ape_materno;
-        LenderSave.lndr_ape_paterno = this.lenderForm.value.lndr_ape_paterno;
-        LenderSave.lndr_slug = this.registroUtil.obtenerSlugPorNombre(LenderSave.lndr_nombres + ' ' + LenderSave.lndr_ape_paterno);
-        LenderSave.lndr_num_documen = this.lenderForm.value.lndr_num_documen;
-        LenderSave.lndr_tip_documen = this.obtenerTipoDocumSeleccionado();
-        LenderSave.lndr_num_celular = this.lenderForm.value.lndr_num_celular;
-        LenderSave.lndr_email = this.lenderForm.value.lndr_email;
-        LenderSave.lndr_ubigeo = this.obtenerUbigeoDistrito();
-        LenderSave.lndr_fec_registro = this.registroUtil.obtenerFechaCreacion();
-        LenderSave.lndr_usu_registro = this.securityService.getUserLogedId();
-
-        // LenderSave.lndr_url_documen = [
-        //     {
-        //         image_key: 'mark_lilly_by_xneetoh-d4lucn4.jpg',
-        //         image_desc: 'Copia DNI'
-        //     },
-        //     {
-        //         image_key: 'mark_lilly_by_xneetoh-d4lucn4.jpg',
-        //         image_desc: 'Copia Recivo de agua'
-        //     }
-        // ];
-
+        const LenderSave: UserModel = new UserModel();        
+        LenderSave.user_names = this.lenderForm.value.user_names;
+        LenderSave.user_full_name1 = this.lenderForm.value.user_full_name1;
+        LenderSave.user_full_name2 = this.lenderForm.value.user_full_name2;
+        LenderSave.user_slug = this.registroUtil.obtenerSlugPorNombre(LenderSave.user_names + ' ' + LenderSave.user_full_name1);
+        LenderSave.user_num_doc = this.lenderForm.value.user_num_doc;
+        LenderSave.user_tip_doc = this.obtenerTipoDocumSeleccionado();
+        LenderSave.user_num_phone = this.lenderForm.value.user_num_phone;
+        LenderSave.user_email = this.lenderForm.value.user_email;
+        LenderSave.user_ubigeo = this.obtenerUbigeoDistrito();
+        LenderSave.user_date_reg = this.registroUtil.obtenerFechaCreacion();
+        LenderSave.user_usur_reg = this.securityService.getUserLogedId();
+        LenderSave.user_categ = {
+            catg_id: '2',
+            catg_name: 'Lender'  
+        };        
         this._lenderService.createLender(LenderSave).subscribe(
-            data => {
-                console.log(data);
+            data => {                
                 if (data.res_service === 'ok') {
                     this._matSnackBar.open('Prestamista registrado', 'Aceptar', {
                         verticalPosition: 'top',
@@ -265,24 +234,23 @@ export class LenderComponent implements OnInit, OnDestroy
                     const listImagesGuardar = [];
                     this.listImages.forEach(element => {
                         const dataUpload = {
-                            imageString64: element.data                            
+                            imageString64: element.data,
+                            user_id: data.data_result.user_id,
+                            user_catg_id: '2'                         
                         };
                         this._lenderService.uploadImageS3(dataUpload).subscribe(
-                            responseUpload => {
-                                console.log(responseUpload);                                
+                            responseUpload => {                                                               
                                 const data_image = {
                                     image_key: responseUpload.data_result.fileName,
                                     image_desc: element.desc.image_desc
                                 };
                                 listImagesGuardar.push(data_image);
                                 const dataUploadFileName = {
-                                    lndr_id: data.data_result.lndr_id,
-                                    lndr_url_documen: listImagesGuardar
-                                };     
-                                console.log(dataUploadFileName);                         
+                                    user_id: data.data_result.user_id,
+                                    user_url_documen: listImagesGuardar
+                                };                                                           
                                 this._lenderService.uploadFileName(dataUploadFileName).subscribe(
-                                    resultUploadFileName => {
-                                        console.log(resultUploadFileName);
+                                    resultUploadFileName => {                                        
                                     }
                                 );
                             }

@@ -25,7 +25,7 @@
                 <div fxLayout="column" fxLayoutAlign="start start"
                      [@animate]="{value:'*',params:{delay:'100ms',x:'-25px'}}">
                     <div class="h2" *ngIf="pageType ==='edit'">
-                        {{lender.lndr_nombres}}
+                        {{lender.user_names}}
                     </div>
                     <div class="h2" *ngIf="pageType ==='new'">
                         Nuevo Prestamista
@@ -40,14 +40,14 @@
             <button mat-raised-button
                     class="save-product-button mat-white-bg"
                     [disabled]="lenderForm.invalid"
-                    *ngIf="pageType ==='new'" (click)="addProduct()">
+                    *ngIf="pageType ==='new'" (click)="addLender()">
                 <span>Registrar</span>
             </button>
 
             <button mat-raised-button
                     class="save-product-button mat-white-bg"
                     [disabled]="lenderForm.invalid || imageUploaded"
-                    *ngIf="pageType ==='edit'" (click)="saveProduct()">
+                    *ngIf="pageType ==='edit'" (click)="saveLender()">
                 <span>Guardar</span>
             </button>
         </div>
@@ -69,27 +69,27 @@
 
                                 <mat-form-field class="w-100-p">
                                     <input matInput
-                                           name="lndr_nombres"
-                                           formControlName="lndr_nombres"
+                                           name="user_names"
+                                           formControlName="user_names"
                                            placeholder="Nombres del prestamista"
                                            required>
                                 </mat-form-field>
                                 <mat-form-field class="w-100-p">
                                     <input matInput
-                                           name="lndr_ape_paterno"
-                                           formControlName="lndr_ape_paterno"
+                                           name="user_full_name1"
+                                           formControlName="user_full_name1"
                                            placeholder="Apellido Paterno"
                                            required>
                                 </mat-form-field>
                                 <mat-form-field class="w-100-p">
                                     <input matInput
-                                           name="lndr_ape_materno"
-                                           formControlName="lndr_ape_materno"
+                                           name="user_full_name2"
+                                           formControlName="user_full_name2"
                                            placeholder="Apellido Materno"
                                            required>
                                 </mat-form-field>
                                 <mat-form-field class="w-50-p">
-                                    <mat-select placeholder="Tipo de documento" formControlName="tip_docum_id"
+                                    <mat-select placeholder="Tipo de documento" formControlName="user_tip_doc"
                                         required>
                                         <mat-option *ngFor="let tipo of listadoTiposDocumento" [value]="tipo.tip_docum_id">
                                             {{tipo.tip_docum_nom}}
@@ -98,8 +98,8 @@
                                 </mat-form-field>                                                            
                                 <mat-form-field class="w-100-p">
                                     <input matInput
-                                           name="lndr_num_documen"
-                                           formControlName="lndr_num_documen"
+                                           name="user_num_doc"
+                                           formControlName="user_num_doc"
                                            placeholder="Número de documento"
                                            required>
                                 </mat-form-field> 
@@ -150,15 +150,15 @@
 
                                 <mat-form-field class="w-100-p">
                                     <input matInput
-                                           name="lndr_num_celular"
-                                           formControlName="lndr_num_celular"
+                                           name="user_num_phone"
+                                           formControlName="user_num_phone"
                                            placeholder="Número de contácto"
                                            required>
                                 </mat-form-field>
                                 <mat-form-field class="w-100-p">
                                     <input matInput
-                                           name="lndr_email"
-                                           formControlName="lndr_email"
+                                           name="user_email"
+                                           formControlName="user_email"
                                            placeholder="Correo electrónico"
                                            required>
                                 </mat-form-field>
@@ -195,36 +195,36 @@
 
                                 <mat-form-field class="w-100-p">
                                     <input matInput
-                                           name="lndr_est_registro"
-                                           formControlName="lndr_est_registro"
+                                           name="user_stat_reg"
+                                           formControlName="user_stat_reg"
                                            placeholder="Estado de registro"
                                            readonly>
                                 </mat-form-field>
                                 <mat-form-field class="w-50-p">
                                     <input matInput
-                                           name="lndr_fec_registro"
-                                           formControlName="lndr_fec_registro"
+                                           name="user_date_reg"
+                                           formControlName="user_date_reg"
                                            placeholder="Fecha de registro"
                                            readonly>
                                 </mat-form-field>
                                 <mat-form-field class="w-50-p">
                                     <input matInput
-                                           name="lndr_usu_registro"
-                                           formControlName="lndr_usu_registro"
+                                           name="user_usur_reg"
+                                           formControlName="user_usur_reg"
                                            placeholder="Usuario de registro"
                                            readonly>
                                 </mat-form-field>                                                            
                                 <mat-form-field *ngIf="lender.lndr_fec_actualiza != null" class="w-50-p">
                                     <input matInput
-                                           name="lndr_fec_actualiza"
-                                           formControlName="lndr_fec_actualiza"
+                                           name="user_date_upt"
+                                           formControlName="user_date_upt"
                                            placeholder="Fecha de actualización"
                                            readonly>
                                 </mat-form-field> 
                                 <mat-form-field *ngIf="lender.lndr_usu_actualiza != null" class="w-50-p">
                                     <input matInput
-                                           name="lndr_usu_actualiza"
-                                           formControlName="lndr_usu_actualiza"
+                                           name="user_usur_upt"
+                                           formControlName="user_usur_upt"
                                            placeholder="Usuario de actualización"
                                            readonly>
                                 </mat-form-field>                                 
