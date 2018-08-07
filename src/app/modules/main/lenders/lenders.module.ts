@@ -13,10 +13,10 @@ import { LenderComponent } from './lender/lender.component';
 import { LendersComponent } from './lenders-list/lenders.component';
 import { ImageViewComponent } from './lender/imageViewer/imageview.component';
 import { ImageViewModule } from './lender/imageViewer/imageview.module';
-import { LenderService } from '../../../services/lender.service';
 import { ImageUploadComponent } from './lender/imageUpload/image-upload.component';
 import { ImageUploadModule } from './lender/imageUpload/image-upload.module';
 import { UsersService } from '../../../services/users.service';
+import { UserService } from '../../../services/user.service';
 
 
 const routes: Routes = [
@@ -31,14 +31,14 @@ const routes: Routes = [
         path: 'lender/:id/:handle',
         component: LenderComponent,
         resolve: {
-            data: LenderService
+            data: UserService
         }
     },
     {
         path: 'lender/:id',
         component: LenderComponent,
         resolve: {
-            data: LenderService
+            data: UserService
         }
     },
 ];
@@ -82,7 +82,7 @@ const routes: Routes = [
     ],
     providers: [
         UsersService,
-        LenderService,
+        UserService,
     ]
 })
 export class LenderModule {

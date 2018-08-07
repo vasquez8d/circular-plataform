@@ -7,7 +7,7 @@ import { ResponseModel } from '../models/response.model';
 import { tap, catchError } from 'rxjs/operators';
 
 @Injectable()
-export class LenderService implements Resolve<any>
+export class UserService implements Resolve<any>
 {
     routeParams: any;
     lender: any;
@@ -77,6 +77,7 @@ export class LenderService implements Resolve<any>
                 };
                 this._httpClient.post(this.detailsUrl, body)
                     .subscribe((response: any) => {
+                        console.log(response);
                         this.lender = response.data_result.Item;                                             
                         this.onProductChanged.next(this.lender);
                         resolve(response);

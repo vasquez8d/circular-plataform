@@ -10,9 +10,9 @@ import { RegistroUtil } from '../../../../utils/registro.util';
 import { Router } from '../../../../../../node_modules/@angular/router';
 import * as base64Converter from 'base64-arraybuffer';
 import { ImageViewComponent } from './imageViewer/imageview.component';
-import { LenderService } from '../../../../services/lender.service';
 import { ImageUploadComponent } from './imageUpload/image-upload.component';
 import { UserModel } from '../../../../models/user.model';
+import { UserService } from '../../../../services/user.service';
 
 @Component({
     selector     : 'lender-app',
@@ -52,7 +52,7 @@ export class LenderComponent implements OnInit, OnDestroy
      * @param {MatSnackBar} _matSnackBar
      */
     constructor(
-        private _lenderService: LenderService,
+        private _lenderService: UserService,
         private _formBuilder: FormBuilder,
         private _location: Location,
         private _matSnackBar: MatSnackBar,        
