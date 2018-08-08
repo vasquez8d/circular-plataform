@@ -44,9 +44,9 @@
                 <span>Registrar</span>
             </button>
 
-            <button mat-raised-button
+            <button mat-raised-button id="btnSaveLender"
                     class="save-product-button mat-white-bg"
-                    [disabled]="lenderForm.invalid || imageUploaded"
+                    [disabled]="lenderForm.invalid || lenderForm.pristine"
                     *ngIf="pageType ==='edit'" (click)="saveLender()">
                 <span>Guardar</span>
             </button>

@@ -40,6 +40,8 @@ export class LenderComponent implements OnInit, OnDestroy
     ];
     listImages = [];
     listImagesGuardar = [];
+    listCurrentImages = [];
+    bNewImages = false;
     // Private
     private _unsubscribeAll: Subject<any>;
 
@@ -104,13 +106,20 @@ export class LenderComponent implements OnInit, OnDestroy
 
     cargarDocumentos(documents): void {
         documents.forEach(element => {
-            this._lenderService.getImageS3(element.image_key).subscribe(
-                data => {
-                    const image = {
-                        data: base64Converter.encode(data.data_result.Body.data),
-                        desc: element
-                    };
-                    this.listImages.push(image);
+            const datas3Body = {
+                key: element.image_key,
+                user_catg_id: '2'
+            };            
+            this._lenderService.getImageS3(datas3Body).subscribe(
+                data => {       
+                    if (data.res_service === 'ok') {
+                        const image = {
+                            data: base64Converter.encode(data.data_result.Body.data),
+                            desc: element
+                        };
+                        this.listCurrentImages.push(element);
+                        this.listImages.push(image);
+                    }             
                 }
             );
         });
@@ -176,16 +185,71 @@ export class LenderComponent implements OnInit, OnDestroy
         LenderSave.user_date_upt = this.registroUtil.obtenerFechaCreacion();
         LenderSave.user_usur_upt = this.securityService.getUserLogedId();
         LenderSave.user_categ = {
-            catg_id: '2',
-            catg_name: 'Lender'
+            catg_id: '2'
         };
 
         this._lenderService.updateLender(LenderSave).subscribe(
             data => {
-                this._matSnackBar.open('Prestamista actualizado', 'Aceptar', {
-                    verticalPosition: 'top',
-                    duration: 3000
-                });                
+                if (data.res_service === 'ok') {
+                    this._matSnackBar.open('Prestamista actualizado', 'Aceptar', {
+                        verticalPosition: 'top',
+                        duration: 3000
+                    }); 
+
+                    if (this.bNewImages) {
+                        const listImagesGuardar = [];
+                        // tslint:disable-next-line:typedef
+                        this.listImages.forEach(function (element, index, theArray){
+                            const dataUpload = {
+                                imageString64: element.data,
+                                user_id: this.lender.user_id,
+                                user_catg_id: '2'                         
+                            };
+                            const existImage = this.listCurrentImages.find(x => x.image_key === element.desc.image_key);
+                            if (existImage == null) {
+                                this._lenderService.uploadImageS3(dataUpload).subscribe(
+                                    responseUpload => {   
+                                        const data_image = {
+                                            image_key: responseUpload.data_result.fileName,
+                                            image_desc: element.desc.image_desc
+                                        };
+                                        listImagesGuardar.push(data_image);                                                                              
+                                        const dataUploadFileName = {
+                                            user_id: this.lender.user_id,
+                                            user_url_documen: listImagesGuardar
+                                        };
+                                        theArray[index] = {
+                                            data: element.data,
+                                            desc: {
+                                                image_key : responseUpload.data_result.fileName,
+                                                image_desc: element.desc.image_desc
+                                            }
+                                        };      
+                                        const newImage = {
+                                            image_key: responseUpload.data_result.fileName
+                                        };
+                                        this.listCurrentImages.push(newImage);                                                                                    
+                                        this._lenderService.uploadFileName(dataUploadFileName).subscribe(
+                                            resultUploadFileName => {                                        
+                                            }
+                                        );
+                                    }
+                                );
+                            } else {
+                                const data_image = {
+                                    image_key: existImage.image_key,
+                                    image_desc: existImage.image_desc
+                                };
+                                listImagesGuardar.push(data_image);
+                            }
+                        }, this);
+                    }
+                } else { 
+                    this._matSnackBar.open('Error actualizando la información del prestamista', 'Aceptar', {
+                        verticalPosition: 'top',
+                        duration: 3000
+                    }); 
+                }               
             }
         );
     }
@@ -293,7 +357,14 @@ export class LenderComponent implements OnInit, OnDestroy
                     }
                 };
                 this.listImages.push(image);
-                this.imageUploaded = false;
+                this.imageUploaded = false;    
+                try {
+                  (<HTMLInputElement> document.getElementById('btnSaveLender')).disabled = false;
+                } catch (e) {}                     
+                
+                if (this.pageType === 'edit') {
+                    this.bNewImages = true;
+                }
             }                 
         });
     }

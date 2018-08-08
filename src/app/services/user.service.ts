@@ -73,11 +73,10 @@ export class UserService implements Resolve<any>
             else
             {
                 const body = {
-                    lndr_id : this.routeParams.id
-                };
+                    user_id : this.routeParams.id
+                };                        
                 this._httpClient.post(this.detailsUrl, body)
                     .subscribe((response: any) => {
-                        console.log(response);
                         this.lender = response.data_result.Item;                                             
                         this.onProductChanged.next(this.lender);
                         resolve(response);
@@ -87,7 +86,7 @@ export class UserService implements Resolve<any>
     }
 
     updateLender(lender): Observable<ResponseModel> {
-        return this._httpClient.post<ResponseModel>(this.UpdateUrl, lender).pipe(
+        return this._httpClient.patch<ResponseModel>(this.UpdateUrl, lender).pipe(
             tap((response: ResponseModel) => this.log(`Resultado del updateLender = ${response.res_service}`)),
             catchError(this.handleError<ResponseModel>('updateLender'))
         );
@@ -100,11 +99,8 @@ export class UserService implements Resolve<any>
         );
     }
 
-    getImageS3(image_key): Observable<ResponseModel> {
-        const body = {
-            key: image_key
-        };
-        return this._httpClient.post<ResponseModel>(this.getImageS3Url, body).pipe(
+    getImageS3(s3Body): Observable<ResponseModel> {
+        return this._httpClient.post<ResponseModel>(this.getImageS3Url, s3Body).pipe(
             tap((response: ResponseModel) => this.log(`Resultado getImageS3 = ${response.res_service}`)),
             catchError(this.handleError<ResponseModel>('getImageS3'))
         );
@@ -112,15 +108,15 @@ export class UserService implements Resolve<any>
 
     uploadImageS3(data): Observable<ResponseModel> {
         return this._httpClient.post<ResponseModel>(this.uploadImageS3Url, data).pipe(
-            tap((response: ResponseModel) => this.log(`Resultado getImageS3 = ${response.res_service}`)),
-            catchError(this.handleError<ResponseModel>('getImageS3'))
+            tap((response: ResponseModel) => this.log(`Resultado uploadImageS3 = ${response.res_service}`)),
+            catchError(this.handleError<ResponseModel>('uploadImageS3'))
         );
     }
 
     uploadFileName(data): Observable<ResponseModel> {
         return this._httpClient.post<ResponseModel>(this.uploadFileNameUrl, data).pipe(
-            tap((response: ResponseModel) => this.log(`Resultado getImageS3 = ${response.res_service}`)),
-            catchError(this.handleError<ResponseModel>('getImageS3'))
+            tap((response: ResponseModel) => this.log(`Resultado uploadFileName = ${response.res_service}`)),
+            catchError(this.handleError<ResponseModel>('uploadFileName'))
         );
     }
     
