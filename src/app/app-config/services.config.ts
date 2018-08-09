@@ -10,7 +10,7 @@ export class ServicesConfig {
     }
 
     urlProducts(): string {
-        return 'https://mofy4cwezf.execute-api.us-east-1.amazonaws.com/Desarrollo';
+        return 'https://mofy4cwezf.execute-api.us-east-1.amazonaws.com/dev';
     }
 
     urlCategorys(): string {
@@ -19,6 +19,10 @@ export class ServicesConfig {
 
     urlUsers(): string {
         return 'https://pqcnj1fxjj.execute-api.us-east-1.amazonaws.com/dev';
+    }
+
+    urlS3(): string {
+        return 'https://h7g83v5yj7.execute-api.us-east-1.amazonaws.com/dev';
     }
 
     currentUrl(): string {

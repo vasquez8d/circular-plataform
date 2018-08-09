@@ -4,6 +4,7 @@ import { Injectable } from '@angular/core';
 export class Product
 {
     prod_id: string;
+    lender_user_id: string;
     prod_nombre: string;
     prod_desc: string;
     prod_tags: string[];
@@ -24,6 +25,12 @@ export class Product
     prod_usu_actualiza: string;
     prod_fec_actualiza: string;
     catg_id: string;
+
+    prod_url_documen: {
+        image_key: string,
+        image_desc: string,
+    }[]; 
+
     /**
      * Constructor
      *
@@ -33,6 +40,7 @@ export class Product
     {
         product = product || {};
         this.prod_id = product.prod_id || '0';
+        this.lender_user_id = product.lender_user_id || '';
         this.prod_nombre = product.prod_nombre || '';
         this.prod_desc = product.prod_desc || '';
         this.prod_tags = product.prod_tags || [];
@@ -47,5 +55,6 @@ export class Product
         this.prod_est_registro = product.prod_est_registro || '';
         this.prod_fec_registro = product.prod_fec_registro || '';
         this.prod_usu_registro = product.prod_usu_registro || '';
+        this.prod_url_documen = product.prod_url_documen || [];
     }
 }

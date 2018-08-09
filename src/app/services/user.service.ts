@@ -15,9 +15,6 @@ export class UserService implements Resolve<any>
     private detailsUrl = `${this.globalValues.urlUsers()}/details`;
     private UpdateUrl = `${this.globalValues.urlUsers()}/update`;
     private CreateUrl = `${this.globalValues.urlUsers()}/create`;
-    private getImageS3Url = `${this.globalValues.urlUsers()}/gets3`; 
-    private uploadImageS3Url = `${this.globalValues.urlUsers()}/uploads3`;
-    private uploadFileNameUrl = `${this.globalValues.urlUsers()}/updates3filename`;
 
     /**
      * Constructor
@@ -96,27 +93,6 @@ export class UserService implements Resolve<any>
         return this._httpClient.post<ResponseModel>(this.CreateUrl, lender).pipe(
             tap((response: ResponseModel) => this.log(`Resultado del createLender = ${response.res_service}`)),
             catchError(this.handleError<ResponseModel>('createLender'))
-        );
-    }
-
-    getImageS3(s3Body): Observable<ResponseModel> {
-        return this._httpClient.post<ResponseModel>(this.getImageS3Url, s3Body).pipe(
-            tap((response: ResponseModel) => this.log(`Resultado getImageS3 = ${response.res_service}`)),
-            catchError(this.handleError<ResponseModel>('getImageS3'))
-        );
-    }
-
-    uploadImageS3(data): Observable<ResponseModel> {
-        return this._httpClient.post<ResponseModel>(this.uploadImageS3Url, data).pipe(
-            tap((response: ResponseModel) => this.log(`Resultado uploadImageS3 = ${response.res_service}`)),
-            catchError(this.handleError<ResponseModel>('uploadImageS3'))
-        );
-    }
-
-    uploadFileName(data): Observable<ResponseModel> {
-        return this._httpClient.post<ResponseModel>(this.uploadFileNameUrl, data).pipe(
-            tap((response: ResponseModel) => this.log(`Resultado uploadFileName = ${response.res_service}`)),
-            catchError(this.handleError<ResponseModel>('uploadFileName'))
         );
     }
     

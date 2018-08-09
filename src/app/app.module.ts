@@ -18,6 +18,7 @@ import { AppComponent } from './app.component';
 import { LayoutModule } from './modules/layout/layout.module';
 import { ServicesConfig } from './app-config/services.config';
 import { LoginGuard } from './guards/login.guard';
+import { AppCategoryConfig } from './app-config/app-categorys.config';
 
 const appRoutes: Routes = [
     {
@@ -76,7 +77,7 @@ const appRoutes: Routes = [
     bootstrap   : [
         AppComponent
     ],
-    providers: [ServicesConfig, LoginGuard]
+    providers: [ServicesConfig, LoginGuard, AppCategoryConfig]
 })
 export class AppModule
 {

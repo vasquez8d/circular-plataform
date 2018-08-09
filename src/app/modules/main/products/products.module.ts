@@ -3,7 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { MatButtonModule, MatChipsModule, MatFormFieldModule, 
          MatIconModule, MatInputModule, MatPaginatorModule, 
          MatRippleModule, MatSelectModule, MatSnackBarModule, 
-         MatSortModule, MatTableModule, MatTabsModule } from '@angular/material';
+         MatSortModule, MatTableModule, MatTabsModule, MatDialogModule } from '@angular/material';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { AgmCoreModule } from '@agm/core';
 
@@ -13,6 +13,10 @@ import { EcommerceProductsComponent } from './products-list/products.component';
 import { EcommerceProductsService } from '../../../services/products.service';
 import { EcommerceProductService } from '../../../services/product.service';
 import { EcommerceProductComponent } from './product/product.component';
+import { ImageUploadComponent } from '../images/imageUpload/image-upload.component';
+import { ImageViewComponent } from '../images/imageViewer/imageview.component';
+import { ImageUploadModule } from '../images/imageUpload/image-upload.module';
+import { ImageViewModule } from '../images/imageViewer/imageview.module';
 
 
 const routes: Routes = [
@@ -44,6 +48,10 @@ const routes: Routes = [
         EcommerceProductsComponent,
         EcommerceProductComponent,
     ],
+    entryComponents : [
+        ImageViewComponent,
+        ImageUploadComponent
+    ],
     imports: [
         RouterModule.forChild(routes),
 
@@ -67,6 +75,11 @@ const routes: Routes = [
 
         FuseSharedModule,
         FuseWidgetModule,
+
+        MatDialogModule,
+
+        ImageViewModule,
+        ImageUploadModule
     ],
     providers: [
         EcommerceProductsService,

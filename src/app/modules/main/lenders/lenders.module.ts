@@ -11,12 +11,12 @@ import { FuseWidgetModule } from '@fuse/components/widget/widget.module';
 
 import { LenderComponent } from './lender/lender.component';
 import { LendersComponent } from './lenders-list/lenders.component';
-import { ImageViewComponent } from './lender/imageViewer/imageview.component';
-import { ImageViewModule } from './lender/imageViewer/imageview.module';
-import { ImageUploadComponent } from './lender/imageUpload/image-upload.component';
-import { ImageUploadModule } from './lender/imageUpload/image-upload.module';
 import { UsersService } from '../../../services/users.service';
 import { UserService } from '../../../services/user.service';
+import { ImageViewComponent } from '../images/imageViewer/imageview.component';
+import { ImageUploadComponent } from '../images/imageUpload/image-upload.component';
+import { ImageViewModule } from '../images/imageViewer/imageview.module';
+import { ImageUploadModule } from '../images/imageUpload/image-upload.module';
 
 
 const routes: Routes = [

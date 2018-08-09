@@ -44,7 +44,7 @@
                 <span>Registrar</span>
             </button>
 
-            <button mat-raised-button
+            <button mat-raised-button id="btnSaveProduct"
                     class="save-product-button mat-white-bg"
                     [disabled]="productForm.invalid || productForm.pristine"
                     *ngIf="pageType ==='edit'" (click)="saveProduct()">
@@ -64,54 +64,77 @@
                     <mat-tab-group>
 
                         <mat-tab label="Prestamista">
+                            <div class="tab-content p-24">
+                                <div class="header" fxLayout="column" fxLayoutAlign="center center" fxLayout.gt-xs="row" fxLayoutAlign.gt-xs="space-between center">
+                                    <div class="search-input-wrapper mx-24 m-md-0" fxFlex="1 0 auto" fxLayout="row" fxLayoutAlign="start center">
+                                        <label for="search" class="mr-8">
+                                            <mat-icon class="secondary-text">search</mat-icon>
+                                        </label>
+                                        <mat-form-field class="w-40-p" floatLabel="never">
+                                            <input id="search" matInput #filter placeholder="Buscar un prestamista">
+                                        </mat-form-field>
+                                        <mat-form-field style="margin-left: 100px;" class="w-50-p">
+                                            <input matInput name="lender_user_id" formControlName="lender_user_id" placeholder="Código de prestamista" required>
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                                <div class="content-card mat-white-bg">
 
-                            <div class="tab-content p-24" fusePerfectScrollbar>
+                                    <!-- <mat-table class="products-table" #table [dataSource]="dataSource" matSort [@animateStagger]="{value:'50'}" fusePerfectScrollbar>
 
-                                <mat-form-field class="w-100-p">
-                                    <input matInput
-                                           name="prod_nombre"
-                                           formControlName="prod_nombre"
-                                           placeholder="Nombre del artículo"
-                                           required>
-                                </mat-form-field>
-                                <mat-form-field class="w-100-p">
-                                    <textarea matInput
-                                           name="prod_desc"
-                                           formControlName="prod_desc"
-                                           placeholder="Descripción del artículo"
-                                           required
-                                           rows="3">
-                                    </textarea>
-                                </mat-form-field>
-                                <mat-form-field class="w-50-p">
-                                    <mat-select placeholder="Categoría del artículo" formControlName="catg_id"
-                                        required>
-                                        <mat-option *ngFor="let categ of listadoCategorias" [value]="categ.catg_id">
-                                            {{categ.catg_nombre}}
-                                        </mat-option>
-                                    </mat-select>  
-                                </mat-form-field>                                
-                              
-                                <mat-form-field class="w-100-p">
+                                        <ng-container matColumnDef="prod_id">
+                                            <mat-header-cell *matHeaderCellDef mat-sort-header>Código</mat-header-cell>
+                                            <mat-cell *matCellDef="let product">
+                                                <p class="text-truncate">{{product.prod_id}}</p>
+                                            </mat-cell>
+                                        </ng-container>
 
-                                    <mat-chip-list #tagList name="prod_tags" formControlName="prod_tags">
+                                        <ng-container matColumnDef="prod_nombre">
+                                            <mat-header-cell *matHeaderCellDef mat-sort-header>Nombre</mat-header-cell>
+                                            <mat-cell *matCellDef="let product">
+                                                <p class="text-truncate">{{product.prod_nombre}}</p>
+                                            </mat-cell>
+                                        </ng-container>
 
-                                        <mat-chip *ngFor="let tag of product.prod_tags"
-                                                  [removable]="true" (removed)="removeTagProduct(tag)">
-                                            {{tag}}
-                                            <mat-icon matChipRemove>cancel</mat-icon>
-                                        </mat-chip>
+                                        <ng-container matColumnDef="prod_categoria">
+                                            <mat-header-cell *matHeaderCellDef fxHide mat-sort-header fxShow.gt-md>Categoría</mat-header-cell>
+                                            <mat-cell *matCellDef="let product" fxHide fxShow.gt-md>
+                                                <p class="category text-truncate">
+                                                    {{product.prod_categoria.catg_nombre}}
+                                                </p>
+                                            </mat-cell>
+                                        </ng-container>
 
-                                        <input placeholder="Tags del artículo"
-                                               [matChipInputFor]="tagList"
-                                               [matChipInputAddOnBlur]="true"
-                                               (matChipInputTokenEnd)="addTagProduct($event)"/>
-                                    </mat-chip-list>
+                                        <ng-container matColumnDef="prod_est_alquiler">
+                                            <mat-header-cell *matHeaderCellDef mat-sort-header fxHide fxShow.gt-sm>Estado Alquiler</mat-header-cell>
+                                            <mat-cell *matCellDef="let product" fxHide fxShow.gt-sm>
 
-                                </mat-form-field>
+                                                <span>
+                                                    {{product.prod_est_alquiler}}
+                                                </span>
 
+                                            </mat-cell>
+                                        </ng-container>
+
+                                        <ng-container matColumnDef="prod_est_registro">
+                                            <mat-header-cell *matHeaderCellDef mat-sort-header fxHide fxShow.gt-xs>Estado</mat-header-cell>
+                                            <mat-cell *matCellDef="let product" fxHide fxShow.gt-xs>
+                                                {{product.prod_est_registro}}
+                                            </mat-cell>
+                                        </ng-container>
+
+                                        <mat-header-row *matHeaderRowDef="displayedColumns; sticky:true"></mat-header-row>
+
+                                        <mat-row *matRowDef="let product; columns: displayedColumns;" class="product" matRipple>
+                                        </mat-row>
+
+                                    </mat-table> -->
+
+                                    <!-- <mat-paginator #paginator>
+                                    </mat-paginator> -->
+
+                                </div>
                             </div>
-
                         </mat-tab>
 
                         <mat-tab label="Información">
@@ -165,25 +188,31 @@
 
                         </mat-tab>
 
-                        <!-- <mat-tab label="Product Images">
+                        <mat-tab label="Imágenes">
                             <div class="tab-content p-24" fusePerfectScrollbar>
                                 <div fxLayout="row wrap" fxLayoutAlign="start start">
 
-                                    <div *ngIf="product.images.length === 0"
-                                         class="product-image" fxlayout="row" fxLayoutAlign="center center">
-                                        <img class="media"
-                                             [src]="'assets/images/ecommerce/product-image-placeholder.png'">
+                                    <!-- <div *ngIf="product.images.length === 0"
+                                                                class="product-image" fxlayout="row" fxLayoutAlign="center center">
+                                                                <img class="media"
+                                                                    [src]="'assets/images/ecommerce/product-image-placeholder.png'">
+                                                            </div> -->
+
+                                    <div *ngFor="let image of listImages">
+                                        <div *ngIf="listImages.length > 0" class="product-image" fxlayout="row" fxLayoutAlign="center center">
+                                            <img (click)="viewImageComplete(image)" class="media" src="data:image/jpg;base64,{{image.data}}">
+                                        </div>
+                                        <mat-form-field class="w-90-p">
+                                            <input matInput placeholder="Descripción del documento" [value]="image.desc.image_desc" readonly>
+                                        </mat-form-field>
                                     </div>
 
-                                    <div *ngFor="let image of product.images">
-                                        <div *ngIf="product.images.length > 0"
-                                             class="product-image" fxlayout="row" fxLayoutAlign="center center">
-                                            <img class="media" [src]="image.url">
-                                        </div>
-                                    </div>
+                                    <button (click)="uploadDocument()" mat-fab>
+                                        <mat-icon aria-label="Agregar precio">exposure_plus_1</mat-icon>
+                                    </button>
                                 </div>
                             </div>
-                        </mat-tab> -->
+                        </mat-tab>
 
                         <mat-tab label="Precios">
                             <div class="tab-content p-24" fusePerfectScrollbar>

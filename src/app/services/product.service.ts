@@ -11,10 +11,16 @@ export class EcommerceProductService implements Resolve<any>
 {
     routeParams: any;
     product: any;
+
+    products: any[];
+    onProductsChanged: BehaviorSubject<any>;
+
     onProductChanged: BehaviorSubject<any>;
     private detailsUrl = `${this.globalValues.urlProducts()}/details`;
     private UpdateUrl = `${this.globalValues.urlProducts()}/update`;
     private CreateUrl = `${this.globalValues.urlProducts()}/create`;
+    private listUrl = `${this.globalValues.urlProducts()}/list`;
+
     /**
      * Constructor
      *
@@ -27,6 +33,7 @@ export class EcommerceProductService implements Resolve<any>
     {
         // Set the defaults
         this.onProductChanged = new BehaviorSubject({});
+        this.onProductsChanged = new BehaviorSubject({});
     }
 
     /**
@@ -43,13 +50,25 @@ export class EcommerceProductService implements Resolve<any>
         return new Promise((resolve, reject) => {
 
             Promise.all([
-                this.getProduct()
+                this.getProduct(),
+                this.getProducts()
             ]).then(
                 () => {
                     resolve();
                 },
                 reject
             );
+        });
+    }
+
+    getProducts(): Promise<any> {
+        return new Promise((resolve, reject) => {
+            this._httpClient.get(this.listUrl)
+                .subscribe((response: any) => {
+                    this.products = response.data_result.Items;
+                    this.onProductsChanged.next(this.products);
+                    resolve(response);
+                }, reject);
         });
     }
 

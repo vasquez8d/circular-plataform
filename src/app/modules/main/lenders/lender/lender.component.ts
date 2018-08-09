@@ -9,10 +9,12 @@ import { SecurityService } from '../../../../services/security.service';
 import { RegistroUtil } from '../../../../utils/registro.util';
 import { Router } from '../../../../../../node_modules/@angular/router';
 import * as base64Converter from 'base64-arraybuffer';
-import { ImageViewComponent } from './imageViewer/imageview.component';
-import { ImageUploadComponent } from './imageUpload/image-upload.component';
 import { UserModel } from '../../../../models/user.model';
 import { UserService } from '../../../../services/user.service';
+import { ImageUploadComponent } from '../../images/imageUpload/image-upload.component';
+import { ImageViewComponent } from '../../images/imageViewer/imageview.component';
+import { S3Service } from '../../../../services/s3.service';
+import { AppCategoryConfig } from '../../../../app-config/app-categorys.config';
 
 @Component({
     selector     : 'lender-app',
@@ -55,6 +57,7 @@ export class LenderComponent implements OnInit, OnDestroy
      */
     constructor(
         private _lenderService: UserService,
+        private _s3Service: S3Service,
         private _formBuilder: FormBuilder,
         private _location: Location,
         private _matSnackBar: MatSnackBar,        
@@ -62,6 +65,7 @@ export class LenderComponent implements OnInit, OnDestroy
         private securityService: SecurityService,
         private router: Router,
         public  dialog: MatDialog,
+        private appCategoryConfig: AppCategoryConfig
     )
     {
         // Set the default
@@ -107,10 +111,10 @@ export class LenderComponent implements OnInit, OnDestroy
     cargarDocumentos(documents): void {
         documents.forEach(element => {
             const datas3Body = {
-                key: element.image_key,
-                user_catg_id: '2'
+                app_key: element.image_key,
+                app_catg_id: this.appCategoryConfig.getLenderCategory()
             };            
-            this._lenderService.getImageS3(datas3Body).subscribe(
+            this._s3Service.getImageS3(datas3Body).subscribe(
                 data => {       
                     if (data.res_service === 'ok') {
                         const image = {
@@ -185,7 +189,7 @@ export class LenderComponent implements OnInit, OnDestroy
         LenderSave.user_date_upt = this.registroUtil.obtenerFechaCreacion();
         LenderSave.user_usur_upt = this.securityService.getUserLogedId();
         LenderSave.user_categ = {
-            catg_id: '2'
+            catg_id: this.appCategoryConfig.getLenderCategory()
         };
 
         this._lenderService.updateLender(LenderSave).subscribe(
@@ -202,12 +206,12 @@ export class LenderComponent implements OnInit, OnDestroy
                         this.listImages.forEach(function (element, index, theArray){
                             const dataUpload = {
                                 imageString64: element.data,
-                                user_id: this.lender.user_id,
-                                user_catg_id: '2'                         
+                                app_id: this.lender.user_id,
+                                app_categ_id: this.appCategoryConfig.getLenderCategory()                        
                             };
                             const existImage = this.listCurrentImages.find(x => x.image_key === element.desc.image_key);
                             if (existImage == null) {
-                                this._lenderService.uploadImageS3(dataUpload).subscribe(
+                                this._s3Service.uploadImageS3(dataUpload).subscribe(
                                     responseUpload => {   
                                         const data_image = {
                                             image_key: responseUpload.data_result.fileName,
@@ -215,8 +219,9 @@ export class LenderComponent implements OnInit, OnDestroy
                                         };
                                         listImagesGuardar.push(data_image);                                                                              
                                         const dataUploadFileName = {
-                                            user_id: this.lender.user_id,
-                                            user_url_documen: listImagesGuardar
+                                            app_id: this.lender.user_id,
+                                            app_url_documen: listImagesGuardar,
+                                            app_categ: this.appCategoryConfig.getLenderCategory()
                                         };
                                         theArray[index] = {
                                             data: element.data,
@@ -226,11 +231,16 @@ export class LenderComponent implements OnInit, OnDestroy
                                             }
                                         };      
                                         const newImage = {
-                                            image_key: responseUpload.data_result.fileName
+                                            image_key: responseUpload.data_result.fileName,
+                                            image_desc: element.desc.image_desc
                                         };
                                         this.listCurrentImages.push(newImage);                                                                                    
-                                        this._lenderService.uploadFileName(dataUploadFileName).subscribe(
-                                            resultUploadFileName => {                                        
+                                        this._s3Service.uploadFileName(dataUploadFileName).subscribe(
+                                            resultUploadFileName => {  
+                                                this._matSnackBar.open('Documentos agregados', 'Aceptar', {
+                                                    verticalPosition: 'top',
+                                                    duration: 3000
+                                                });                                      
                                             }
                                         );
                                     }
@@ -272,6 +282,7 @@ export class LenderComponent implements OnInit, OnDestroy
      */
     addLender(): void
     {
+
         const LenderSave: UserModel = new UserModel();        
         LenderSave.user_names = this.lenderForm.value.user_names;
         LenderSave.user_full_name1 = this.lenderForm.value.user_full_name1;
@@ -285,24 +296,24 @@ export class LenderComponent implements OnInit, OnDestroy
         LenderSave.user_date_reg = this.registroUtil.obtenerFechaCreacion();
         LenderSave.user_usur_reg = this.securityService.getUserLogedId();
         LenderSave.user_categ = {
-            catg_id: '2',
+            catg_id: this.appCategoryConfig.getLenderCategory(),
             catg_name: 'Lender'  
         };        
         this._lenderService.createLender(LenderSave).subscribe(
             data => {                
                 if (data.res_service === 'ok') {
-                    this._matSnackBar.open('Prestamista registrado', 'Aceptar', {
+                    this._matSnackBar.open('Prestamista modificado', 'Aceptar', {
                         verticalPosition: 'top',
-                        duration: 3000
+                        duration: 5000
                     });
                     const listImagesGuardar = [];
                     this.listImages.forEach(element => {
                         const dataUpload = {
                             imageString64: element.data,
-                            user_id: data.data_result.user_id,
-                            user_catg_id: '2'                         
+                            app_id: data.data_result.user_id,
+                            app_categ_id: this.appCategoryConfig.getLenderCategory()                             
                         };
-                        this._lenderService.uploadImageS3(dataUpload).subscribe(
+                        this._s3Service.uploadImageS3(dataUpload).subscribe(
                             responseUpload => {                                                               
                                 const data_image = {
                                     image_key: responseUpload.data_result.fileName,
@@ -310,11 +321,16 @@ export class LenderComponent implements OnInit, OnDestroy
                                 };
                                 listImagesGuardar.push(data_image);
                                 const dataUploadFileName = {
-                                    user_id: data.data_result.user_id,
-                                    user_url_documen: listImagesGuardar
+                                    app_id: data.data_result.user_id,
+                                    app_url_documen: listImagesGuardar,
+                                    app_categ: this.appCategoryConfig.getLenderCategory()
                                 };                                                           
-                                this._lenderService.uploadFileName(dataUploadFileName).subscribe(
-                                    resultUploadFileName => {                                        
+                                this._s3Service.uploadFileName(dataUploadFileName).subscribe(
+                                    resultUploadFileName => {
+                                        this._matSnackBar.open('Documentos agregados', 'Aceptar', {
+                                            verticalPosition: 'top',
+                                            duration: 3000
+                                        });                                        
                                     }
                                 );
                             }
@@ -323,9 +339,10 @@ export class LenderComponent implements OnInit, OnDestroy
                     
                     this.router.navigateByUrl('/lenders');
                 } else {
-                    this._matSnackBar.open('Error registrando al prestamista', 'Aceptar', {
+                    this._matSnackBar.open('Error modificando la información del prestamista', 'Aceptar', {
                         verticalPosition: 'top',
-                        duration: 3000                        
+                        duration: 3000,
+                        panelClass: 'mat-error-dialog'
                     });
                 }
             }
