@@ -25,7 +25,11 @@
                 <div fxLayout="column" fxLayoutAlign="start start"
                      [@animate]="{value:'*',params:{delay:'100ms',x:'-25px'}}">
                     <div class="h2" *ngIf="pageType ==='edit'">
-                        {{lender.user_names}}
+                        {{lender.user_names}} --
+                        <span>{{lender.user_id}}</span>
+                        <button (click)="copyClipBoardLenderId(lender.user_id)" mat-mini-fab style="margin-left: 10px;">
+                            <mat-icon aria-label="Example icon-button with a heart icon">content_copy</mat-icon>
+                        </button>
                     </div>
                     <div class="h2" *ngIf="pageType ==='new'">
                         Nuevo Prestamista

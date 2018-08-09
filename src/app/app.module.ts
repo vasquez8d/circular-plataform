@@ -19,10 +19,12 @@ import { LayoutModule } from './modules/layout/layout.module';
 import { ServicesConfig } from './app-config/services.config';
 import { LoginGuard } from './guards/login.guard';
 import { AppCategoryConfig } from './app-config/app-categorys.config';
+import { LogoutGuard } from './guards/logout.guard';
 
 const appRoutes: Routes = [
     {
         path        : 'security',
+        canActivate : [LogoutGuard],
         loadChildren: './modules/main/security/security.module#SecurityModule'
     },
     {
@@ -39,10 +41,11 @@ const appRoutes: Routes = [
         path        : 'borrowers',
         canActivate : [LoginGuard],
         loadChildren: './modules/main/borrowers/borrowers.module#BorrowerModule'
-    },           
+    },          
     {
         path        : '**',
-        loadChildren: './modules/main/security/security.module#SecurityModule'
+        canActivate : [LoginGuard],
+        redirectTo  : 'lenders'
     }
 ];
 
@@ -77,7 +80,7 @@ const appRoutes: Routes = [
     bootstrap   : [
         AppComponent
     ],
-    providers: [ServicesConfig, LoginGuard, AppCategoryConfig]
+    providers: [ServicesConfig, LoginGuard, AppCategoryConfig, LogoutGuard]
 })
 export class AppModule
 {

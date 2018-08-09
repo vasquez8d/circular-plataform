@@ -78,7 +78,7 @@ const routes: Routes = [
         FuseSharedModule,
         FuseWidgetModule,
         ImageViewModule,
-        ImageUploadModule
+        ImageUploadModule        
     ],
     providers: [
         UsersService,

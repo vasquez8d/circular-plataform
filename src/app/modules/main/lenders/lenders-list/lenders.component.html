@@ -121,7 +121,10 @@
                 <ng-container matColumnDef="user_stat_reg">
                     <mat-header-cell *matHeaderCellDef mat-sort-header fxHide fxShow.gt-xs>Estado</mat-header-cell>
                     <mat-cell *matCellDef="let lender" fxHide fxShow.gt-xs>
-                        {{lender.user_stat_reg}}
+                        <mat-chip-list>
+                            <mat-chip *ngIf="lender.user_stat_reg == 0" color="primary" selected="true">Deshabilitado</mat-chip>
+                            <mat-chip *ngIf="lender.user_stat_reg == 1" color="accent" selected="true">Habilitado</mat-chip>
+                        </mat-chip-list>
                     </mat-cell>
                 </ng-container>
 

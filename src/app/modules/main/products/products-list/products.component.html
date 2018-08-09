@@ -118,10 +118,13 @@
 
                 <!-- Active Column -->
                 <ng-container matColumnDef="prod_est_registro">
-                    <mat-header-cell *matHeaderCellDef mat-sort-header fxHide fxShow.gt-xs>Estado</mat-header-cell>
+                    <mat-header-cell *matHeaderCellDef mat-sort-header fxHide fxShow.gt-xs>Estado</mat-header-cell>>
                     <mat-cell *matCellDef="let product" fxHide fxShow.gt-xs>
-                        {{product.prod_est_registro}}
-                    </mat-cell>
+                        <mat-chip-list>
+                            <mat-chip *ngIf="product.prod_est_registro == 0" color="primary" selected="true">Deshabilitado</mat-chip>
+                            <mat-chip *ngIf="product.prod_est_registro == 1" color="accent" selected="true">Habilitado</mat-chip>
+                        </mat-chip-list>
+                    </mat-cell>                    
                 </ng-container>
 
                 <mat-header-row *matHeaderRowDef="displayedColumns; sticky:true"></mat-header-row>
