@@ -2,8 +2,8 @@ import { Component, OnDestroy, OnInit, ViewEncapsulation, ElementRef, ViewChild 
 import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
 import { Location } from '@angular/common';
 import { MatSnackBar, MatPaginator, MatSort, MatDialog } from '@angular/material';
-import { merge, Observable, BehaviorSubject, fromEvent, Subject } from 'rxjs';
-import { debounceTime, distinctUntilChanged, map, takeUntil } from 'rxjs/operators';
+import { merge, Observable, BehaviorSubject, Subject } from 'rxjs';
+import { map, takeUntil } from 'rxjs/operators';
 
 import { fuseAnimations } from '@fuse/animations';
 import { EcommerceProductService } from '../../../../services/product.service';
@@ -19,6 +19,8 @@ import { ImageViewComponent } from '../../images/imageViewer/imageview.component
 import { S3Service } from '../../../../services/s3.service';
 import { AppCategoryConfig } from '../../../../app-config/app-categorys.config';
 import * as base64Converter from 'base64-arraybuffer';
+import { UserService } from '../../../../services/user.service';
+import { UserModel } from '../../../../models/user.model';
 
 @Component({
     selector     : 'e-commerce-product',
@@ -44,6 +46,8 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
     sort: MatSort;
     @ViewChild('filter')
     filter: ElementRef;
+    lenderInformation = false;
+    public lender = new UserModel();
 
     // Imagenes
     listImages = [];
@@ -52,6 +56,10 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
     listImagesUpload = [];
     bNewImages = false;
     public imageUploaded = true;
+
+    // Status de producto
+    public checkedStatusProduct = false;
+    public prod_current_status = '';
 
     // Private
     private _unsubscribeAll: Subject<any>;
@@ -75,7 +83,8 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
         private router: Router,
         public dialog: MatDialog,
         private _s3Service: S3Service,
-        private appCategoryConfig: AppCategoryConfig
+        private appCategoryConfig: AppCategoryConfig,
+        private _userService: UserService
     )
     {
         // Set the default
@@ -109,6 +118,8 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
                     this.product = new Product(product);
                     this.pageType = 'edit';
                     this.cargarDocumentos(this.product.prod_url_documen);
+                    this.loadCurrentStatusProduct(product);
+                    this.cargarInfoLender(product);
                 }
                 else
                 {
@@ -121,21 +132,88 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
 
 
         this.dataSource = new FilesDataSource(this._ecommerceProductService, this.paginator, this.sort);
-        console.log(this.dataSource); // CARGA INICIAL
-        fromEvent(this.filter.nativeElement, 'keyup')
-            .pipe(
-                takeUntil(this._unsubscribeAll),
-                debounceTime(150),
-                distinctUntilChanged()
-            )
-            .subscribe(() => {
-                if (!this.dataSource) {
-                    return;
-                }
+        // console.log(this.dataSource); // CARGA INICIAL
+        // fromEvent(this.filter.nativeElement, 'keyup')
+        //     .pipe(
+        //         takeUntil(this._unsubscribeAll),
+        //         debounceTime(150),
+        //         distinctUntilChanged()
+        //     )
+        //     .subscribe(() => {
+        //         if (!this.dataSource) {
+        //             return;
+        //         }
 
-                this.dataSource.filter = this.filter.nativeElement.value;
-                console.log(this.dataSource); // BUSCADOR
-            });
+        //         this.dataSource.filter = this.filter.nativeElement.value;
+        //         console.log(this.dataSource); // BUSCADOR
+        //     });
+    }
+
+    loadCurrentStatusProduct(product): void {
+        if (product.prod_est_registro === '1') {
+            this.prod_current_status = 'Habilitado';
+            this.checkedStatusProduct = true;
+        } else {
+            this.prod_current_status = 'Deshabilitado';
+            this.checkedStatusProduct = false;
+        }
+    }
+    onSearchLenderChange(event): void {
+        if (event.length === 16) {
+            const body = {
+                user_id : event
+            };
+            this._userService.detailsLender(body).subscribe(
+                data => {
+                    if (data.res_service === 'ok'){
+                        if (data.data_result.Item != null){
+                            this.lenderInformation = true;
+                            this.lender = data.data_result.Item;                            
+                        } else {
+                            this.lenderInformation = false;
+                            this._matSnackBar.open('Prestamista no existe o deshabilitado', 'Aceptar', {
+                                verticalPosition: 'top',
+                                duration: 3000
+                            });
+                            this.productForm.controls.lender_user_id.patchValue('');
+                        }
+                    } else {
+                        this.lenderInformation = false;
+                    }
+                }
+            );
+        } else {
+            this.lenderInformation = false;
+        }
+    }
+
+    cargarInfoLender(product): void {        
+        const body = {
+            user_id: product.lender_user_id
+        };
+        this._userService.detailsLender(body).subscribe(
+            data => {
+                if (data.res_service === 'ok') {
+                    if (data.data_result.Item != null) {
+                        this.lenderInformation = true;
+                        this.lender = data.data_result.Item;
+                    } else {
+                        this.lenderInformation = false;
+                        this._matSnackBar.open('Prestamista no existe o deshabilitado', 'Aceptar', {
+                            verticalPosition: 'top',
+                            duration: 3000
+                        });
+                        this.productForm.controls.lender_user_id.patchValue('');
+                    }
+                } else {
+                    this.lenderInformation = false;
+                }
+            }
+        );
+    }
+
+    navigateToLender(): void {
+        this.router.navigateByUrl('lenders/lender/' + this.lender.user_id + '/' + this.lender.user_slug);
     }
 
     cargarDocumentos(documents): void {
@@ -459,6 +537,64 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
             }
         });
     }
+
+    copyClipBoardLenderId(user_id): void {
+
+        const selBox = document.createElement('textarea');
+        selBox.style.position = 'fixed';
+        selBox.style.left = '0';
+        selBox.style.top = '0';
+        selBox.style.opacity = '0';
+        selBox.value = user_id;
+        document.body.appendChild(selBox);
+        selBox.focus();
+        selBox.select();
+        document.execCommand('copy');
+        document.body.removeChild(selBox);
+
+        document.execCommand('copy');
+
+        this._matSnackBar.open('Código copiado', 'Aceptar', {
+            verticalPosition: 'top',
+            duration: 3000
+        });
+    }
+
+    changeStatusProduct(event): void {
+        let current_status = '0';
+        let current_status_msg = 'Deshabilitado';
+
+        if (event.checked) {
+            current_status = '1';
+            current_status_msg = 'Habilitado';
+        } else {
+            current_status = '0';
+            current_status_msg = 'Deshabilitado';
+        }
+
+        const bodyDelete = {
+            prod_id : this.product.prod_id,
+            prod_est_registro: current_status
+        };
+
+        this._ecommerceProductService.deleteProduct(bodyDelete).subscribe(
+            data => {
+                if (data.res_service === 'ok') {
+                    this.prod_current_status = current_status_msg;
+                    this._matSnackBar.open('Artículo ' + current_status_msg, 'Aceptar', {
+                        verticalPosition: 'top',
+                        duration: 3000
+                    });
+                } else {
+                    this._matSnackBar.open('Error actualizando la información', 'Aceptar', {
+                        verticalPosition: 'top',
+                        duration: 3000
+                    });
+                }
+            }
+        );
+    }
+
 }
 
 

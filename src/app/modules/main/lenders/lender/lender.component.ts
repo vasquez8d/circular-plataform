@@ -30,6 +30,9 @@ export class LenderComponent implements OnInit, OnDestroy
     lenderForm: FormGroup;
     listadoDistritosLima = [];
     fileToUpload: File = null;
+    
+    public lndr_current_status = '';
+    public checkedStatusUser = false;
 
     public imageUploaded = true;
 
@@ -91,9 +94,10 @@ export class LenderComponent implements OnInit, OnDestroy
             .subscribe(lender => {
                 if ( lender )
                 {
-                    this.lender = new UserModel(lender);
+                    this.lender = new UserModel(lender);                                        
                     this.pageType = 'edit';
                     this.cargarDocumentos(this.lender.user_url_documen);
+                    this.loadCurrentStatusLender(lender);
                 }
                 else
                 {
@@ -102,6 +106,16 @@ export class LenderComponent implements OnInit, OnDestroy
                 }
                 this.lenderForm = this.createLenderForm();
             });
+    }
+
+    loadCurrentStatusLender(lender): void {
+        if (lender.user_stat_reg === '1') {
+            this.lndr_current_status = 'Habilitado';
+            this.checkedStatusUser = true;
+        } else {
+            this.lndr_current_status = 'Deshabilitado';
+            this.checkedStatusUser = false;
+        }
     }
 
     cargarDistritosLima(): void {
@@ -277,6 +291,10 @@ export class LenderComponent implements OnInit, OnDestroy
         };
     }
 
+    navigateProducsXLender(user_id, user_slug): any {
+        this.router.navigateByUrl('products/lender/' + user_id + '/' + user_slug);
+    }
+
     /**
      * Add product
      */
@@ -302,9 +320,9 @@ export class LenderComponent implements OnInit, OnDestroy
         this._lenderService.createLender(LenderSave).subscribe(
             data => {                
                 if (data.res_service === 'ok') {
-                    this._matSnackBar.open('Prestamista modificado', 'Aceptar', {
+                    this._matSnackBar.open('Prestamista registrado', 'Aceptar', {
                         verticalPosition: 'top',
-                        duration: 5000
+                        duration: 3000
                     });
                     const listImagesGuardar = [];
                     this.listImages.forEach(element => {
@@ -386,6 +404,40 @@ export class LenderComponent implements OnInit, OnDestroy
         });
     }
 
+    changeStatusLender(event): void {
+        let current_status = '0';
+        let current_status_msg = 'Deshabilitado';
+
+        if (event.checked) {
+            current_status = '1';
+            current_status_msg = 'Habilitado';
+        } else {
+            current_status = '0';
+            current_status_msg = 'Deshabilitado';
+        }
+
+        const bodyDelete = {
+            user_id: this.lender.user_id,
+            user_stat_reg: current_status
+        };
+
+        this._lenderService.deleteUser(bodyDelete).subscribe(
+            data => {                
+                if (data.res_service === 'ok'){
+                    this.lndr_current_status = current_status_msg;
+                    this._matSnackBar.open('Prestamista ' + current_status_msg, 'Aceptar', {
+                        verticalPosition: 'top',
+                        duration: 3000
+                    });
+                } else {
+                    this._matSnackBar.open('Error actualizando la información', 'Aceptar', {
+                        verticalPosition: 'top',
+                        duration: 3000
+                    });
+                }
+            }
+        );
+    }
 
     copyClipBoardLenderId(user_id): void {
 
@@ -405,7 +457,7 @@ export class LenderComponent implements OnInit, OnDestroy
 
         this._matSnackBar.open('Código copiado', 'Aceptar', {
             verticalPosition: 'top',
-            duration: 5000
+            duration: 3000
         });
     }
 }

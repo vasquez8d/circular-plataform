@@ -25,7 +25,11 @@
                 <div fxLayout="column" fxLayoutAlign="start start"
                      [@animate]="{value:'*',params:{delay:'100ms',x:'-25px'}}">
                     <div class="h2" *ngIf="pageType ==='edit'">
-                        {{product.prod_nombre}}
+                        {{product.prod_nombre}} --
+                        <span>{{product.prod_id}}</span>
+                        <button matTooltip="Copiar código" (click)="copyClipBoardLenderId(product.prod_id)" mat-mini-fab style="margin-left: 10px;">
+                            <mat-icon aria-label="Example icon-button with a heart icon">content_copy</mat-icon>
+                        </button>
                     </div>
                     <div class="h2" *ngIf="pageType ==='new'">
                         Nuevo Artículo
@@ -64,23 +68,67 @@
                     <mat-tab-group>
 
                         <mat-tab label="Prestamista">
-                            <div class="tab-content p-24">
-                                <div class="header" fxLayout="column" fxLayoutAlign="center center" fxLayout.gt-xs="row" fxLayoutAlign.gt-xs="space-between center">
+                            <div class="tab-content p-24" fusePerfectScrollbar>                                
+                                <mat-form-field class="w-50-p">
+                                    <input matInput name="lender_user_id" 
+                                           formControlName="lender_user_id" 
+                                           (input)="onSearchLenderChange($event.target.value)"
+                                           maxlength="16"
+                                           placeholder="Código de prestamista"
+                                           required>
+                                </mat-form-field>
+                                <mat-card class="result" *ngIf="lenderInformation">
+                                    <mat-card-content>
+                                        <h2 class="example-h2">Información del Prestamista</h2>
+                                        <mat-form-field class="w-50-p">
+                                            <input matInput 
+                                                   [value] = "lender.user_names"
+                                                   placeholder="Nombres" readonly>
+                                        </mat-form-field>
+                                        <mat-form-field class="w-50-p">
+                                            <input matInput 
+                                                   [value] = "lender.user_num_doc"
+                                                   placeholder="N° Documento" readonly>
+                                        </mat-form-field>
+                                        <mat-form-field class="w-50-p">
+                                            <input matInput 
+                                                   [value] = "lender.user_full_name1"
+                                                   placeholder="Apellido Paterno" readonly>
+                                        </mat-form-field>
+                                        <mat-form-field class="w-50-p">
+                                            <input matInput 
+                                                   [value] = "lender.user_full_name1"
+                                                   placeholder="Apellido Materno" readonly>
+                                        </mat-form-field>
+                                        <mat-form-field class="w-50-p">
+                                            <input matInput 
+                                                   [value] = "lender.user_email"
+                                                   placeholder="Correo electrónico" readonly>
+                                        </mat-form-field>
+                                        <mat-form-field class="w-50-p">
+                                            <input matInput 
+                                                   [value] = "lender.user_ubigeo.ubig_dpt + ' / ' + lender.user_ubigeo.ubig_prv + ' / ' + lender.user_ubigeo.ubig_dst"
+                                                   placeholder="Ubigeo" readonly>
+                                        </mat-form-field>
+                                        <button (click)="navigateToLender()" mat-raised-button color="accent">
+                                            <mat-icon>account_circle</mat-icon>
+                                            <span>  Ver detalle</span>
+                                        </button>
+                                    </mat-card-content>
+                                </mat-card>
+                                <!-- <div class="header" fxLayout="column" fxLayoutAlign="center center" fxLayout.gt-xs="row" fxLayoutAlign.gt-xs="space-between center">
                                     <div class="search-input-wrapper mx-24 m-md-0" fxFlex="1 0 auto" fxLayout="row" fxLayoutAlign="start center">
                                         <label for="search" class="mr-8">
                                             <mat-icon class="secondary-text">search</mat-icon>
                                         </label>
                                         <mat-form-field class="w-40-p" floatLabel="never">
                                             <input id="search" matInput #filter placeholder="Buscar un prestamista">
-                                        </mat-form-field>
-                                        <mat-form-field style="margin-left: 100px;" class="w-50-p">
-                                            <input matInput name="lender_user_id" formControlName="lender_user_id" placeholder="Código de prestamista" required>
-                                        </mat-form-field>
+                                        </mat-form-field>                                        
                                     </div>
                                 </div>
                                 <div class="content-card mat-white-bg">
 
-                                    <!-- <mat-table class="products-table" #table [dataSource]="dataSource" matSort [@animateStagger]="{value:'50'}" fusePerfectScrollbar>
+                                    <mat-table class="products-table" #table [dataSource]="dataSource" matSort [@animateStagger]="{value:'50'}" fusePerfectScrollbar>
 
                                         <ng-container matColumnDef="prod_id">
                                             <mat-header-cell *matHeaderCellDef mat-sort-header>Código</mat-header-cell>
@@ -128,12 +176,12 @@
                                         <mat-row *matRowDef="let product; columns: displayedColumns;" class="product" matRipple>
                                         </mat-row>
 
-                                    </mat-table> -->
+                                    </mat-table>
 
-                                    <!-- <mat-paginator #paginator>
-                                    </mat-paginator> -->
+                                    <mat-paginator #paginator>
+                                    </mat-paginator>
 
-                                </div>
+                                </div> -->
                             </div>
                         </mat-tab>
 
@@ -183,6 +231,18 @@
                                     </mat-chip-list>
 
                                 </mat-form-field>
+
+                                <mat-card class="result">
+                                    <mat-card-content>
+                                        <h2 class="example-h2">Estado del producto</h2>
+
+                                        <section class="example-section">
+                                            <mat-slide-toggle (change)="changeStatusProduct($event)" [checked]="checkedStatusProduct">
+                                                {{prod_current_status}}
+                                            </mat-slide-toggle>
+                                        </section>
+                                    </mat-card-content>
+                                </mat-card>
 
                             </div>
 

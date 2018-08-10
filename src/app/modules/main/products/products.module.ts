@@ -3,7 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { MatButtonModule, MatChipsModule, MatFormFieldModule, 
          MatIconModule, MatInputModule, MatPaginatorModule, 
          MatRippleModule, MatSelectModule, MatSnackBarModule, 
-         MatSortModule, MatTableModule, MatTabsModule, MatDialogModule } from '@angular/material';
+         MatSortModule, MatTableModule, MatTabsModule, MatDialogModule, MatSlideToggleModule, MatCardModule, MatTooltipModule } from '@angular/material';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { AgmCoreModule } from '@agm/core';
 
@@ -17,7 +17,9 @@ import { ImageUploadComponent } from '../images/imageUpload/image-upload.compone
 import { ImageViewComponent } from '../images/imageViewer/imageview.component';
 import { ImageUploadModule } from '../images/imageUpload/image-upload.module';
 import { ImageViewModule } from '../images/imageViewer/imageview.module';
-
+import { LenderProductComponent } from './lender/producxlender.component';
+import { UserService } from '../../../services/user.service';
+import { LenderProductsService } from '../../../services/productsxlender.service';
 
 const routes: Routes = [
     {
@@ -41,12 +43,20 @@ const routes: Routes = [
             data: EcommerceProductService
         }
     },
+    {
+        path: 'lender/:id/:handle',
+        component: LenderProductComponent,
+        resolve: {
+            data: LenderProductsService
+        }
+    },
 ];
 
 @NgModule({
     declarations: [
         EcommerceProductsComponent,
         EcommerceProductComponent,
+        LenderProductComponent
     ],
     entryComponents : [
         ImageViewComponent,
@@ -68,6 +78,10 @@ const routes: Routes = [
         MatTableModule,
         MatTabsModule,
 
+        MatSlideToggleModule,
+        MatCardModule,
+        MatTooltipModule,
+
         NgxChartsModule,
         AgmCoreModule.forRoot({
             apiKey: 'AIzaSyD81ecsCj4yYpcXSLFcYU97PvRsE_X8Bx8'
@@ -84,6 +98,8 @@ const routes: Routes = [
     providers: [
         EcommerceProductsService,
         EcommerceProductService,
+        UserService,
+        LenderProductsService
     ]
 })
 export class ProductsModule {

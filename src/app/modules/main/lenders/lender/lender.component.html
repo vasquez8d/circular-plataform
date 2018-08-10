@@ -27,8 +27,11 @@
                     <div class="h2" *ngIf="pageType ==='edit'">
                         {{lender.user_names}} --
                         <span>{{lender.user_id}}</span>
-                        <button (click)="copyClipBoardLenderId(lender.user_id)" mat-mini-fab style="margin-left: 10px;">
+                        <button matTooltip="Copiar código" (click)="copyClipBoardLenderId(lender.user_id)" mat-mini-fab style="margin-left: 10px;">
                             <mat-icon aria-label="Example icon-button with a heart icon">content_copy</mat-icon>
+                        </button>
+                        <button matTooltip="Ver articulos relacionados" (click)="navigateProducsXLender(lender.user_id, lender.user_slug)" mat-mini-fab style="margin-left: 10px;">
+                            <mat-icon aria-label="Example icon-button with a heart icon">storage</mat-icon>
                         </button>
                     </div>
                     <div class="h2" *ngIf="pageType ==='new'">
@@ -40,7 +43,7 @@
                 </div>
             </div>
             <!-- / APP TITLE -->
-
+            
             <button mat-raised-button
                     class="save-product-button mat-white-bg"
                     [disabled]="lenderForm.invalid"
@@ -107,6 +110,19 @@
                                            placeholder="Número de documento"
                                            required>
                                 </mat-form-field> 
+
+                                <mat-card class="result">
+                                    <mat-card-content>
+                                        <h2 class="example-h2">Estado del prestamista</h2>
+
+                                        <section class="example-section">
+                                            <mat-slide-toggle (change)="changeStatusLender($event)" [checked]="checkedStatusUser">
+                                                {{lndr_current_status}}
+                                            </mat-slide-toggle>
+                                        </section>
+                                    </mat-card-content>
+                                </mat-card>
+
                             </div>
 
                         </mat-tab>
@@ -197,13 +213,13 @@
 
                             <div class="tab-content p-24" fusePerfectScrollbar>
 
-                                <mat-form-field class="w-100-p">
+                                <!-- <mat-form-field class="w-100-p">
                                     <input matInput
                                            name="user_stat_reg"
                                            formControlName="user_stat_reg"
                                            placeholder="Estado de registro"
                                            readonly>
-                                </mat-form-field>
+                                </mat-form-field> -->
                                 <mat-form-field class="w-50-p">
                                     <input matInput
                                            name="user_date_reg"

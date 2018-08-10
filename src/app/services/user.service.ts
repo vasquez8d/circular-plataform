@@ -15,6 +15,7 @@ export class UserService implements Resolve<any>
     private detailsUrl = `${this.globalValues.urlUsers()}/details`;
     private UpdateUrl = `${this.globalValues.urlUsers()}/update`;
     private CreateUrl = `${this.globalValues.urlUsers()}/create`;
+    private DeleteUserUrl = `${this.globalValues.urlUsers()}/delete`;
 
     /**
      * Constructor
@@ -82,6 +83,13 @@ export class UserService implements Resolve<any>
         });
     }
 
+    detailsLender(body): Observable<ResponseModel> {
+        return this._httpClient.post<ResponseModel>(this.detailsUrl, body).pipe(
+            tap((response: ResponseModel) => this.log(`Resultado del detailsLender = ${response.res_service}`)),
+            catchError(this.handleError<ResponseModel>('detailsLender'))
+        );
+    }
+
     updateLender(lender): Observable<ResponseModel> {
         return this._httpClient.patch<ResponseModel>(this.UpdateUrl, lender).pipe(
             tap((response: ResponseModel) => this.log(`Resultado del updateLender = ${response.res_service}`)),
@@ -96,6 +104,14 @@ export class UserService implements Resolve<any>
         );
     }
     
+
+    deleteUser(body): Observable<ResponseModel> {
+        return this._httpClient.post<ResponseModel>(this.DeleteUserUrl, body).pipe(
+            tap((response: ResponseModel) => this.log(`Resultado del deleteUser = ${response.res_service}`)),
+            catchError(this.handleError<ResponseModel>('deleteUser'))
+        );
+    }
+
     // tslint:disable-next-line:typedef
     private handleError<T>(operation = 'operation', result?: T) {
         return (error: any): Observable<T> => {

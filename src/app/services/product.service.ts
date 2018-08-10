@@ -20,6 +20,7 @@ export class EcommerceProductService implements Resolve<any>
     private UpdateUrl = `${this.globalValues.urlProducts()}/update`;
     private CreateUrl = `${this.globalValues.urlProducts()}/create`;
     private listUrl = `${this.globalValues.urlProducts()}/list`;
+    private DeleteUrl = `${this.globalValues.urlProducts()}/delete`;    
 
     /**
      * Constructor
@@ -111,6 +112,13 @@ export class EcommerceProductService implements Resolve<any>
         return this._httpClient.post<ResponseModel>(this.CreateUrl, producto).pipe(
             tap((response: ResponseModel) => this.log(`Resultado del registrarProducto = ${response.res_service}`)),
             catchError(this.handleError<ResponseModel>('registrarProducto'))
+        );
+    }
+
+    deleteProduct(body): Observable<ResponseModel> {
+        return this._httpClient.post<ResponseModel>(this.DeleteUrl, body).pipe(
+            tap((response: ResponseModel) => this.log(`Resultado del deleteProduct = ${response.res_service}`)),
+            catchError(this.handleError<ResponseModel>('deleteProduct'))
         );
     }
 
