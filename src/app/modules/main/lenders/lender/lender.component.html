@@ -33,6 +33,10 @@
                         <button matTooltip="Ver articulos relacionados" (click)="navigateProducsXLender(lender.user_id, lender.user_slug)" mat-mini-fab style="margin-left: 10px;">
                             <mat-icon aria-label="Example icon-button with a heart icon">storage</mat-icon>
                         </button>
+                        <button matTooltip="Agregar un artículo" (click)="navigateCreateProduct(lender.user_id, lender.user_slug)" mat-mini-fab
+                            style="margin-left: 10px;">
+                            <mat-icon aria-label="Example icon-button with a heart icon">playlist_add</mat-icon>
+                        </button>
                     </div>
                     <div class="h2" *ngIf="pageType ==='new'">
                         Nuevo Prestamista
@@ -81,14 +85,14 @@
                                            placeholder="Nombres del prestamista"
                                            required>
                                 </mat-form-field>
-                                <mat-form-field class="w-100-p">
+                                <mat-form-field class="w-50-p">
                                     <input matInput
                                            name="user_full_name1"
                                            formControlName="user_full_name1"
                                            placeholder="Apellido Paterno"
                                            required>
                                 </mat-form-field>
-                                <mat-form-field class="w-100-p">
+                                <mat-form-field class="w-50-p">
                                     <input matInput
                                            name="user_full_name2"
                                            formControlName="user_full_name2"
@@ -103,15 +107,47 @@
                                         </mat-option>
                                     </mat-select>  
                                 </mat-form-field>                                                            
-                                <mat-form-field class="w-100-p">
+                                <mat-form-field class="w-50-p">
                                     <input matInput
                                            name="user_num_doc"
                                            formControlName="user_num_doc"
                                            placeholder="Número de documento"
                                            required>
                                 </mat-form-field> 
+                                <!-- <mat-form-field >
+                                    <input matInput
+                                           type="date"
+                                           name="user_num_doc"
+                                           formControlName="user_num_doc"
+                                           placeholder="Fecha de nacimiento"
+                                           required>
+                                </mat-form-field>  -->
 
-                                <mat-card class="result">
+                                <!-- <mat-form-field class="w-50-p">
+                                    <input matInput [matDatepicker]="startDatePicker" 
+                                           placeholder="Fecha de nacimiento" formControlName="user_num_doc" 
+                                           required>
+                                    <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
+                                    <mat-datepicker #startDatePicker></mat-datepicker>
+                                </mat-form-field> -->
+
+                                <mat-form-field class="w-30-p">
+                                    <input (click)="dp.click()" matInput [matDatepicker]="dp" placeholder="Fecha de nacimiento">
+                                    <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
+                                    <mat-datepicker touchUi 
+                                                    #dp 
+                                                    startView="multi-year"
+                                                    panelClass="example-month-picker">
+                                    </mat-datepicker>
+                                    <!-- <mat-datepicker #dp startView="multi-year" 
+                                                    (yearSelected)="chosenYearHandler($event)" 
+                                                    (monthSelected)="chosenMonthHandler($event, dp)"
+                                                    panelClass="example-month-picker">
+                                    </mat-datepicker>                                     -->
+                                </mat-form-field>
+
+
+                                <mat-card class="result" *ngIf="pageType ==='edit'">
                                     <mat-card-content>
                                         <h2 class="example-h2">Estado del prestamista</h2>
 

@@ -11,7 +11,7 @@ import { Product } from '../../../../models/product.model';
 import { CategorysService } from '../../../../services/categorys.service';
 import { SecurityService } from '../../../../services/security.service';
 import { RegistroUtil } from '../../../../utils/registro.util';
-import { Router } from '../../../../../../node_modules/@angular/router';
+import { Router, ActivatedRoute } from '../../../../../../node_modules/@angular/router';
 import { FuseUtils } from '@fuse/utils';
 import { DataSource } from '@angular/cdk/collections';
 import { ImageUploadComponent } from '../../images/imageUpload/image-upload.component';
@@ -48,7 +48,7 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
     filter: ElementRef;
     lenderInformation = false;
     public lender = new UserModel();
-
+    public readonlyLender = false;
     // Imagenes
     listImages = [];
     listImagesGuardar = [];
@@ -84,7 +84,8 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
         public dialog: MatDialog,
         private _s3Service: S3Service,
         private appCategoryConfig: AppCategoryConfig,
-        private _userService: UserService
+        private _userService: UserService,
+        private _activatedRoute: ActivatedRoute,
     )
     {
         // Set the default
@@ -125,6 +126,7 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
                 {
                     this.pageType = 'new';
                     this.product = new Product();
+                    this.cargarInfoNewLender();
                 }
 
                 this.productForm = this.createProductForm();
@@ -210,6 +212,37 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
                 }
             }
         );
+    }
+
+    cargarInfoNewLender(): void {
+        this._activatedRoute.params.subscribe(params => {
+            if (params.user_id){
+                const body = {
+                    user_id: params.user_id
+                };
+                this._userService.detailsLender(body).subscribe(
+                    data => {
+                        if (data.res_service === 'ok') {
+                            if (data.data_result.Item != null) {
+                                this.lenderInformation = true;
+                                this.lender = data.data_result.Item;
+                                this.productForm.controls.lender_user_id.patchValue(params.user_id);
+                                this.readonlyLender = true;
+                            } else {
+                                this.lenderInformation = false;
+                                this._matSnackBar.open('Prestamista no existe o deshabilitado', 'Aceptar', {
+                                    verticalPosition: 'top',
+                                    duration: 3000
+                                });
+                                this.productForm.controls.lender_user_id.patchValue('');
+                            }
+                        } else {
+                            this.lenderInformation = false;
+                        }
+                    }
+                );
+            }
+        });
     }
 
     navigateToLender(): void {

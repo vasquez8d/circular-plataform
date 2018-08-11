@@ -30,6 +30,13 @@ const routes: Routes = [
         }
     },
     {
+        path: 'product/:id/:handle/:user_id',
+        component: EcommerceProductComponent,
+        resolve: {
+            data: EcommerceProductService
+        }
+    },
+    {
         path: 'product/:id/:handle',
         component: EcommerceProductComponent,
         resolve: {
@@ -49,7 +56,7 @@ const routes: Routes = [
         resolve: {
             data: LenderProductsService
         }
-    },
+    }
 ];
 
 @NgModule({

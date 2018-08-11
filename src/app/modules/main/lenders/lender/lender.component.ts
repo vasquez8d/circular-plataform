@@ -15,11 +15,22 @@ import { ImageUploadComponent } from '../../images/imageUpload/image-upload.comp
 import { ImageViewComponent } from '../../images/imageViewer/imageview.component';
 import { S3Service } from '../../../../services/s3.service';
 import { AppCategoryConfig } from '../../../../app-config/app-categorys.config';
+import { MAT_DATE_FORMATS } from '@angular/material/core';
+
+export const MY_FORMATS = {
+    parse: {
+        dateInput: 'DD/MM/YYYY',
+    },
+    display: {
+        dateInput: 'DD/MM/YYYY'
+    }
+};
 
 @Component({
     selector     : 'lender-app',
     templateUrl  : './lender.component.html',
     styleUrls    : ['./lender.component.scss'],
+    providers: [{ provide: MAT_DATE_FORMATS, useValue: MY_FORMATS }],
     encapsulation: ViewEncapsulation.None,
     animations   : fuseAnimations
 })
@@ -293,6 +304,10 @@ export class LenderComponent implements OnInit, OnDestroy
 
     navigateProducsXLender(user_id, user_slug): any {
         this.router.navigateByUrl('products/lender/' + user_id + '/' + user_slug);
+    }
+
+    navigateCreateProduct(user_id, user_slug): any {
+        this.router.navigateByUrl('products/product/new/' + user_slug + '/' + user_id);
     }
 
     /**
