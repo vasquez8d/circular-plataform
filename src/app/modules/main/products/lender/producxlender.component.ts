@@ -8,9 +8,10 @@ import { fuseAnimations } from '@fuse/animations';
 import { FuseUtils } from '@fuse/utils';
 
 import { takeUntil } from 'rxjs/internal/operators';
-import { ActivatedRoute } from '../../../../../../node_modules/@angular/router';
+import { ActivatedRoute, Router } from '../../../../../../node_modules/@angular/router';
 import { UserService } from '../../../../services/user.service';
 import { LenderProductsService } from '../../../../services/productsxlender.service';
+import { UserModel } from '../../../../models/user.model';
 
 @Component({
     selector: 'e-commerce-producxlender',
@@ -35,13 +36,16 @@ export class LenderProductComponent implements OnInit {
     public lndr_names = '';
     public routeParams: any;
 
+    public user = new UserModel();
+
     // Private
     private _unsubscribeAll: Subject<any>;
 
     constructor(
         private _ecommerceProductsService: LenderProductsService,        
         private _activatedRoute: ActivatedRoute,
-        private _userService: UserService
+        private _userService: UserService,
+        private _router: Router
     ) {
         // Set the private defaults
         this._unsubscribeAll = new Subject();
@@ -71,6 +75,10 @@ export class LenderProductComponent implements OnInit {
         this.loadInfoLender();
     }
 
+    navigateCreateProduct(user_id, user_slug): any {
+        this._router.navigateByUrl('products/product/new/' + user_slug + '/' + user_id);
+    }
+
     loadInfoLender(): void {
         this._activatedRoute.params.subscribe(params => {
             if (params.id) {
@@ -80,8 +88,8 @@ export class LenderProductComponent implements OnInit {
                 this._userService.detailsLender(body).subscribe(
                     data => {
                         if (data.res_service === 'ok'){
-                            const user = data.data_result.Item;
-                            this.lndr_names = user.user_names + ' ' + user.user_full_name1;
+                            this.user =  data.data_result.Item;
+                            this.lndr_names = this.user.user_names + ' ' + this.user.user_full_name1;
                         }
                     }
                 );

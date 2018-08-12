@@ -25,8 +25,7 @@
                 <div fxLayout="column" fxLayoutAlign="start start"
                      [@animate]="{value:'*',params:{delay:'100ms',x:'-25px'}}">
                     <div class="h2" *ngIf="pageType ==='edit'">
-                        {{product.prod_nombre}} --
-                        <span>{{product.prod_id}}</span>
+                        {{product.prod_nombre}}
                         <button matTooltip="Copiar código" (click)="copyClipBoardLenderId(product.prod_id)" mat-mini-fab style="margin-left: 10px;">
                             <mat-icon aria-label="Example icon-button with a heart icon">content_copy</mat-icon>
                         </button>
@@ -117,85 +116,34 @@
                                         </button>
                                     </mat-card-content>
                                 </mat-card>
-                                <!-- <div class="header" fxLayout="column" fxLayoutAlign="center center" fxLayout.gt-xs="row" fxLayoutAlign.gt-xs="space-between center">
-                                    <div class="search-input-wrapper mx-24 m-md-0" fxFlex="1 0 auto" fxLayout="row" fxLayoutAlign="start center">
-                                        <label for="search" class="mr-8">
-                                            <mat-icon class="secondary-text">search</mat-icon>
-                                        </label>
-                                        <mat-form-field class="w-40-p" floatLabel="never">
-                                            <input id="search" matInput #filter placeholder="Buscar un prestamista">
-                                        </mat-form-field>                                        
-                                    </div>
-                                </div>
-                                <div class="content-card mat-white-bg">
-
-                                    <mat-table class="products-table" #table [dataSource]="dataSource" matSort [@animateStagger]="{value:'50'}" fusePerfectScrollbar>
-
-                                        <ng-container matColumnDef="prod_id">
-                                            <mat-header-cell *matHeaderCellDef mat-sort-header>Código</mat-header-cell>
-                                            <mat-cell *matCellDef="let product">
-                                                <p class="text-truncate">{{product.prod_id}}</p>
-                                            </mat-cell>
-                                        </ng-container>
-
-                                        <ng-container matColumnDef="prod_nombre">
-                                            <mat-header-cell *matHeaderCellDef mat-sort-header>Nombre</mat-header-cell>
-                                            <mat-cell *matCellDef="let product">
-                                                <p class="text-truncate">{{product.prod_nombre}}</p>
-                                            </mat-cell>
-                                        </ng-container>
-
-                                        <ng-container matColumnDef="prod_categoria">
-                                            <mat-header-cell *matHeaderCellDef fxHide mat-sort-header fxShow.gt-md>Categoría</mat-header-cell>
-                                            <mat-cell *matCellDef="let product" fxHide fxShow.gt-md>
-                                                <p class="category text-truncate">
-                                                    {{product.prod_categoria.catg_nombre}}
-                                                </p>
-                                            </mat-cell>
-                                        </ng-container>
-
-                                        <ng-container matColumnDef="prod_est_alquiler">
-                                            <mat-header-cell *matHeaderCellDef mat-sort-header fxHide fxShow.gt-sm>Estado Alquiler</mat-header-cell>
-                                            <mat-cell *matCellDef="let product" fxHide fxShow.gt-sm>
-
-                                                <span>
-                                                    {{product.prod_est_alquiler}}
-                                                </span>
-
-                                            </mat-cell>
-                                        </ng-container>
-
-                                        <ng-container matColumnDef="prod_est_registro">
-                                            <mat-header-cell *matHeaderCellDef mat-sort-header fxHide fxShow.gt-xs>Estado</mat-header-cell>
-                                            <mat-cell *matCellDef="let product" fxHide fxShow.gt-xs>
-                                                {{product.prod_est_registro}}
-                                            </mat-cell>
-                                        </ng-container>
-
-                                        <mat-header-row *matHeaderRowDef="displayedColumns; sticky:true"></mat-header-row>
-
-                                        <mat-row *matRowDef="let product; columns: displayedColumns;" class="product" matRipple>
-                                        </mat-row>
-
-                                    </mat-table>
-
-                                    <mat-paginator #paginator>
-                                    </mat-paginator>
-
-                                </div> -->
                             </div>
                         </mat-tab>
 
                         <mat-tab label="Información">
 
                             <div class="tab-content p-24" fusePerfectScrollbar>
-
+                                <mat-form-field class="w-100-p" *ngIf="pageType ==='edit'">
+                                    <input matInput
+                                           name="prod_nombre"
+                                           formControlName="prod_id"
+                                           placeholder="Código del artículo"
+                                           required
+                                           readonly>
+                                </mat-form-field>
                                 <mat-form-field class="w-100-p">
                                     <input matInput
                                            name="prod_nombre"
                                            formControlName="prod_nombre"
                                            placeholder="Nombre del artículo"
                                            required>
+                                </mat-form-field>
+                                <mat-form-field class="w-50-p">
+                                    <mat-select placeholder="Categoría del artículo" formControlName="catg_id"
+                                        required>
+                                        <mat-option *ngFor="let categ of listadoCategorias" [value]="categ.catg_id">
+                                            {{categ.catg_nombre}}
+                                        </mat-option>
+                                    </mat-select>  
                                 </mat-form-field>
                                 <mat-form-field class="w-100-p">
                                     <textarea matInput
@@ -206,15 +154,6 @@
                                            rows="3">
                                     </textarea>
                                 </mat-form-field>
-                                <mat-form-field class="w-50-p">
-                                    <mat-select placeholder="Categoría del artículo" formControlName="catg_id"
-                                        required>
-                                        <mat-option *ngFor="let categ of listadoCategorias" [value]="categ.catg_id">
-                                            {{categ.catg_nombre}}
-                                        </mat-option>
-                                    </mat-select>  
-                                </mat-form-field>                                
-                              
                                 <mat-form-field class="w-100-p">
 
                                     <mat-chip-list #tagList name="prod_tags" formControlName="prod_tags">
@@ -232,21 +171,94 @@
                                     </mat-chip-list>
 
                                 </mat-form-field>
-
-                                <mat-card class="result" *ngIf="pageType ==='edit'">
-                                    <mat-card-content>
-                                        <h2 class="example-h2">Estado del producto</h2>
-
-                                        <section class="example-section">
-                                            <mat-slide-toggle (change)="changeStatusProduct($event)" [checked]="checkedStatusProduct">
-                                                {{prod_current_status}}
-                                            </mat-slide-toggle>
-                                        </section>
-                                    </mat-card-content>
-                                </mat-card>
-
+                                <div id="card-container" *ngIf="pageType ==='edit'">
+                                        <mat-card class="example-card">
+                                                <mat-card-content>
+                                                    <h2 class="example-h2">Estado del producto</h2>
+                                                    <section class="example-section">
+                                                        <mat-slide-toggle (change)="changeStatusProduct($event)" [checked]="checkedStatusProduct">
+                                                            {{prod_current_status}}
+                                                        </mat-slide-toggle>
+                                                    </section>                                        
+                                                </mat-card-content>
+                                        </mat-card>                                                                                 
+                                </div>                                                                                                                       
+                                <div id="card-container">
+                                        <mat-card class="example-card">                                   
+                                                <mat-card-content>
+                                                    <h3>Estado de Conversación: {{prd_est_conversva}}</h3> 
+                                                    <section class="example-section">
+                                                        <mat-slider
+                                                            thumbLabel
+                                                            [displayWith]="formatLabel"
+                                                            (change)="changeEstConversa($event)"
+                                                            tickInterval="1"
+                                                            formControlName="prod_est_converva_value"
+                                                            min="1"
+                                                            max="10"></mat-slider>
+                                                    </section>
+                                                    <mat-form-field class="w-100-p">
+                                                        <input matInput
+                                                               formControlName="prod_est_converva_desc"
+                                                               placeholder="Descripción del estado"
+                                                               required>
+                                                    </mat-form-field>
+                                                </mat-card-content>
+                                            </mat-card>                                     
+                                            <mat-card class="example-card">                                   
+                                                <mat-card-content>
+                                                    <h3>Tiempo de uso:</h3> 
+                                                    <section class="example-section">
+                                                        <mat-form-field class="w-50-p">
+                                                            <input matInput
+                                                                formControlName="prod_time_uso_value"
+                                                                placeholder="¿Cúanto?"
+                                                                required>
+                                                        </mat-form-field>
+                                                        <mat-form-field class="w-50-p">
+                                                            <mat-select placeholder="Tiempo" 
+                                                                formControlName="prod_time_uso_id"
+                                                                required>
+                                                                <mat-option *ngFor="let tipo of listTiempos" [value]="tipo.value">
+                                                                    {{tipo.text}}
+                                                                </mat-option>
+                                                            </mat-select>
+                                                        </mat-form-field>
+                                                    </section>
+                                                </mat-card-content>
+                                            </mat-card>
+                                            <mat-card class="example-card-mercado">                                   
+                                                <mat-card-content>
+                                                    <h3>Valor en el mercado:</h3> 
+                                                    <section class="example-section">
+                                                        <mat-form-field class="w-50-p">
+                                                            <input matInput
+                                                                formControlName="prod_val_merca_value"
+                                                                placeholder="¿Cúanto?"
+                                                                required>
+                                                        </mat-form-field>
+                                                        <mat-form-field class="w-50-p">
+                                                            <mat-select placeholder="¿Qué moneda?" 
+                                                                        formControlName="prod_val_merca_moneda_id"
+                                                                        required>
+                                                                <mat-option *ngFor="let tipo of listTipoMonedas" [value]="tipo.value">
+                                                                    {{tipo.text}}
+                                                                </mat-option>
+                                                            </mat-select> 
+                                                        </mat-form-field>
+                                                    </section>
+                                                    <mat-form-field class="w-100-p">
+                                                            <textarea matInput
+                                                                   formControlName="prod_val_merca_ref_price"
+                                                                   placeholder="Referencia del precio"
+                                                                   required>
+                                                            </textarea>      
+                                                    </mat-form-field> 
+                                                </mat-card-content>
+                                            </mat-card>
+                                           
+                                </div> 
                             </div>
-
                         </mat-tab>
 
                         <mat-tab label="Imágenes">

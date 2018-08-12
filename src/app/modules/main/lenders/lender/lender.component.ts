@@ -58,6 +58,10 @@ export class LenderComponent implements OnInit, OnDestroy
     listImagesGuardar = [];
     listCurrentImages = [];
     bNewImages = false;
+
+    // Fecha nacimiento
+    public maxDateFecNacLender = new Date(2000, 0, 1);
+
     // Private
     private _unsubscribeAll: Subject<any>;
 
@@ -175,11 +179,16 @@ export class LenderComponent implements OnInit, OnDestroy
      */
     createLenderForm(): FormGroup
     {  
+        let user_fec_nac = '';
+        if (this.lender.user_fec_nac !== ''){
+            user_fec_nac = (new Date(this.lender.user_fec_nac)).toISOString();
+        }         
         return this._formBuilder.group({
             user_id             : [this.lender.user_id],            
             user_names          : [this.lender.user_names],
             user_full_name1     : [this.lender.user_full_name1],
             user_full_name2     : [this.lender.user_full_name2],
+            user_fec_nac        : [user_fec_nac],
             user_email          : [this.lender.user_email],            
             user_num_phone      : [this.lender.user_num_phone],
             user_num_doc        : [this.lender.user_num_doc],
@@ -205,6 +214,7 @@ export class LenderComponent implements OnInit, OnDestroy
         LenderSave.user_names = this.lenderForm.value.user_names;
         LenderSave.user_full_name1 = this.lenderForm.value.user_full_name1;
         LenderSave.user_full_name2 = this.lenderForm.value.user_full_name2;
+        LenderSave.user_fec_nac = this.lenderForm.value.user_fec_nac.format('DD/MM/YYYY');
         LenderSave.user_slug = this.registroUtil.obtenerSlugPorNombre(LenderSave.user_names + ' ' + LenderSave.user_full_name1);
         LenderSave.user_num_doc = this.lenderForm.value.user_num_doc;
         LenderSave.user_tip_doc = this.obtenerTipoDocumSeleccionado();
@@ -216,7 +226,6 @@ export class LenderComponent implements OnInit, OnDestroy
         LenderSave.user_categ = {
             catg_id: this.appCategoryConfig.getLenderCategory()
         };
-
         this._lenderService.updateLender(LenderSave).subscribe(
             data => {
                 if (data.res_service === 'ok') {
@@ -320,6 +329,7 @@ export class LenderComponent implements OnInit, OnDestroy
         LenderSave.user_names = this.lenderForm.value.user_names;
         LenderSave.user_full_name1 = this.lenderForm.value.user_full_name1;
         LenderSave.user_full_name2 = this.lenderForm.value.user_full_name2;
+        LenderSave.user_fec_nac = this.lenderForm.value.user_fec_nac.format('DD/MM/YYYY');
         LenderSave.user_slug = this.registroUtil.obtenerSlugPorNombre(LenderSave.user_names + ' ' + LenderSave.user_full_name1);
         LenderSave.user_num_doc = this.lenderForm.value.user_num_doc;
         LenderSave.user_tip_doc = this.obtenerTipoDocumSeleccionado();
@@ -370,7 +380,7 @@ export class LenderComponent implements OnInit, OnDestroy
                         );
                     });
                     
-                    this.router.navigateByUrl('/lenders');
+                    this.router.navigateByUrl('/lenders/lender/' + data.data_result.user_id + '/' + LenderSave.user_slug);
                 } else {
                     this._matSnackBar.open('Error modificando la información del prestamista', 'Aceptar', {
                         verticalPosition: 'top',

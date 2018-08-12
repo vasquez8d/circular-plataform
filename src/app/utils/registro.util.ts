@@ -17,9 +17,10 @@ export class RegistroUtil {
     finalName = finalName.replace('ó', 'o');
     finalName = finalName.replace('ú', 'u');
     finalName = finalName.replace('ñ', 'n');
+    finalName = finalName.replace('/', '');
     return finalName;
   }
-  
+
   obtenerFechaCreacion(): string {
     const date = new Date();
     const dateFormat = ('00' + date.getDate()).slice(-2) + '/' + 

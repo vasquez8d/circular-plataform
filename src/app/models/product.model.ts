@@ -25,11 +25,26 @@ export class Product
     prod_usu_actualiza: string;
     prod_fec_actualiza: string;
     catg_id: string;
-
     prod_url_documen: {
         image_key: string,
         image_desc: string,
     }[]; 
+
+    prod_est_converva: {
+        est_value: number,
+        est_desc: string
+    };
+
+    prod_time_uso: {
+        time_value: number,
+        time_id: number
+    };
+
+    prod_val_merca: {
+        val_value: number,
+        val_moneda_id: number,
+        val_ref_price: string
+    };
 
     /**
      * Constructor
@@ -42,6 +57,18 @@ export class Product
         this.prod_id = product.prod_id || '0';
         this.lender_user_id = product.lender_user_id || '';
         this.prod_nombre = product.prod_nombre || '';
+
+        this.prod_est_converva = product.prod_est_converva || {
+            est_value: 0,
+            est_desc: ''
+        };
+        this.prod_time_uso = product.prod_time_uso || {
+            time_id: 1
+        };
+        this.prod_val_merca = product.prod_val_merca || {
+            val_moneda_id: 1
+        };
+
         this.prod_desc = product.prod_desc || '';
         this.prod_tags = product.prod_tags || [];
         this.prod_slug = product.prod_slug || '';
@@ -56,5 +83,6 @@ export class Product
         this.prod_fec_registro = product.prod_fec_registro || '';
         this.prod_usu_registro = product.prod_usu_registro || '';
         this.prod_url_documen = product.prod_url_documen || [];
+
     }
 }

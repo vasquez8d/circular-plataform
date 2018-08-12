@@ -31,6 +31,7 @@ export class UserModel {
     user_usur_reg: any;
     user_date_upt: any;
     user_usur_upt: any;
+    user_fec_nac: any;
     /**
          * Constructor
          *
@@ -64,6 +65,7 @@ export class UserModel {
         this.user_usur_reg = user.user_usur_reg || null;
         this.user_date_upt = user.user_date_upt || null;
         this.user_usur_upt = user.user_usur_upt || null;
+        this.user_fec_nac = user.user_fec_nac || '';
     }
 
 }

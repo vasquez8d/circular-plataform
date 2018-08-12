@@ -32,7 +32,7 @@
             </div>
             <!-- / SEARCH -->
 
-            <button mat-raised-button [routerLink]="'/products/product/new'" class="add-product-button mat-white-bg my-12 mt-sm-0">
+            <button mat-raised-button (click)="navigateCreateProduct(user.user_id, user.user_slug)" class="add-product-button mat-white-bg my-12 mt-sm-0">
                 <span>Agregar un artículo</span>
             </button>
 

@@ -12,14 +12,14 @@ export class EcommerceProductService implements Resolve<any>
     routeParams: any;
     product: any;
 
-    products: any[];
+    // products: any[];
     onProductsChanged: BehaviorSubject<any>;
 
     onProductChanged: BehaviorSubject<any>;
     private detailsUrl = `${this.globalValues.urlProducts()}/details`;
     private UpdateUrl = `${this.globalValues.urlProducts()}/update`;
     private CreateUrl = `${this.globalValues.urlProducts()}/create`;
-    private listUrl = `${this.globalValues.urlProducts()}/list`;
+    // private listUrl = `${this.globalValues.urlProducts()}/list`;
     private DeleteUrl = `${this.globalValues.urlProducts()}/delete`;    
 
     /**
@@ -52,7 +52,7 @@ export class EcommerceProductService implements Resolve<any>
 
             Promise.all([
                 this.getProduct(),
-                this.getProducts()
+                // this.getProducts()
             ]).then(
                 () => {
                     resolve();
@@ -62,16 +62,16 @@ export class EcommerceProductService implements Resolve<any>
         });
     }
 
-    getProducts(): Promise<any> {
-        return new Promise((resolve, reject) => {
-            this._httpClient.get(this.listUrl)
-                .subscribe((response: any) => {
-                    this.products = response.data_result.Items;
-                    this.onProductsChanged.next(this.products);
-                    resolve(response);
-                }, reject);
-        });
-    }
+    // getProducts(): Promise<any> {
+    //     return new Promise((resolve, reject) => {
+    //         this._httpClient.get(this.listUrl)
+    //             .subscribe((response: any) => {
+    //                 this.products = response.data_result.Items;
+    //                 this.onProductsChanged.next(this.products);
+    //                 resolve(response);
+    //             }, reject);
+    //     });
+    // }
 
     /**
      * Get product
@@ -110,7 +110,7 @@ export class EcommerceProductService implements Resolve<any>
 
     registrarProducto(producto): Observable<ResponseModel> {
         return this._httpClient.post<ResponseModel>(this.CreateUrl, producto).pipe(
-            tap((response: ResponseModel) => this.log(`Resultado del registrarProducto = ${response.res_service}`)),
+            tap((response: ResponseModel) => this.log(`Resultado del registrarProducto = ${JSON.stringify(response)}`)),
             catchError(this.handleError<ResponseModel>('registrarProducto'))
         );
     }

@@ -3,7 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { MatButtonModule, MatChipsModule, MatFormFieldModule, 
          MatIconModule, MatInputModule, MatPaginatorModule, 
          MatRippleModule, MatSelectModule, MatSnackBarModule, 
-         MatSortModule, MatTableModule, MatTabsModule, MatDialogModule, MatSlideToggleModule, MatCardModule, MatTooltipModule } from '@angular/material';
+         MatSortModule, MatTableModule, MatTabsModule, MatDialogModule, MatSlideToggleModule, MatCardModule, MatTooltipModule, MatSliderModule } from '@angular/material';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { AgmCoreModule } from '@agm/core';
 
@@ -86,6 +86,7 @@ const routes: Routes = [
         MatTabsModule,
 
         MatSlideToggleModule,
+        MatSliderModule,
         MatCardModule,
         MatTooltipModule,
 

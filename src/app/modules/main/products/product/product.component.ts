@@ -1,9 +1,9 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation, ElementRef, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation} from '@angular/core';
 import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
 import { Location } from '@angular/common';
-import { MatSnackBar, MatPaginator, MatSort, MatDialog } from '@angular/material';
-import { merge, Observable, BehaviorSubject, Subject } from 'rxjs';
-import { map, takeUntil } from 'rxjs/operators';
+import { MatSnackBar, MatDialog } from '@angular/material';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 import { fuseAnimations } from '@fuse/animations';
 import { EcommerceProductService } from '../../../../services/product.service';
@@ -12,8 +12,6 @@ import { CategorysService } from '../../../../services/categorys.service';
 import { SecurityService } from '../../../../services/security.service';
 import { RegistroUtil } from '../../../../utils/registro.util';
 import { Router, ActivatedRoute } from '../../../../../../node_modules/@angular/router';
-import { FuseUtils } from '@fuse/utils';
-import { DataSource } from '@angular/cdk/collections';
 import { ImageUploadComponent } from '../../images/imageUpload/image-upload.component';
 import { ImageViewComponent } from '../../images/imageViewer/imageview.component';
 import { S3Service } from '../../../../services/s3.service';
@@ -37,15 +35,7 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
     rangoPreciosArrayForm: FormArray;
     listadoCategorias = [];
 
-    // Buscador Lenders
-    dataSource: FilesDataSource | null;
-    displayedColumns = ['prod_id', 'prod_nombre', 'prod_categoria', 'prod_est_alquiler', 'prod_est_registro'];
-    @ViewChild(MatPaginator)
-    paginator: MatPaginator;
-    @ViewChild(MatSort)
-    sort: MatSort;
-    @ViewChild('filter')
-    filter: ElementRef;
+    // Buscador Lenders    
     lenderInformation = false;
     public lender = new UserModel();
     public readonlyLender = false;
@@ -60,6 +50,33 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
     // Status de producto
     public checkedStatusProduct = false;
     public prod_current_status = '';
+
+    // Estado de conversacion
+    public prd_est_conversva = '';
+    public listTipoMonedas = [
+        {
+            value : 1,
+            text  : 'Soles'
+        },
+        {
+            value : 2,
+            text  : 'Dólares'
+        }
+    ];
+    public listTiempos = [
+        {
+            value : 1,
+            text  : 'Días'
+        },
+        {
+            value : 2,
+            text  : 'Meses'
+        },
+        {
+            value : 1,
+            text  : 'Años'
+        }
+    ];
 
     // Private
     private _unsubscribeAll: Subject<any>;
@@ -131,24 +148,6 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
 
                 this.productForm = this.createProductForm();
             });
-
-
-        this.dataSource = new FilesDataSource(this._ecommerceProductService, this.paginator, this.sort);
-        // console.log(this.dataSource); // CARGA INICIAL
-        // fromEvent(this.filter.nativeElement, 'keyup')
-        //     .pipe(
-        //         takeUntil(this._unsubscribeAll),
-        //         debounceTime(150),
-        //         distinctUntilChanged()
-        //     )
-        //     .subscribe(() => {
-        //         if (!this.dataSource) {
-        //             return;
-        //         }
-
-        //         this.dataSource.filter = this.filter.nativeElement.value;
-        //         console.log(this.dataSource); // BUSCADOR
-        //     });
     }
 
     loadCurrentStatusProduct(product): void {
@@ -160,6 +159,29 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
             this.checkedStatusProduct = false;
         }
     }
+
+    formatLabel(value: number | null): any {
+        if (!value) {
+          return 0;
+        }
+        return value;
+    }
+
+    changeEstConversa(event): void {
+        if (event.value > 7) {
+            this.prd_est_conversva = 'Perfecto';
+        }
+        else if (event.value > 4) {
+            this.prd_est_conversva = 'Sin detalles';
+        }
+        else if (event.value > 2) {
+            this.prd_est_conversva = 'Con algún detalle';
+        }
+        else if (event.value > 0) {
+            this.prd_est_conversva = 'Funcional';
+        }
+    }
+
     onSearchLenderChange(event): void {
         if (event.length === 16) {
             const body = {
@@ -308,12 +330,25 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
                 }
             );
             this.rangoPreciosArrayForm.push(formGroup);
-        });       
-        return this._formBuilder.group({            
+        });
+         
+        const prodFormBuild = this._formBuilder.group({            
             lender_user_id      : [this.product.lender_user_id],
+            prod_id             : [this.product.prod_id],
             prod_nombre         : [this.product.prod_nombre],
             prod_desc           : [this.product.prod_desc],
             prod_tags           : [this.product.prod_tags],
+
+            prod_est_converva_value   : [this.product.prod_est_converva.est_value],
+            prod_est_converva_desc    : [this.product.prod_est_converva.est_desc],
+
+            prod_time_uso_value       : [this.product.prod_time_uso.time_value],
+            prod_time_uso_id          : [this.product.prod_time_uso.time_id],
+
+            prod_val_merca_value      : [this.product.prod_val_merca.val_value],
+            prod_val_merca_moneda_id  : [this.product.prod_val_merca.val_moneda_id],
+            prod_val_merca_ref_price  : [this.product.prod_val_merca.val_ref_price],
+
             prod_slug           : [this.product.prod_slug],
             catg_id             : [this.product.prod_categoria.catg_id],
             prod_rango_precios  : [this.rangoPreciosArrayForm],
@@ -326,6 +361,7 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
             prod_fec_registro   : [this.product.prod_fec_registro],
             prod_usu_registro   : [this.product.prod_usu_registro]
         });
+        return prodFormBuild;
     }
 
     agregarRangoPrecio(): void {
@@ -373,6 +409,19 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
         productSave.lender_user_id = this.productForm.value.lender_user_id;
         productSave.prod_nombre = this.productForm.value.prod_nombre;
         productSave.prod_desc = this.productForm.value.prod_desc;
+        productSave.prod_est_converva = {
+            est_value: this.productForm.value.prod_est_converva_value,
+            est_desc: this.productForm.value.prod_est_converva_desc
+        };
+        productSave.prod_time_uso = {
+            time_value: this.productForm.value.prod_time_uso_value,
+            time_id: this.productForm.value.prod_time_uso_id
+        };
+        productSave.prod_val_merca = {
+            val_value: this.productForm.value.prod_val_merca_value,
+            val_moneda_id: this.productForm.value.prod_val_merca_moneda_id,
+            val_ref_price: this.productForm.value.prod_val_merca_ref_price
+        };
         productSave.prod_dir_entrega = this.productForm.value.prod_dir_entrega;
         productSave.prod_hora_entrega = this.productForm.value.prod_hora_entrega;
         productSave.prod_dir_recibe = this.productForm.value.prod_dir_recibe;
@@ -480,6 +529,19 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
         productSave.lender_user_id = this.productForm.value.lender_user_id;
         productSave.prod_desc = this.productForm.value.prod_desc;
         productSave.prod_tags = this.productForm.value.prod_tags;
+        productSave.prod_est_converva = {
+            est_value: this.productForm.value.prod_est_converva_value.toString(),
+            est_desc: this.productForm.value.prod_est_converva_desc
+        };
+        productSave.prod_time_uso = {
+            time_value: this.productForm.value.prod_time_uso_value.toString(),
+            time_id: this.productForm.value.prod_time_uso_id.toString()
+        };
+        productSave.prod_val_merca = {
+            val_value: this.productForm.value.prod_val_merca_value.toString(),
+            val_moneda_id: this.productForm.value.prod_val_merca_moneda_id.toString(),
+            val_ref_price: this.productForm.value.prod_val_merca_ref_price
+        };
         productSave.prod_slug = this.registroUtil.obtenerSlugPorNombre(productSave.prod_nombre);
         productSave.prod_categoria = this.obtenerCategoriaSeleccionada();
         productSave.prod_rango_precios = this.rangoPreciosArrayForm.value;
@@ -490,7 +552,7 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
         productSave.prod_est_alquiler = 'Disponible';
         productSave.prod_fec_registro = this.registroUtil.obtenerFechaCreacion();
         productSave.prod_usu_registro = this.securityService.getUserLogedId();
-        console.log(productSave);               
+        console.log(productSave);
         this._ecommerceProductService.registrarProducto(productSave).subscribe(
             data => {
                 if (data.res_service === 'ok') {
@@ -628,147 +690,4 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
         );
     }
 
-}
-
-
-export class FilesDataSource extends DataSource<any>
-{
-    private _filterChange = new BehaviorSubject('');
-    private _filteredDataChange = new BehaviorSubject('');
-
-    /**
-     * Constructor
-     *
-     * @param {EcommerceProductService} _ecommerceProductsService
-     * @param {MatPaginator} _matPaginator
-     * @param {MatSort} _matSort
-     */
-    constructor(
-        private _ecommerceProductService: EcommerceProductService,
-        private _matPaginator: MatPaginator,
-        private _matSort: MatSort
-    ) {
-        super();
-
-        this.filteredData = this._ecommerceProductService.products;
-    }
-
-    /**
-     * Connect function called by the table to retrieve one stream containing the data to render.
-     *
-     * @returns {Observable<any[]>}
-     */
-    connect(): Observable<any[]> {
-        const displayDataChanges = [
-            this._ecommerceProductService.onProductsChanged,
-            this._matPaginator.page,
-            this._filterChange,
-            this._matSort.sortChange
-        ];
-
-        return merge(...displayDataChanges)
-            .pipe(
-                map(() => {
-                    // let data = [];
-                    let data = this._ecommerceProductService.products.slice();
-
-                    data = this.filterData(data);
-
-                    this.filteredData = [...data];
-
-                    data = this.sortData(data);
-
-                    // Grab the page's slice of data.
-                    const startIndex = this._matPaginator.pageIndex * this._matPaginator.pageSize;
-                    return data.splice(startIndex, this._matPaginator.pageSize);
-                }
-                ));
-    }
-
-    // -----------------------------------------------------------------------------------------------------
-    // @ Accessors
-    // -----------------------------------------------------------------------------------------------------
-
-    // Filtered data
-    get filteredData(): any {
-        return this._filteredDataChange.value;
-    }
-
-    set filteredData(value: any) {
-        this._filteredDataChange.next(value);
-    }
-
-    // Filter
-    get filter(): string {
-        return this._filterChange.value;
-    }
-
-    set filter(filter: string) {
-        this._filterChange.next(filter);
-    }
-
-    // -----------------------------------------------------------------------------------------------------
-    // @ Public methods
-    // -----------------------------------------------------------------------------------------------------
-
-    /**
-     * Filter data
-     *
-     * @param data
-     * @returns {any}
-     */
-    filterData(data): any {
-        if (!this.filter) {
-            return data;
-        }
-        return FuseUtils.filterArrayByString(data, this.filter);
-    }
-
-    /**
-     * Sort data
-     *
-     * @param data
-     * @returns {any[]}
-     */
-    sortData(data): any[] {
-        if (!this._matSort.active || this._matSort.direction === '') {
-            return data;
-        }
-
-        return data.sort((a, b) => {
-            let propertyA: number | string = '';
-            let propertyB: number | string = '';
-
-            switch (this._matSort.active) {
-                case 'prod_id':
-                    [propertyA, propertyB] = [a.prod_id, b.prod_id];
-                    break;
-                case 'prod_nombre':
-                    [propertyA, propertyB] = [a.prod_nombre, b.prod_nombre];
-                    break;
-                case 'prod_categoria':
-                    [propertyA, propertyB] = [a.prod_categoria, b.prod_categoria];
-                    break;
-                // case 'prod_precio_dia':
-                //     [propertyA, propertyB] = [a.prod_precio_dia, b.prod_precio_dia];
-                //     break;
-                case 'prod_est_alquiler':
-                    [propertyA, propertyB] = [a.prod_est_alquiler, b.prod_est_alquiler];
-                    break;
-                case 'prod_est_registro':
-                    [propertyA, propertyB] = [a.prod_est_registro, b.prod_est_registro];
-                    break;
-            }
-            const valueA = isNaN(+propertyA) ? propertyA : +propertyA;
-            const valueB = isNaN(+propertyB) ? propertyB : +propertyB;
-
-            return (valueA < valueB ? -1 : 1) * (this._matSort.direction === 'asc' ? 1 : -1);
-        });
-    }
-
-    /**
-     * Disconnect
-     */
-    disconnect(): void {
-    }
 }

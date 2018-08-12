@@ -25,8 +25,7 @@
                 <div fxLayout="column" fxLayoutAlign="start start"
                      [@animate]="{value:'*',params:{delay:'100ms',x:'-25px'}}">
                     <div class="h2" *ngIf="pageType ==='edit'">
-                        {{lender.user_names}} --
-                        <span>{{lender.user_id}}</span>
+                        {{lender.user_names}}
                         <button matTooltip="Copiar código" (click)="copyClipBoardLenderId(lender.user_id)" mat-mini-fab style="margin-left: 10px;">
                             <mat-icon aria-label="Example icon-button with a heart icon">content_copy</mat-icon>
                         </button>
@@ -78,23 +77,27 @@
 
                             <div class="tab-content p-24" fusePerfectScrollbar>
 
+                                <mat-form-field class="w-50-p">
+                                    <input matInput   
+                                           readonly                                        
+                                           formControlName="user_id"
+                                           placeholder="Código del prestamista"
+                                           required>
+                                </mat-form-field>
                                 <mat-form-field class="w-100-p">
-                                    <input matInput
-                                           name="user_names"
+                                    <input matInput                                           
                                            formControlName="user_names"
                                            placeholder="Nombres del prestamista"
                                            required>
                                 </mat-form-field>
                                 <mat-form-field class="w-50-p">
-                                    <input matInput
-                                           name="user_full_name1"
+                                    <input matInput                                           
                                            formControlName="user_full_name1"
                                            placeholder="Apellido Paterno"
                                            required>
                                 </mat-form-field>
                                 <mat-form-field class="w-50-p">
-                                    <input matInput
-                                           name="user_full_name2"
+                                    <input matInput                                           
                                            formControlName="user_full_name2"
                                            placeholder="Apellido Materno"
                                            required>
@@ -132,10 +135,17 @@
                                 </mat-form-field> -->
 
                                 <mat-form-field class="w-30-p">
-                                    <input (click)="dp.click()" matInput [matDatepicker]="dp" placeholder="Fecha de nacimiento">
-                                    <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
+                                    <input matInput 
+                                           readonly 
+                                           required 
+                                           formControlName="user_fec_nac" 
+                                           (click)="user_fec_nac.open()" 
+                                           [matDatepicker]="user_fec_nac" 
+                                           [max]="maxDateFecNacLender"
+                                           placeholder="Fecha de nacimiento">
+                                    <mat-datepicker-toggle matSuffix [for]="user_fec_nac"></mat-datepicker-toggle>
                                     <mat-datepicker touchUi 
-                                                    #dp 
+                                                    #user_fec_nac 
                                                     startView="multi-year"
                                                     panelClass="example-month-picker">
                                     </mat-datepicker>
@@ -205,30 +215,26 @@
                             <div class="tab-content p-24" fusePerfectScrollbar>
 
                                 <mat-form-field class="w-100-p">
-                                    <input matInput
-                                           name="user_num_phone"
+                                    <input matInput                                           
                                            formControlName="user_num_phone"
                                            placeholder="Número de contácto"
                                            required>
                                 </mat-form-field>
                                 <mat-form-field class="w-100-p">
-                                    <input matInput
-                                           name="user_email"
+                                    <input matInput                                           
                                            formControlName="user_email"
                                            placeholder="Correo electrónico"
                                            required>
                                 </mat-form-field>
 
                                 <mat-form-field class="w-30-p">
-                                    <input matInput
-                                           name="lndr_ubigeo_dpt"
+                                    <input matInput                                           
                                            formControlName="lndr_ubigeo_dpt"
                                            placeholder="Departamento"
                                            readonly>
                                 </mat-form-field>                                                           
                                 <mat-form-field class="w-30-p">
-                                    <input matInput
-                                           name="lndr_ubigeo_prv"
+                                    <input matInput                                           
                                            formControlName="lndr_ubigeo_prv"
                                            placeholder="Provincia"
                                            readonly>
