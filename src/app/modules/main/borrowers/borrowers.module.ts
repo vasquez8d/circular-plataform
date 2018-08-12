@@ -3,37 +3,42 @@ import { RouterModule, Routes } from '@angular/router';
 import { MatButtonModule, MatChipsModule, MatFormFieldModule, 
          MatIconModule, MatInputModule, MatPaginatorModule, 
          MatRippleModule, MatSelectModule, MatSnackBarModule, 
-         MatSortModule, MatTableModule, MatTabsModule } from '@angular/material';
+         MatSortModule, MatTableModule, MatTabsModule, MatDialogModule, MatSlideToggleModule, MatCardModule, 
+         MatTooltipModule, MatDatepickerModule } from '@angular/material';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { AgmCoreModule } from '@agm/core';
 import { FuseSharedModule } from '@fuse/shared.module';
 import { FuseWidgetModule } from '@fuse/components/widget/widget.module';
-import { EcommerceProductsService } from '../../../services/products.service';
-import { EcommerceProductService } from '../../../services/product.service';
-import { BorrowersComponent } from './borrowers-list/borrowers.component';
-import { BorrowerComponent } from './borrower/borrower.component';
 
+import { UsersService } from '../../../services/users.service';
+import { UserService } from '../../../services/user.service';
+import { ImageViewComponent } from '../images/imageViewer/imageview.component';
+import { ImageUploadComponent } from '../images/imageUpload/image-upload.component';
+import { ImageViewModule } from '../images/imageViewer/imageview.module';
+import { ImageUploadModule } from '../images/imageUpload/image-upload.module';
+import { BorrowersComponent } from './lenders-list/borrowers.component';
+import { BorrowerComponent } from './borrower/borrower.component';
 
 const routes: Routes = [
     {
         path: '',
         component: BorrowersComponent,
         resolve: {
-            data: EcommerceProductsService
+            data: UsersService
         }
     },
     {
-        path: 'product/:id/:handle',
+        path: 'borrower/:id/:handle',
         component: BorrowerComponent,
         resolve: {
-            data: EcommerceProductService
+            data: UserService
         }
     },
     {
-        path: 'product/:id',
+        path: 'borrower/:id',
         component: BorrowerComponent,
         resolve: {
-            data: EcommerceProductService
+            data: UserService
         }
     },
 ];
@@ -41,7 +46,11 @@ const routes: Routes = [
 @NgModule({
     declarations: [
         BorrowerComponent,
-        BorrowersComponent,
+        BorrowersComponent        
+    ],
+    entryComponents: [
+        ImageViewComponent,
+        ImageUploadComponent
     ],
     imports: [
         RouterModule.forChild(routes),
@@ -57,8 +66,12 @@ const routes: Routes = [
         MatSortModule,
         MatSnackBarModule,
         MatTableModule,
-        MatTabsModule,
-
+        MatTabsModule,        
+        MatSlideToggleModule,
+        MatCardModule,
+        MatDialogModule,
+        MatTooltipModule,
+        MatDatepickerModule,
         NgxChartsModule,
         AgmCoreModule.forRoot({
             apiKey: 'AIzaSyD81ecsCj4yYpcXSLFcYU97PvRsE_X8Bx8'
@@ -66,10 +79,12 @@ const routes: Routes = [
 
         FuseSharedModule,
         FuseWidgetModule,
+        ImageViewModule,
+        ImageUploadModule        
     ],
     providers: [
-        EcommerceProductsService,
-        EcommerceProductService,
+        UsersService,
+        UserService,
     ]
 })
 export class BorrowerModule {

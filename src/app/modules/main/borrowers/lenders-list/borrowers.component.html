@@ -1,14 +1,14 @@
 <div id="products" class="page-layout carded fullwidth inner-scroll">
 
     <!-- TOP BACKGROUND -->
-    <div class="top-bg mat-indigo-bg"></div>
+    <div class="top-bg mat-cyan-bg"></div>
     <!-- / TOP BACKGROUND -->
 
     <!-- CENTER -->
     <div class="center">
 
         <!-- HEADER -->
-        <div class="header mat-indigo-bg"
+        <div class="header mat-cyan-bg"
              fxLayout="column" fxLayoutAlign="center center"
              fxLayout.gt-xs="row" fxLayoutAlign.gt-xs="space-between center">
 
@@ -31,15 +31,15 @@
                     <mat-icon class="secondary-text">search</mat-icon>
                 </label>
                 <mat-form-field floatLabel="never" fxFlex="1 0 auto">
-                    <input id="search" matInput #filter placeholder="Buscar un artículo">
+                    <input id="search" matInput #filter placeholder="Buscar un prestamista">
                 </mat-form-field>
             </div>
             <!-- / SEARCH -->
 
             <button mat-raised-button
-                    [routerLink]="'/products/product/new'"
+                    [routerLink]="'/lenders/lender/new'"
                     class="add-product-button mat-white-bg my-12 mt-sm-0">
-                <span>Agregar un artículo</span>
+                <span>Agregar un prestamista</span>
             </button>
 
         </div>
@@ -55,10 +55,10 @@
                        fusePerfectScrollbar>
 
                 <!-- ID Column -->
-                <ng-container matColumnDef="prod_id">
+                <ng-container matColumnDef="user_id">
                     <mat-header-cell *matHeaderCellDef mat-sort-header>Código</mat-header-cell>
-                    <mat-cell *matCellDef="let product">
-                        <p class="text-truncate">{{product.prod_id}}</p>
+                    <mat-cell *matCellDef="let lender">
+                        <p class="text-truncate">{{lender.user_id}}</p>
                     </mat-cell>
                 </ng-container>
 
@@ -73,63 +73,67 @@
                     </mat-cell>
                 </ng-container> -->
 
+                <ng-container matColumnDef="user_num_doc">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header>N° Documento</mat-header-cell>
+                    <mat-cell *matCellDef="let lender">
+                        <p class="text-truncate">{{lender.user_num_doc}}</p>
+                    </mat-cell>
+                </ng-container>
+
                 <!-- Name Column -->
-                <ng-container matColumnDef="prod_nombre">
-                    <mat-header-cell *matHeaderCellDef mat-sort-header>Nombre</mat-header-cell>
-                    <mat-cell *matCellDef="let product">
-                        <p class="text-truncate">{{product.prod_nombre}}</p>
+                <ng-container matColumnDef="user_names">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header>Nombres</mat-header-cell>
+                    <mat-cell *matCellDef="let lender">
+                        <p class="text-truncate">{{lender.user_names}}</p>
                     </mat-cell>
                 </ng-container>
 
                 <!-- Category Column -->
-                <ng-container matColumnDef="prod_categoria">
-                    <mat-header-cell *matHeaderCellDef fxHide mat-sort-header fxShow.gt-md>Categoría</mat-header-cell>
-                    <mat-cell *matCellDef="let product" fxHide fxShow.gt-md>
-                        <p class="category text-truncate">
-                            {{product.prod_categoria.catg_nombre}}
-                        </p>
+                <ng-container matColumnDef="user_full_name1">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header>Ap. Paterno</mat-header-cell>
+                    <mat-cell *matCellDef="let lender">
+                        <p class="text-truncate">{{lender.user_full_name1}}</p>
                     </mat-cell>
                 </ng-container>
 
-                <!-- Price Column -->
-                <!-- <ng-container matColumnDef="prod_precio_dia">
-                    <mat-header-cell *matHeaderCellDef mat-sort-header fxHide fxShow.gt-xs>Precio/día</mat-header-cell>
-                    <mat-cell *matCellDef="let product" fxHide fxShow.gt-xs>
-                        <p class="price text-truncate">
-                            S/. {{product.prod_precio_dia}}
-                        </p>
+                <ng-container matColumnDef="user_full_name2">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header>Ap. Materno</mat-header-cell>
+                    <mat-cell *matCellDef="let lender">
+                        <p class="text-truncate">{{lender.user_full_name2}}</p>
                     </mat-cell>
-                </ng-container> -->
+                </ng-container>
 
-                <!-- Quantity Column -->
-                <ng-container matColumnDef="prod_est_alquiler">
-                    <mat-header-cell *matHeaderCellDef mat-sort-header fxHide fxShow.gt-sm>Estado Alquiler</mat-header-cell>
-                    <mat-cell *matCellDef="let product" fxHide fxShow.gt-sm>
+                <ng-container matColumnDef="user_email">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header>Correo Electrónico</mat-header-cell>
+                    <mat-cell *matCellDef="let lender">
+                        <p class="text-truncate">{{lender.user_email}}</p>
+                    </mat-cell>
+                </ng-container>
 
-                        <!-- <span class="quantity-indicator text-truncate"
-                              [ngClass]="{'mat-red-500-bg':product.quantity <= 5, 'mat-amber-500-bg':product.quantity > 5 && product.quantity <= 25,'mat-green-600-bg':product.quantity > 25}">
-                        </span> -->
-                        <span>
-                            {{product.prod_est_alquiler}}
-                        </span>
-
+                <ng-container matColumnDef="user_num_phone">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header>N° Contacto</mat-header-cell>
+                    <mat-cell *matCellDef="let lender">
+                        <p class="text-truncate">{{lender.user_num_phone}}</p>
                     </mat-cell>
                 </ng-container>
 
                 <!-- Active Column -->
-                <ng-container matColumnDef="prod_est_registro">
+                <ng-container matColumnDef="user_stat_reg">
                     <mat-header-cell *matHeaderCellDef mat-sort-header fxHide fxShow.gt-xs>Estado</mat-header-cell>
-                    <mat-cell *matCellDef="let product" fxHide fxShow.gt-xs>
-                        {{product.prod_est_registro}}
+                    <mat-cell *matCellDef="let lender" fxHide fxShow.gt-xs>
+                        <mat-chip-list>
+                            <mat-chip *ngIf="lender.user_stat_reg == 0" color="primary" selected="true">Deshabilitado</mat-chip>
+                            <mat-chip *ngIf="lender.user_stat_reg == 1" color="accent" selected="true">Habilitado</mat-chip>
+                        </mat-chip-list>
                     </mat-cell>
                 </ng-container>
 
                 <mat-header-row *matHeaderRowDef="displayedColumns; sticky:true"></mat-header-row>
 
-                <mat-row *matRowDef="let product; columns: displayedColumns;"
+                <mat-row *matRowDef="let lender; columns: displayedColumns;"
                          class="product"
                          matRipple
-                         [routerLink]="'/products/product/'+product.prod_id+'/'+product.prod_slug">
+                         [routerLink]="'/lenders/lender/'+lender.user_id+'/'+lender.user_slug">
                 </mat-row>
 
             </mat-table>

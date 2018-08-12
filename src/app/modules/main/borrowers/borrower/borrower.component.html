@@ -1,19 +1,19 @@
 <div id="product" class="page-layout carded fullwidth inner-scroll">
 
     <!-- TOP BACKGROUND -->
-    <div class="top-bg mat-light-green-bg"></div>
+    <div class="top-bg mat-amber-bg"></div>
     <!-- / TOP BACKGROUND -->
 
     <!-- CENTER -->
     <div class="center">
 
         <!-- HEADER -->
-        <div class="header mat-light-green-bg" fxLayout="row" fxLayoutAlign="space-between center">
+        <div class="header mat-amber-bg" fxLayout="row" fxLayoutAlign="space-between center">
 
             <!-- APP TITLE -->
             <div fxLayout="row" fxLayoutAlign="start center">
 
-                <button mat-icon-button class="mr-0 mr-sm-16" [routerLink]="'/products'">
+                <button mat-icon-button class="mr-0 mr-sm-16" [routerLink]="'/lenders'">
                     <mat-icon>arrow_back</mat-icon>
                 </button>
 
@@ -25,29 +25,39 @@
                 <div fxLayout="column" fxLayoutAlign="start start"
                      [@animate]="{value:'*',params:{delay:'100ms',x:'-25px'}}">
                     <div class="h2" *ngIf="pageType ==='edit'">
-                        {{product.prod_nombre}}
+                        {{lender.user_names}}
+                        <button matTooltip="Copiar código" (click)="copyClipBoardLenderId(lender.user_id)" mat-mini-fab style="margin-left: 10px;">
+                            <mat-icon aria-label="Example icon-button with a heart icon">content_copy</mat-icon>
+                        </button>
+                        <button matTooltip="Ver articulos relacionados" (click)="navigateProducsXLender(lender.user_id, lender.user_slug)" mat-mini-fab style="margin-left: 10px;">
+                            <mat-icon aria-label="Example icon-button with a heart icon">storage</mat-icon>
+                        </button>
+                        <button matTooltip="Agregar un artículo" (click)="navigateCreateProduct(lender.user_id, lender.user_slug)" mat-mini-fab
+                            style="margin-left: 10px;">
+                            <mat-icon aria-label="Example icon-button with a heart icon">playlist_add</mat-icon>
+                        </button>
                     </div>
                     <div class="h2" *ngIf="pageType ==='new'">
-                        Nuevo Artículo
+                        Nuevo Prestamista
                     </div>
                     <div class="subtitle secondary-text">
-                        <span>Detalles del artículo</span>
+                        <span>Detalles del prestamista</span>
                     </div>
                 </div>
             </div>
             <!-- / APP TITLE -->
-
+            
             <button mat-raised-button
                     class="save-product-button mat-white-bg"
-                    [disabled]="productForm.invalid"
-                    *ngIf="pageType ==='new'" (click)="addProduct()">
+                    [disabled]="lenderForm.invalid"
+                    *ngIf="pageType ==='new'" (click)="addLender()">
                 <span>Registrar</span>
             </button>
 
-            <button mat-raised-button
+            <button mat-raised-button id="btnSaveLender"
                     class="save-product-button mat-white-bg"
-                    [disabled]="productForm.invalid || productForm.pristine"
-                    *ngIf="pageType ==='edit'" (click)="saveProduct()">
+                    [disabled]="lenderForm.invalid || lenderForm.pristine"
+                    *ngIf="pageType ==='edit'" (click)="saveLender()">
                 <span>Guardar</span>
             </button>
         </div>
@@ -59,57 +69,227 @@
             <!-- CONTENT -->
             <div class="content">
 
-                <form name="productForm" [formGroup]="productForm" class="product w-100-p" fxLayout="column" fxFlex>
+                <form name="lenderForm" [formGroup]="lenderForm" class="product w-100-p" fxLayout="column" fxFlex>
 
                     <mat-tab-group>
 
-                        <mat-tab label="Información">
+                        <mat-tab label="Información personal">
+
+                            <div class="tab-content p-24" fusePerfectScrollbar>
+
+                                <mat-form-field class="w-50-p">
+                                    <input matInput   
+                                           readonly                                        
+                                           formControlName="user_id"
+                                           placeholder="Código del prestamista"
+                                           required>
+                                </mat-form-field>
+                                <mat-form-field class="w-100-p">
+                                    <input matInput                                           
+                                           formControlName="user_names"
+                                           placeholder="Nombres del prestamista"
+                                           required>
+                                </mat-form-field>
+                                <mat-form-field class="w-50-p">
+                                    <input matInput                                           
+                                           formControlName="user_full_name1"
+                                           placeholder="Apellido Paterno"
+                                           required>
+                                </mat-form-field>
+                                <mat-form-field class="w-50-p">
+                                    <input matInput                                           
+                                           formControlName="user_full_name2"
+                                           placeholder="Apellido Materno"
+                                           required>
+                                </mat-form-field>
+                                <mat-form-field class="w-50-p">
+                                    <mat-select placeholder="Tipo de documento" formControlName="user_tip_doc"
+                                        required>
+                                        <mat-option *ngFor="let tipo of listadoTiposDocumento" [value]="tipo.tip_docum_id">
+                                            {{tipo.tip_docum_nom}}
+                                        </mat-option>
+                                    </mat-select>  
+                                </mat-form-field>                                                            
+                                <mat-form-field class="w-50-p">
+                                    <input matInput
+                                           name="user_num_doc"
+                                           formControlName="user_num_doc"
+                                           placeholder="Número de documento"
+                                           required>
+                                </mat-form-field> 
+                                <!-- <mat-form-field >
+                                    <input matInput
+                                           type="date"
+                                           name="user_num_doc"
+                                           formControlName="user_num_doc"
+                                           placeholder="Fecha de nacimiento"
+                                           required>
+                                </mat-form-field>  -->
+
+                                <!-- <mat-form-field class="w-50-p">
+                                    <input matInput [matDatepicker]="startDatePicker" 
+                                           placeholder="Fecha de nacimiento" formControlName="user_num_doc" 
+                                           required>
+                                    <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
+                                    <mat-datepicker #startDatePicker></mat-datepicker>
+                                </mat-form-field> -->
+
+                                <mat-form-field class="w-30-p">
+                                    <input matInput 
+                                           readonly 
+                                           required 
+                                           formControlName="user_fec_nac" 
+                                           (click)="user_fec_nac.open()" 
+                                           [matDatepicker]="user_fec_nac" 
+                                           [max]="maxDateFecNacLender"
+                                           placeholder="Fecha de nacimiento">
+                                    <mat-datepicker-toggle matSuffix [for]="user_fec_nac"></mat-datepicker-toggle>
+                                    <mat-datepicker touchUi 
+                                                    #user_fec_nac 
+                                                    startView="multi-year"
+                                                    panelClass="example-month-picker">
+                                    </mat-datepicker>
+                                    <!-- <mat-datepicker #dp startView="multi-year" 
+                                                    (yearSelected)="chosenYearHandler($event)" 
+                                                    (monthSelected)="chosenMonthHandler($event, dp)"
+                                                    panelClass="example-month-picker">
+                                    </mat-datepicker>                                     -->
+                                </mat-form-field>
+
+
+                                <mat-card class="result" *ngIf="pageType ==='edit'">
+                                    <mat-card-content>
+                                        <h2 class="example-h2">Estado del prestamista</h2>
+
+                                        <section class="example-section">
+                                            <mat-slide-toggle (change)="changeStatusLender($event)" [checked]="checkedStatusUser">
+                                                {{lndr_current_status}}
+                                            </mat-slide-toggle>
+                                        </section>
+                                    </mat-card-content>
+                                </mat-card>
+
+                            </div>
+
+                        </mat-tab>
+
+                        <mat-tab label="Documentos adjuntos">
+                            <div class="tab-content p-24" fusePerfectScrollbar>
+                                <div fxLayout="row wrap" fxLayoutAlign="start start">
+
+                                    <!-- <div *ngIf="product.images.length === 0"
+                                         class="product-image" fxlayout="row" fxLayoutAlign="center center">
+                                        <img class="media"
+                                             [src]="'assets/images/ecommerce/product-image-placeholder.png'">
+                                    </div> -->
+
+                                    <div *ngFor="let image of listImages">
+                                        <div *ngIf="listImages.length > 0" class="product-image" fxlayout="row" fxLayoutAlign="center center">                                            
+                                                <img (click)="viewImageComplete(image)" class="media" src="data:image/jpg;base64,{{image.data}}">                                       
+                                        </div>
+                                        <mat-form-field class="w-90-p">
+                                            <input matInput
+                                                   placeholder="Descripción del documento"
+                                                   [value]="image.desc.image_desc"
+                                                   readonly>
+                                        </mat-form-field> 
+                                    </div>
+                                    
+                                    <button (click)="uploadDocument()" mat-fab>
+                                        <mat-icon aria-label="Agregar precio">exposure_plus_1</mat-icon>                                    
+                                    </button>
+
+                                    <!-- <button (click)="fileInput.click()" mat-fab>
+                                        <mat-icon aria-label="Agregar precio">exposure_plus_1</mat-icon>                                    
+                                    </button>  
+                                    <div class="file-uploader">
+                                        <input accept="image/x-png,image/jpeg" (change)="handleFileInput($event)" 
+                                        hidden type="file" #fileInput/>
+                                    </div> -->
+                                </div>
+                            </div>
+                        </mat-tab>
+
+                        <mat-tab label="Información de contácto">
 
                             <div class="tab-content p-24" fusePerfectScrollbar>
 
                                 <mat-form-field class="w-100-p">
-                                    <input matInput
-                                           name="prod_nombre"
-                                           formControlName="prod_nombre"
-                                           placeholder="Nombre del artículo"
+                                    <input matInput                                           
+                                           formControlName="user_num_phone"
+                                           placeholder="Número de contácto"
                                            required>
                                 </mat-form-field>
                                 <mat-form-field class="w-100-p">
-                                    <textarea matInput
-                                           name="prod_desc"
-                                           formControlName="prod_desc"
-                                           placeholder="Descripción del artículo"
-                                           required
-                                           rows="3">
-                                    </textarea>
+                                    <input matInput                                           
+                                           formControlName="user_email"
+                                           placeholder="Correo electrónico"
+                                           required>
                                 </mat-form-field>
-                                <mat-form-field class="w-50-p">
-                                    <mat-select placeholder="Categoría del artículo" formControlName="catg_id"
+
+                                <mat-form-field class="w-30-p">
+                                    <input matInput                                           
+                                           formControlName="lndr_ubigeo_dpt"
+                                           placeholder="Departamento"
+                                           readonly>
+                                </mat-form-field>                                                           
+                                <mat-form-field class="w-30-p">
+                                    <input matInput                                           
+                                           formControlName="lndr_ubigeo_prv"
+                                           placeholder="Provincia"
+                                           readonly>
+                                </mat-form-field>
+                                <mat-form-field class="w-40-p">
+                                    <mat-select id="cboxDistrito" placeholder="Distrito" formControlName="lndr_ubigeo_dst_id"
                                         required>
-                                        <mat-option *ngFor="let categ of listadoCategorias" [value]="categ.catg_id">
-                                            {{categ.catg_nombre}}
+                                        <mat-option *ngFor="let distrito of listadoDistritosLima" [value]="distrito.dst_id">
+                                            {{distrito.dst_nombre}}
                                         </mat-option>
                                     </mat-select>  
-                                </mat-form-field>                                
-                              
-                                <mat-form-field class="w-100-p">
+                                </mat-form-field> 
+                            </div>
 
-                                    <mat-chip-list #tagList name="prod_tags" formControlName="prod_tags">
+                        </mat-tab>
 
-                                        <mat-chip *ngFor="let tag of product.prod_tags"
-                                                  [removable]="true" (removed)="removeTagProduct(tag)">
-                                            {{tag}}
-                                            <mat-icon matChipRemove>cancel</mat-icon>
-                                        </mat-chip>
+                        <mat-tab *ngIf="pageType ==='edit'" label="Información de registro">
 
-                                        <input placeholder="Tags del artículo"
-                                               [matChipInputFor]="tagList"
-                                               [matChipInputAddOnBlur]="true"
-                                               (matChipInputTokenEnd)="addTagProduct($event)"/>
-                                    </mat-chip-list>
+                            <div class="tab-content p-24" fusePerfectScrollbar>
 
+                                <!-- <mat-form-field class="w-100-p">
+                                    <input matInput
+                                           name="user_stat_reg"
+                                           formControlName="user_stat_reg"
+                                           placeholder="Estado de registro"
+                                           readonly>
+                                </mat-form-field> -->
+                                <mat-form-field class="w-50-p">
+                                    <input matInput
+                                           name="user_date_reg"
+                                           formControlName="user_date_reg"
+                                           placeholder="Fecha de registro"
+                                           readonly>
                                 </mat-form-field>
-
+                                <mat-form-field class="w-50-p">
+                                    <input matInput
+                                           name="user_usur_reg"
+                                           formControlName="user_usur_reg"
+                                           placeholder="Usuario de registro"
+                                           readonly>
+                                </mat-form-field>                                                            
+                                <mat-form-field *ngIf="lender.lndr_fec_actualiza != null" class="w-50-p">
+                                    <input matInput
+                                           name="user_date_upt"
+                                           formControlName="user_date_upt"
+                                           placeholder="Fecha de actualización"
+                                           readonly>
+                                </mat-form-field> 
+                                <mat-form-field *ngIf="lender.lndr_usu_actualiza != null" class="w-50-p">
+                                    <input matInput
+                                           name="user_usur_upt"
+                                           formControlName="user_usur_upt"
+                                           placeholder="Usuario de actualización"
+                                           readonly>
+                                </mat-form-field>                                 
                             </div>
 
                         </mat-tab>
@@ -133,73 +313,6 @@
                                 </div>
                             </div>
                         </mat-tab> -->
-
-                        <mat-tab label="Precios">
-                            <div class="tab-content p-24" fusePerfectScrollbar>
-                                <div formArrayName="prod_rango_precios">
-                                    <div *ngFor="let rango of productForm.value.prod_rango_precios.controls; index as i">
-                                            <div [formGroup]="rango">
-                                                <mat-form-field class="w-20-p">
-                                                    <input matInput
-                                                        name="name"
-                                                        formControlName="rango"
-                                                        placeholder="Rango de días">
-                                                </mat-form-field>
-                                                <mat-form-field class="w-20-p">
-                                                    <input matInput
-                                                        name="name"
-                                                        formControlName="precio"
-                                                        placeholder="Precio">
-                                                </mat-form-field>  
-                                                <button (click)="eliminarRangoPrecio(rango)" mat-fab>
-                                                    <mat-icon aria-label="Agregar precio">exposure_neg_1</mat-icon>                                    
-                                                </button>                                                                                                    
-                                            </div>                                            
-                                    </div>                                     
-                                </div>  
-                                                <button (click)="agregarRangoPrecio()" mat-fab>
-                                                    <mat-icon aria-label="Agregar precio">exposure_plus_1</mat-icon>                                    
-                                                </button>                                                              
-                            </div>
-                        </mat-tab>
-
-                        <mat-tab label="Direcciones">
-                            <div class="tab-content p-24" fusePerfectScrollbar fxLayout="column">
-                                <div class="py-16" fxLayout="row">
-                                    <mat-form-field fxFlex>
-                                        <input matInput
-                                               name="prod_dir_entrega"
-                                               formControlName="prod_dir_entrega"
-                                               placeholder="Dirección de entrega"
-                                               required>
-                                    </mat-form-field>
-                                    <mat-form-field fxFlex>
-                                        <input matInput
-                                               name="prod_hora_entrega"
-                                               formControlName="prod_hora_entrega"
-                                               placeholder="Hora de entrega"
-                                               required>
-                                    </mat-form-field>
-                                </div>
-
-                                <div class="py-16" fxLayout="row">
-                                    <mat-form-field fxFlex>
-                                        <input matInput
-                                               name="prod_dir_recibe"
-                                               formControlName="prod_dir_recibe"
-                                               placeholder="Dirección de recepción"
-                                               required>
-                                    </mat-form-field>
-                                    <mat-form-field fxFlex>
-                                        <input matInput
-                                               name="prod_hora_recibe"
-                                               formControlName="prod_hora_recibe"
-                                               placeholder="Hora de recepción"
-                                               required>
-                                    </mat-form-field>
-                                </div>
-                            </div>
-                        </mat-tab>
 
                     </mat-tab-group>
                 </form>

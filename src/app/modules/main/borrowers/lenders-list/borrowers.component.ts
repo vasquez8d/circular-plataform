@@ -3,15 +3,13 @@ import { MatPaginator, MatSort } from '@angular/material';
 import { DataSource } from '@angular/cdk/collections';
 import { merge, Observable, BehaviorSubject, fromEvent, Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
-
 import { fuseAnimations } from '@fuse/animations';
 import { FuseUtils } from '@fuse/utils';
-
 import { takeUntil } from 'rxjs/internal/operators';
-import { EcommerceProductsService } from '../../../../services/products.service';
+import { UsersService } from '../../../../services/users.service';
 
 @Component({
-    selector   : 'borrowers-app',
+    selector   : 'app-borrowers',
     templateUrl: './borrowers.component.html',
     styleUrls  : ['./borrowers.component.scss'],
     animations : fuseAnimations
@@ -19,7 +17,7 @@ import { EcommerceProductsService } from '../../../../services/products.service'
 export class BorrowersComponent implements OnInit
 {
     dataSource: FilesDataSource | null;
-    displayedColumns = ['prod_id', 'prod_nombre', 'prod_categoria', 'prod_est_alquiler', 'prod_est_registro'];
+    displayedColumns = ['user_id', 'user_num_doc', 'user_names', 'user_full_name1', 'user_full_name2', 'user_email', 'user_num_phone', 'user_stat_reg'];
 
     @ViewChild(MatPaginator)
     paginator: MatPaginator;
@@ -34,7 +32,7 @@ export class BorrowersComponent implements OnInit
     private _unsubscribeAll: Subject<any>;
 
     constructor(
-        private _ecommerceProductsService: EcommerceProductsService,        
+        private _lendersService: UsersService,        
     )
     {
         // Set the private defaults
@@ -50,7 +48,7 @@ export class BorrowersComponent implements OnInit
      */
     ngOnInit(): void
     {
-        this.dataSource = new FilesDataSource(this._ecommerceProductsService, this.paginator, this.sort);
+        this.dataSource = new FilesDataSource(this._lendersService, this.paginator, this.sort);
         fromEvent(this.filter.nativeElement, 'keyup')
             .pipe(
                 takeUntil(this._unsubscribeAll),
@@ -81,14 +79,14 @@ export class FilesDataSource extends DataSource<any>
      * @param {MatSort} _matSort
      */
     constructor(
-        private _ecommerceProductsService: EcommerceProductsService,
+        private _lendersService: UsersService,
         private _matPaginator: MatPaginator,
         private _matSort: MatSort
     )
     {
         super();
 
-        this.filteredData = this._ecommerceProductsService.products;
+        this.filteredData = this._lendersService.products;
     }
 
     /**
@@ -99,7 +97,7 @@ export class FilesDataSource extends DataSource<any>
     connect(): Observable<any[]>
     {
         const displayDataChanges = [
-            this._ecommerceProductsService.onProductsChanged,
+            this._lendersService.onProductsChanged,
             this._matPaginator.page,
             this._filterChange,
             this._matSort.sortChange
@@ -108,7 +106,7 @@ export class FilesDataSource extends DataSource<any>
         return merge(...displayDataChanges)
             .pipe(
                 map(() => {
-                        let data = this._ecommerceProductsService.products.slice();
+                        let data = this._lendersService.products.slice();
 
                         data = this.filterData(data);
 
@@ -180,31 +178,36 @@ export class FilesDataSource extends DataSource<any>
         {
             return data;
         }
-
+        
         return data.sort((a, b) => {
             let propertyA: number | string = '';
             let propertyB: number | string = '';
-
             switch ( this._matSort.active )
             {
-                case 'prod_id':
-                    [propertyA, propertyB] = [a.prod_id, b.prod_id];
+                case 'user_id':
+                    [propertyA, propertyB] = [a.user_id, b.user_id];
                     break;
-                case 'prod_nombre':
-                    [propertyA, propertyB] = [a.prod_nombre, b.prod_nombre];
+                case 'user_num_doc':
+                    [propertyA, propertyB] = [a.user_num_doc, b.user_num_doc];
                     break;
-                case 'prod_categoria':
-                    [propertyA, propertyB] = [a.prod_categoria, b.prod_categoria];
+                case 'user_names':
+                    [propertyA, propertyB] = [a.user_names, b.user_names];
                     break;
-                // case 'prod_precio_dia':
-                //     [propertyA, propertyB] = [a.prod_precio_dia, b.prod_precio_dia];
-                //     break;
-                case 'prod_est_alquiler':
-                    [propertyA, propertyB] = [a.prod_est_alquiler, b.prod_est_alquiler];
+                case 'user_full_name1':
+                    [propertyA, propertyB] = [a.user_full_name1, b.user_full_name1];
                     break;
-                case 'prod_est_registro':
-                    [propertyA, propertyB] = [a.prod_est_registro, b.prod_est_registro];
+                case 'user_full_name2':
+                    [propertyA, propertyB] = [a.user_full_name2, b.user_full_name2];
                     break;
+                case 'user_email':
+                    [propertyA, propertyB] = [a.user_email, b.user_email];
+                    break;
+                case 'user_num_phone':
+                    [propertyA, propertyB] = [a.user_num_phone, b.user_num_phone];
+                    break;     
+                case 'user_stat_reg':
+                    [propertyA, propertyB] = [a.user_stat_reg, b.user_stat_reg];
+                    break;                                                        
             }
             const valueA = isNaN(+propertyA) ? propertyA : +propertyA;
             const valueB = isNaN(+propertyB) ? propertyB : +propertyB;

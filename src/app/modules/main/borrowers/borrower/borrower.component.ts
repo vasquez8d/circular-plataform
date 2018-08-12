@@ -1,56 +1,93 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
 import { Location } from '@angular/common';
-import { MatSnackBar } from '@angular/material';
+import { MatSnackBar, MatDialog } from '@angular/material';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-
 import { fuseAnimations } from '@fuse/animations';
-import { EcommerceProductService } from '../../../../services/product.service';
-import { Product } from '../../../../models/product.model';
-import { CategorysService } from '../../../../services/categorys.service';
 import { SecurityService } from '../../../../services/security.service';
 import { RegistroUtil } from '../../../../utils/registro.util';
 import { Router } from '../../../../../../node_modules/@angular/router';
+import * as base64Converter from 'base64-arraybuffer';
+import { UserModel } from '../../../../models/user.model';
+import { UserService } from '../../../../services/user.service';
+import { ImageUploadComponent } from '../../images/imageUpload/image-upload.component';
+import { ImageViewComponent } from '../../images/imageViewer/imageview.component';
+import { S3Service } from '../../../../services/s3.service';
+import { AppCategoryConfig } from '../../../../app-config/app-categorys.config';
+import { MAT_DATE_FORMATS } from '@angular/material/core';
+
+export const MY_FORMATS = {
+    parse: {
+        dateInput: 'DD/MM/YYYY',
+    },
+    display: {
+        dateInput: 'DD/MM/YYYY'
+    }
+};
 
 @Component({
     selector     : 'borrower-app',
     templateUrl  : './borrower.component.html',
     styleUrls    : ['./borrower.component.scss'],
+    providers: [{ provide: MAT_DATE_FORMATS, useValue: MY_FORMATS }],
     encapsulation: ViewEncapsulation.None,
     animations   : fuseAnimations
 })
 export class BorrowerComponent implements OnInit, OnDestroy
 {
-    product: Product;
+    lender: UserModel;
     pageType: string;
-    productForm: FormGroup;
-    rangoPreciosArrayForm: FormArray;
-    listadoCategorias = [];
+    lenderForm: FormGroup;
+    listadoDistritosLima = [];
+    fileToUpload: File = null;
+    
+    public lndr_current_status = '';
+    public checkedStatusUser = false;
+
+    public imageUploaded = true;
+
+    listImagesUpload = [];
+    listadoTiposDocumento = [
+        {
+            tip_docum_id: '1',
+            tip_docum_nom: 'Documento Nacional de Identidad (DNI)'
+        }
+    ];
+    listImages = [];
+    listImagesGuardar = [];
+    listCurrentImages = [];
+    bNewImages = false;
+
+    // Fecha nacimiento
+    public maxDateFecNacLender = new Date(2000, 0, 1);
+
     // Private
     private _unsubscribeAll: Subject<any>;
 
     /**
      * Constructor
      *
-     * @param {EcommerceProductService} _ecommerceProductService
+     * @param {LenderService} _lenderService
      * @param {FormBuilder} _formBuilder
      * @param {Location} _location
      * @param {MatSnackBar} _matSnackBar
      */
     constructor(
-        private _ecommerceProductService: EcommerceProductService,
+        private _lenderService: UserService,
+        private _s3Service: S3Service,
         private _formBuilder: FormBuilder,
         private _location: Location,
-        private _matSnackBar: MatSnackBar,
-        private categoryService: CategorysService,
+        private _matSnackBar: MatSnackBar,        
         private registroUtil: RegistroUtil,
         private securityService: SecurityService,
-        private router: Router
+        private router: Router,
+        public  dialog: MatDialog,
+        private appCategoryConfig: AppCategoryConfig
     )
     {
         // Set the default
-        this.product = new Product();
+        this.lender = new UserModel();
 
         // Set the private defaults
         this._unsubscribeAll = new Subject();
@@ -65,37 +102,60 @@ export class BorrowerComponent implements OnInit, OnDestroy
      */
     ngOnInit(): void
     {
-        this.cargarCategorias();
-        this.rangoPreciosArrayForm = new FormArray(
-            [
-            ]
-        );
+        this.cargarDistritosLima();
         // Subscribe to update product on changes
-        this._ecommerceProductService.onProductChanged
+        this._lenderService.onProductChanged
             .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe(product => {
-
-                if ( product )
+            .subscribe(lender => {
+                if ( lender )
                 {
-                    this.product = new Product(product);
+                    this.lender = new UserModel(lender);                                        
                     this.pageType = 'edit';
+                    this.cargarDocumentos(this.lender.user_url_documen);
+                    this.loadCurrentStatusLender(lender);
                 }
                 else
                 {
                     this.pageType = 'new';
-                    this.product = new Product();
+                    this.lender = new UserModel();
                 }
-
-                this.productForm = this.createProductForm();
+                this.lenderForm = this.createLenderForm();
             });
     }
 
-    cargarCategorias(): void{
-        this.categoryService.obtenerCategorias().subscribe(
-            data => {
-                this.listadoCategorias = data.data_result.Items;
-            }
-        );
+    loadCurrentStatusLender(lender): void {
+        if (lender.user_stat_reg === '1') {
+            this.lndr_current_status = 'Habilitado';
+            this.checkedStatusUser = true;
+        } else {
+            this.lndr_current_status = 'Deshabilitado';
+            this.checkedStatusUser = false;
+        }
+    }
+
+    cargarDistritosLima(): void {
+        this.listadoDistritosLima = this._lenderService.cargarDistritosLima();
+    }
+
+    cargarDocumentos(documents): void {
+        documents.forEach(element => {
+            const datas3Body = {
+                app_key: element.image_key,
+                app_catg_id: this.appCategoryConfig.getLenderCategory()
+            };            
+            this._s3Service.getImageS3(datas3Body).subscribe(
+                data => {       
+                    if (data.res_service === 'ok') {
+                        const image = {
+                            data: base64Converter.encode(data.data_result.Body.data),
+                            desc: element
+                        };
+                        this.listCurrentImages.push(element);
+                        this.listImages.push(image);
+                    }             
+                }
+            );
+        });
     }
 
     /**
@@ -117,141 +177,312 @@ export class BorrowerComponent implements OnInit, OnDestroy
      *
      * @returns {FormGroup}
      */
-    createProductForm(): FormGroup
-    {
-        
-        this.product.prod_rango_precios.forEach(element => {
-            const formGroup = this._formBuilder.group(
-                {
-                    rango: element.rango,
-                    precio: element.precio
-                }
-            );
-            this.rangoPreciosArrayForm.push(formGroup);
-        });       
-        return this._formBuilder.group({            
-            prod_nombre         : [this.product.prod_nombre],
-            prod_desc           : [this.product.prod_desc],
-            prod_tags           : [this.product.prod_tags],
-            prod_slug           : [this.product.prod_slug],
-            catg_id             : [this.product.prod_categoria.catg_id],
-            prod_rango_precios  : [this.rangoPreciosArrayForm],
-            prod_dir_entrega    : [this.product.prod_dir_entrega],
-            prod_hora_entrega   : [this.product.prod_hora_entrega],
-            prod_dir_recibe     : [this.product.prod_dir_recibe],
-            prod_hora_recibe    : [this.product.prod_hora_recibe],
-            prod_est_alquiler   : [this.product.prod_est_alquiler],
-            prod_est_registro   : [this.product.prod_est_registro],
-            prod_fec_registro   : [this.product.prod_fec_registro],
-            prod_usu_registro   : [this.product.prod_usu_registro]
+    createLenderForm(): FormGroup
+    {  
+        let user_fec_nac = '';
+        if (this.lender.user_fec_nac !== ''){
+            user_fec_nac = (new Date(this.lender.user_fec_nac)).toISOString();
+        }         
+        return this._formBuilder.group({
+            user_id             : [this.lender.user_id],            
+            user_names          : [this.lender.user_names],
+            user_full_name1     : [this.lender.user_full_name1],
+            user_full_name2     : [this.lender.user_full_name2],
+            user_fec_nac        : [user_fec_nac],
+            user_email          : [this.lender.user_email],            
+            user_num_phone      : [this.lender.user_num_phone],
+            user_num_doc        : [this.lender.user_num_doc],
+            user_tip_doc        : [this.lender.user_tip_doc.tip_docum_id],
+            lndr_ubigeo_dpt     : [this.lender.user_ubigeo.ubig_dpt],
+            lndr_ubigeo_prv     : [this.lender.user_ubigeo.ubig_prv],
+            lndr_ubigeo_dst_id  : [this.lender.user_ubigeo.ubig_id.substr(4, 2)],
+            user_stat_reg       : [this.lender.user_stat_reg],
+            user_date_reg       : [this.lender.user_date_reg],
+            user_usur_reg       : [this.lender.user_usur_reg],
+            user_date_upt       : [this.lender.user_date_upt],
+            user_usur_upt       : [this.lender.user_usur_upt],
         });
-    }
-
-    agregarRangoPrecio(): void {
-        const formGroup = this._formBuilder.group(
-            {
-                rango: [''],
-                precio: ['']
-            }
-        );
-        this.rangoPreciosArrayForm.push(formGroup);
-    }
-
-    eliminarRangoPrecio(rango): void {        
-        this.rangoPreciosArrayForm.removeAt(this.rangoPreciosArrayForm.value.findIndex(x => x.precio === rango.value.precio));
-    }
-
-    addTagProduct(event): void {
-        const input = event.input;
-        const value = event.value;
-        if ( value )
-        {
-            this.product.prod_tags.push(value);
-        }
-        if ( input )
-        {
-            input.value = '';
-        }
-    }
-
-    removeTagProduct(tagProduct): void {
-        const index = this.product.prod_tags.indexOf(tagProduct);
-        if ( index >= 0 )
-        {
-            this.product.prod_tags.splice(index, 1);
-        }
     }
 
     /**
-     * Save product
+     * Save Lender
      */
-    saveProduct(): void
-    {      
-        const productSave: Product = new Product();
-        productSave.prod_id = this.product.prod_id;
-        productSave.prod_nombre = this.productForm.value.prod_nombre;
-        productSave.prod_desc = this.productForm.value.prod_desc;
-        productSave.prod_dir_entrega = this.productForm.value.prod_dir_entrega;
-        productSave.prod_hora_entrega = this.productForm.value.prod_hora_entrega;
-        productSave.prod_dir_recibe = this.productForm.value.prod_dir_recibe;
-        productSave.prod_hora_recibe = this.productForm.value.prod_hora_recibe;
-        productSave.prod_tags = this.productForm.value.prod_tags;
-        productSave.prod_est_alquiler = 'Disponible';
-        productSave.prod_fec_actualiza = this.registroUtil.obtenerFechaCreacion();
-        productSave.prod_usu_actualiza = this.securityService.getUserLogedId();
-        productSave.prod_categoria = this.obtenerCategoriaSeleccionada();
-        productSave.prod_rango_precios = this.rangoPreciosArrayForm.value;        
-        this._ecommerceProductService.actualizarProducto(productSave).subscribe(
+    saveLender(): void
+    {
+        const LenderSave: UserModel = new UserModel();
+        LenderSave.user_id = this.lender.user_id;
+        LenderSave.user_names = this.lenderForm.value.user_names;
+        LenderSave.user_full_name1 = this.lenderForm.value.user_full_name1;
+        LenderSave.user_full_name2 = this.lenderForm.value.user_full_name2;
+        LenderSave.user_fec_nac = this.lenderForm.value.user_fec_nac.format('DD/MM/YYYY');
+        LenderSave.user_slug = this.registroUtil.obtenerSlugPorNombre(LenderSave.user_names + ' ' + LenderSave.user_full_name1);
+        LenderSave.user_num_doc = this.lenderForm.value.user_num_doc;
+        LenderSave.user_tip_doc = this.obtenerTipoDocumSeleccionado();
+        LenderSave.user_num_phone = this.lenderForm.value.user_num_phone;
+        LenderSave.user_email = this.lenderForm.value.user_email;
+        LenderSave.user_ubigeo = this.obtenerUbigeoDistrito();
+        LenderSave.user_date_upt = this.registroUtil.obtenerFechaCreacion();
+        LenderSave.user_usur_upt = this.securityService.getUserLogedId();
+        LenderSave.user_categ = {
+            catg_id: this.appCategoryConfig.getLenderCategory()
+        };
+        this._lenderService.updateLender(LenderSave).subscribe(
             data => {
-                this._matSnackBar.open('Artículo actualizado', 'OK', {
-                    verticalPosition: 'top',
-                    duration: 3000
-                });                
+                if (data.res_service === 'ok') {
+                    this._matSnackBar.open('Prestamista actualizado', 'Aceptar', {
+                        verticalPosition: 'top',
+                        duration: 3000
+                    }); 
+
+                    if (this.bNewImages) {
+                        const listImagesGuardar = [];
+                        // tslint:disable-next-line:typedef
+                        this.listImages.forEach(function (element, index, theArray){
+                            const dataUpload = {
+                                imageString64: element.data,
+                                app_id: this.lender.user_id,
+                                app_categ_id: this.appCategoryConfig.getLenderCategory()                        
+                            };
+                            const existImage = this.listCurrentImages.find(x => x.image_key === element.desc.image_key);
+                            if (existImage == null) {
+                                this._s3Service.uploadImageS3(dataUpload).subscribe(
+                                    responseUpload => {   
+                                        const data_image = {
+                                            image_key: responseUpload.data_result.fileName,
+                                            image_desc: element.desc.image_desc
+                                        };
+                                        listImagesGuardar.push(data_image);                                                                              
+                                        const dataUploadFileName = {
+                                            app_id: this.lender.user_id,
+                                            app_url_documen: listImagesGuardar,
+                                            app_categ: this.appCategoryConfig.getLenderCategory()
+                                        };
+                                        theArray[index] = {
+                                            data: element.data,
+                                            desc: {
+                                                image_key : responseUpload.data_result.fileName,
+                                                image_desc: element.desc.image_desc
+                                            }
+                                        };      
+                                        const newImage = {
+                                            image_key: responseUpload.data_result.fileName,
+                                            image_desc: element.desc.image_desc
+                                        };
+                                        this.listCurrentImages.push(newImage);                                                                                    
+                                        this._s3Service.uploadFileName(dataUploadFileName).subscribe(
+                                            resultUploadFileName => {  
+                                                this._matSnackBar.open('Documentos agregados', 'Aceptar', {
+                                                    verticalPosition: 'top',
+                                                    duration: 3000
+                                                });                                      
+                                            }
+                                        );
+                                    }
+                                );
+                            } else {
+                                const data_image = {
+                                    image_key: existImage.image_key,
+                                    image_desc: existImage.image_desc
+                                };
+                                listImagesGuardar.push(data_image);
+                            }
+                        }, this);
+                    }
+                } else { 
+                    this._matSnackBar.open('Error actualizando la información del prestamista', 'Aceptar', {
+                        verticalPosition: 'top',
+                        duration: 3000
+                    }); 
+                }               
             }
         );
     }
 
-    obtenerCategoriaSeleccionada(): any {
-        const catg_id = this.productForm.value.catg_id;
-        let catg_nombre = '';
-        this.listadoCategorias.forEach(element => {
-            if (element.catg_id === catg_id) {
-                catg_nombre = element.catg_nombre;
-            }
-        });
+    obtenerTipoDocumSeleccionado(): any {
+        return this.listadoTiposDocumento.find(x => x.tip_docum_id === this.lenderForm.value.user_tip_doc);
+    }
+
+    obtenerUbigeoDistrito(): any {
         return {
-            catg_id: catg_id,
-            catg_nombre: catg_nombre
+            ubig_dpt: 'Lima',
+            ubig_prv: 'Lima',
+            ubig_dst: this.listadoDistritosLima.find(x => x.dst_id === this.lenderForm.value.lndr_ubigeo_dst_id).dst_nombre,
+            ubig_id: '1501' + this.listadoDistritosLima.find(x => x.dst_id === this.lenderForm.value.lndr_ubigeo_dst_id).dst_id
         };
+    }
+
+    navigateProducsXLender(user_id, user_slug): any {
+        this.router.navigateByUrl('products/lender/' + user_id + '/' + user_slug);
+    }
+
+    navigateCreateProduct(user_id, user_slug): any {
+        this.router.navigateByUrl('products/product/new/' + user_slug + '/' + user_id);
     }
 
     /**
      * Add product
      */
-    addProduct(): void
+    addLender(): void
     {
-        const productSave: Product = new Product();
-        productSave.prod_nombre = this.productForm.value.prod_nombre;
-        productSave.prod_desc = this.productForm.value.prod_desc;
-        productSave.prod_tags = this.productForm.value.prod_tags;
-        productSave.prod_slug = this.registroUtil.obtenerSlugPorNombre(productSave.prod_nombre);
-        productSave.prod_categoria = this.obtenerCategoriaSeleccionada();
-        productSave.prod_rango_precios = this.rangoPreciosArrayForm.value;
-        productSave.prod_dir_entrega = this.productForm.value.prod_dir_entrega;
-        productSave.prod_hora_entrega = this.productForm.value.prod_hora_entrega;
-        productSave.prod_dir_recibe = this.productForm.value.prod_dir_recibe;
-        productSave.prod_hora_recibe = this.productForm.value.prod_hora_recibe;
-        productSave.prod_est_alquiler = 'Disponible';
-        productSave.prod_fec_registro = this.registroUtil.obtenerFechaCreacion();
-        productSave.prod_usu_registro = this.securityService.getUserLogedId();               
-        this._ecommerceProductService.registrarProducto(productSave).subscribe(
-            data => {
-                this._matSnackBar.open('Artículo registrado', 'OK', {
-                    verticalPosition: 'top',
-                    duration: 3000
-                });                
-                this.router.navigateByUrl('/products');
+
+        const LenderSave: UserModel = new UserModel();        
+        LenderSave.user_names = this.lenderForm.value.user_names;
+        LenderSave.user_full_name1 = this.lenderForm.value.user_full_name1;
+        LenderSave.user_full_name2 = this.lenderForm.value.user_full_name2;
+        LenderSave.user_fec_nac = this.lenderForm.value.user_fec_nac.format('DD/MM/YYYY');
+        LenderSave.user_slug = this.registroUtil.obtenerSlugPorNombre(LenderSave.user_names + ' ' + LenderSave.user_full_name1);
+        LenderSave.user_num_doc = this.lenderForm.value.user_num_doc;
+        LenderSave.user_tip_doc = this.obtenerTipoDocumSeleccionado();
+        LenderSave.user_num_phone = this.lenderForm.value.user_num_phone;
+        LenderSave.user_email = this.lenderForm.value.user_email;
+        LenderSave.user_ubigeo = this.obtenerUbigeoDistrito();
+        LenderSave.user_date_reg = this.registroUtil.obtenerFechaCreacion();
+        LenderSave.user_usur_reg = this.securityService.getUserLogedId();
+        LenderSave.user_categ = {
+            catg_id: this.appCategoryConfig.getLenderCategory(),
+            catg_name: 'Lender'  
+        };        
+        this._lenderService.createLender(LenderSave).subscribe(
+            data => {                
+                if (data.res_service === 'ok') {
+                    this._matSnackBar.open('Prestamista registrado', 'Aceptar', {
+                        verticalPosition: 'top',
+                        duration: 3000
+                    });
+                    const listImagesGuardar = [];
+                    this.listImages.forEach(element => {
+                        const dataUpload = {
+                            imageString64: element.data,
+                            app_id: data.data_result.user_id,
+                            app_categ_id: this.appCategoryConfig.getLenderCategory()                             
+                        };
+                        this._s3Service.uploadImageS3(dataUpload).subscribe(
+                            responseUpload => {                                                               
+                                const data_image = {
+                                    image_key: responseUpload.data_result.fileName,
+                                    image_desc: element.desc.image_desc
+                                };
+                                listImagesGuardar.push(data_image);
+                                const dataUploadFileName = {
+                                    app_id: data.data_result.user_id,
+                                    app_url_documen: listImagesGuardar,
+                                    app_categ: this.appCategoryConfig.getLenderCategory()
+                                };                                                           
+                                this._s3Service.uploadFileName(dataUploadFileName).subscribe(
+                                    resultUploadFileName => {
+                                        this._matSnackBar.open('Documentos agregados', 'Aceptar', {
+                                            verticalPosition: 'top',
+                                            duration: 3000
+                                        });                                        
+                                    }
+                                );
+                            }
+                        );
+                    });
+                    
+                    this.router.navigateByUrl('/lenders/lender/' + data.data_result.user_id + '/' + LenderSave.user_slug);
+                } else {
+                    this._matSnackBar.open('Error modificando la información del prestamista', 'Aceptar', {
+                        verticalPosition: 'top',
+                        duration: 3000,
+                        panelClass: 'mat-error-dialog'
+                    });
+                }
             }
         );
+    }
+
+    viewImageComplete(image): void {
+        const dialogRef = this.dialog.open(ImageViewComponent, {
+            data: {
+                data_image: image.data,
+                info_image: image.desc
+            }
+        });
+        dialogRef.afterClosed().subscribe(result => {            
+        });
+    }
+
+    uploadDocument(): void {
+        const dialogRef = this.dialog.open(ImageUploadComponent, {
+            data: {
+            }
+        });
+        dialogRef.afterClosed().subscribe(result => {
+            if (result){
+                const image = {
+                    data: result.data_image,
+                    desc: {
+                        image_desc: result.data_desc
+                    }
+                };
+                this.listImages.push(image);
+                this.imageUploaded = false;    
+                try {
+                  (<HTMLInputElement> document.getElementById('btnSaveLender')).disabled = false;
+                } catch (e) {}                     
+                
+                if (this.pageType === 'edit') {
+                    this.bNewImages = true;
+                }
+            }                 
+        });
+    }
+
+    changeStatusLender(event): void {
+        let current_status = '0';
+        let current_status_msg = 'Deshabilitado';
+
+        if (event.checked) {
+            current_status = '1';
+            current_status_msg = 'Habilitado';
+        } else {
+            current_status = '0';
+            current_status_msg = 'Deshabilitado';
+        }
+
+        const bodyDelete = {
+            user_id: this.lender.user_id,
+            user_stat_reg: current_status
+        };
+
+        this._lenderService.deleteUser(bodyDelete).subscribe(
+            data => {                
+                if (data.res_service === 'ok'){
+                    this.lndr_current_status = current_status_msg;
+                    this._matSnackBar.open('Prestamista ' + current_status_msg, 'Aceptar', {
+                        verticalPosition: 'top',
+                        duration: 3000
+                    });
+                } else {
+                    this._matSnackBar.open('Error actualizando la información', 'Aceptar', {
+                        verticalPosition: 'top',
+                        duration: 3000
+                    });
+                }
+            }
+        );
+    }
+
+    copyClipBoardLenderId(user_id): void {
+
+        const selBox = document.createElement('textarea');
+        selBox.style.position = 'fixed';
+        selBox.style.left = '0';
+        selBox.style.top = '0';
+        selBox.style.opacity = '0';
+        selBox.value = user_id;
+        document.body.appendChild(selBox);
+        selBox.focus();
+        selBox.select();
+        document.execCommand('copy');
+        document.body.removeChild(selBox);
+
+        document.execCommand('copy');
+
+        this._matSnackBar.open('Código copiado', 'Aceptar', {
+            verticalPosition: 'top',
+            duration: 3000
+        });
     }
 }
