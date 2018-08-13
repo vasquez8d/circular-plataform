@@ -19,4 +19,8 @@ export class AppCategoryConfig {
         return '4';
     }
 
+    getLenderBorrowerCategory(): string {
+        return '5';
+    }
+
 }

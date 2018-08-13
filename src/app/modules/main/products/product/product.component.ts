@@ -91,8 +91,7 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
      */
     constructor(
         private _ecommerceProductService: EcommerceProductService,
-        private _formBuilder: FormBuilder,
-        private _location: Location,
+        private _formBuilder: FormBuilder,        
         private _matSnackBar: MatSnackBar,
         private categoryService: CategorysService,
         private registroUtil: RegistroUtil,
@@ -103,6 +102,7 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
         private appCategoryConfig: AppCategoryConfig,
         private _userService: UserService,
         private _activatedRoute: ActivatedRoute,
+        private _appCategConfig: AppCategoryConfig
     )
     {
         // Set the default
@@ -138,6 +138,7 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
                     this.cargarDocumentos(this.product.prod_url_documen);
                     this.loadCurrentStatusProduct(product);
                     this.cargarInfoLender(product);
+                    this.cargarEstadoConvervaText(product);
                 }
                 else
                 {
@@ -148,6 +149,21 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
 
                 this.productForm = this.createProductForm();
             });
+    }
+
+    cargarEstadoConvervaText(product): void {
+        if (product.prod_est_converva.est_value > 7) {
+            this.prd_est_conversva = 'Perfecto';
+        }
+        else if (product.prod_est_converva.est_value > 4) {
+            this.prd_est_conversva = 'Sin detalles';
+        }
+        else if (product.prod_est_converva.est_value > 2) {
+            this.prd_est_conversva = 'Con algún detalle';
+        }
+        else if (product.prod_est_converva.est_value > 0) {
+            this.prd_est_conversva = 'Funcional';
+        }
     }
 
     loadCurrentStatusProduct(product): void {
@@ -185,7 +201,8 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
     onSearchLenderChange(event): void {
         if (event.length === 16) {
             const body = {
-                user_id : event
+                user_id : event,
+                catg_id : this._appCategConfig.getLenderCategory()
             };
             this._userService.detailsLender(body).subscribe(
                 data => {
@@ -213,7 +230,8 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
 
     cargarInfoLender(product): void {        
         const body = {
-            user_id: product.lender_user_id
+            user_id: product.lender.user_id,            
+            catg_id: this._appCategConfig.getLenderCategory()
         };
         this._userService.detailsLender(body).subscribe(
             data => {
@@ -240,7 +258,8 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
         this._activatedRoute.params.subscribe(params => {
             if (params.user_id){
                 const body = {
-                    user_id: params.user_id
+                    user_id: params.user_id,
+                    catg_id: this._appCategConfig.getLenderCategory()
                 };
                 this._userService.detailsLender(body).subscribe(
                     data => {
@@ -333,7 +352,7 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
         });
          
         const prodFormBuild = this._formBuilder.group({            
-            lender_user_id      : [this.product.lender_user_id],
+            lender_user_id      : [this.product.lender.user_id],
             prod_id             : [this.product.prod_id],
             prod_nombre         : [this.product.prod_nombre],
             prod_desc           : [this.product.prod_desc],
@@ -405,22 +424,28 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
     saveProduct(): void
     {      
         const productSave: Product = new Product();
-        productSave.prod_id = this.product.prod_id;
-        productSave.lender_user_id = this.productForm.value.lender_user_id;
+        productSave.prod_id = this.product.prod_id;        
+        productSave.lender = {
+            user_id: this.lender.user_id,
+            user_slug: this.lender.user_slug
+        };
         productSave.prod_nombre = this.productForm.value.prod_nombre;
         productSave.prod_desc = this.productForm.value.prod_desc;
         productSave.prod_est_converva = {
             est_value: this.productForm.value.prod_est_converva_value,
-            est_desc: this.productForm.value.prod_est_converva_desc
+            est_desc: this.productForm.value.prod_est_converva_desc,
+            est_text: this.prd_est_conversva
         };
         productSave.prod_time_uso = {
             time_value: this.productForm.value.prod_time_uso_value,
-            time_id: this.productForm.value.prod_time_uso_id
+            time_id: this.productForm.value.prod_time_uso_id,
+            time_text: this.obtenerTiempoTextSelected(this.productForm.value.prod_time_uso_id)
         };
         productSave.prod_val_merca = {
             val_value: this.productForm.value.prod_val_merca_value,
             val_moneda_id: this.productForm.value.prod_val_merca_moneda_id,
-            val_ref_price: this.productForm.value.prod_val_merca_ref_price
+            val_ref_price: this.productForm.value.prod_val_merca_ref_price,
+            val_moneda_text: this.obtenerTipoMonedaSelected(this.productForm.value.prod_val_merca_moneda_id)
         };
         productSave.prod_dir_entrega = this.productForm.value.prod_dir_entrega;
         productSave.prod_hora_entrega = this.productForm.value.prod_hora_entrega;
@@ -431,12 +456,12 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
         productSave.prod_fec_actualiza = this.registroUtil.obtenerFechaCreacion();
         productSave.prod_usu_actualiza = this.securityService.getUserLogedId();
         productSave.prod_categoria = this.obtenerCategoriaSeleccionada();
-        productSave.prod_rango_precios = this.rangoPreciosArrayForm.value;        
+        productSave.prod_rango_precios = this.rangoPreciosArrayForm.value;                
+
         this._ecommerceProductService.actualizarProducto(productSave).subscribe(
-            data => {
-                console.log(data);
+            data => {                
                 if (data.res_service === 'ok') {
-                    this._matSnackBar.open('Producto actualizado', 'Aceptar', {
+                    this._matSnackBar.open('Artículo actualizado', 'Aceptar', {
                         verticalPosition: 'top',
                         duration: 3000
                     });
@@ -505,6 +530,14 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
         );
     }
 
+    obtenerTiempoTextSelected(value): any {
+        return this.listTiempos.find(x => x.value === value).text;
+    }
+
+    obtenerTipoMonedaSelected(value): any {
+        return this.listTipoMonedas.find(x => x.value === value).text;
+    }
+
     obtenerCategoriaSeleccionada(): any {
         const catg_id = this.productForm.value.catg_id;
         let catg_nombre = '';
@@ -526,21 +559,27 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
     {
         const productSave: Product = new Product();
         productSave.prod_nombre = this.productForm.value.prod_nombre;
-        productSave.lender_user_id = this.productForm.value.lender_user_id;
+        productSave.lender = {
+            user_id: this.lender.user_id,
+            user_slug: this.lender.user_slug
+        };
         productSave.prod_desc = this.productForm.value.prod_desc;
         productSave.prod_tags = this.productForm.value.prod_tags;
         productSave.prod_est_converva = {
             est_value: this.productForm.value.prod_est_converva_value.toString(),
-            est_desc: this.productForm.value.prod_est_converva_desc
+            est_desc: this.productForm.value.prod_est_converva_desc,
+            est_text: this.prd_est_conversva
         };
         productSave.prod_time_uso = {
             time_value: this.productForm.value.prod_time_uso_value.toString(),
-            time_id: this.productForm.value.prod_time_uso_id.toString()
+            time_id: this.productForm.value.prod_time_uso_id.toString(),
+            time_text: this.obtenerTiempoTextSelected(this.productForm.value.prod_time_uso_id)
         };
         productSave.prod_val_merca = {
             val_value: this.productForm.value.prod_val_merca_value.toString(),
             val_moneda_id: this.productForm.value.prod_val_merca_moneda_id.toString(),
-            val_ref_price: this.productForm.value.prod_val_merca_ref_price
+            val_ref_price: this.productForm.value.prod_val_merca_ref_price,
+            val_moneda_text: this.obtenerTipoMonedaSelected(this.productForm.value.prod_val_merca_moneda_id)
         };
         productSave.prod_slug = this.registroUtil.obtenerSlugPorNombre(productSave.prod_nombre);
         productSave.prod_categoria = this.obtenerCategoriaSeleccionada();
@@ -551,8 +590,7 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
         productSave.prod_hora_recibe = this.productForm.value.prod_hora_recibe;
         productSave.prod_est_alquiler = 'Disponible';
         productSave.prod_fec_registro = this.registroUtil.obtenerFechaCreacion();
-        productSave.prod_usu_registro = this.securityService.getUserLogedId();
-        console.log(productSave);
+        productSave.prod_usu_registro = this.securityService.getUserLogedId();        
         this._ecommerceProductService.registrarProducto(productSave).subscribe(
             data => {
                 if (data.res_service === 'ok') {
@@ -591,7 +629,7 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
                         );
                     });
                 }         
-                // this.router.navigateByUrl('/products');
+                this.router.navigateByUrl('/products/product/' + data.data_result.prod_id + '/' + productSave.prod_slug);
             }
         );
     }

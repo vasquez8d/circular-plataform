@@ -5,22 +5,31 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 import { fuseAnimations } from '@fuse/animations';
-import { EcommerceProductService } from '../../../../services/product.service';
 import { Product } from '../../../../models/product.model';
-import { CategorysService } from '../../../../services/categorys.service';
 import { SecurityService } from '../../../../services/security.service';
 import { RegistroUtil } from '../../../../utils/registro.util';
 import { Router, ActivatedRoute } from '../../../../../../node_modules/@angular/router';
-import { S3Service } from '../../../../services/s3.service';
-import { AppCategoryConfig } from '../../../../app-config/app-categorys.config';
 import { UserService } from '../../../../services/user.service';
 import { UserModel } from '../../../../models/user.model';
 import { RentalModel } from '../../../../models/rental.model';
+import { MAT_DATE_FORMATS } from '@angular/material/core';
+import { RentalService } from '../../../../services/rental.service';
+import { EcommerceProductService } from '../../../../services/product.service';
+
+export const MY_FORMATS = {
+    parse: {
+        dateInput: 'DD/MM/YYYY',
+    },
+    display: {
+        dateInput: 'DD/MM/YYYY'
+    }
+};
 
 @Component({
     selector     : 'e-commerce-rental',
     templateUrl  : './rental.component.html',
-    styleUrls    : ['./rental.component.scss'],
+    styleUrls    : ['./rental.component.scss'],   
+    providers: [{ provide: MAT_DATE_FORMATS, useValue: MY_FORMATS }], 
     encapsulation: ViewEncapsulation.None,
     animations   : fuseAnimations
 })
@@ -32,10 +41,10 @@ export class RentalComponent implements OnInit, OnDestroy
 
     // Date Range Picker
 
-    // Buscador Lenders    
-    lenderInformation = false;
-    public lender = new UserModel();
-    public readonlyLender = false;
+    // Buscador Prestatarios    
+    borrowerInformation = false;
+    public borrower = new UserModel();
+    public readonlyBorrower = false;
 
     // Buscador Articulos
     prodInformation = false;
@@ -58,62 +67,7 @@ export class RentalComponent implements OnInit, OnDestroy
             text  : 'Dólares'
         }
     ];
-    public listRangoTiempos = [
-        {
-            value : 1,
-            text  : 'De 8:00 a.m. a 11:00 a.m.',
-            min   : '8:00',
-            max   : '9:00' 
-        },
-        {
-            value : 2,
-            text  : 'De 9:00 a.m. a 12:00 p.m.',
-            min   : '9:00',
-            max   : '12:00' 
-        },
-        {
-            value : 3,
-            text  : 'De 10:00 a.m. a 1:00 p.m.',
-            min   : '10:00',
-            max   : '13:00' 
-        },
-        {
-            value : 4,
-            text  : 'De 11:00 a.m. a 2:00 p.m.',
-            min   : '11:00',
-            max   : '14:00' 
-        },
-        {
-            value : 5,
-            text  : 'De 12:00 p.m. a 3:00 p.m.',
-            min   : '12:00',
-            max   : '15:00' 
-        },
-        {
-            value : 6,
-            text  : 'De 1:00 p.m. a 4:00 p.m.',
-            min   : '13:00',
-            max   : '16:00' 
-        },
-        {
-            value : 7,
-            text  : 'De 2:00 p.m. a 5:00 p.m.',
-            min   : '14:00',
-            max   : '17:00' 
-        },
-        {
-            value : 8,
-            text  : 'De 3:00 p.m. a 6:00 p.m.',
-            min   : '15:00',
-            max   : '18:00' 
-        },
-        {
-            value : 9,
-            text  : 'De 4:00 p.m. a 7:00 p.m.',
-            min   : '16:00',
-            max   : '19:00' 
-        }
-    ];
+    public listRangoTiempos = [];
     
     // Private
     private _unsubscribeAll: Subject<any>;
@@ -127,17 +81,15 @@ export class RentalComponent implements OnInit, OnDestroy
      * @param {MatSnackBar} _matSnackBar
      */
     constructor(
-        private _ecommerceProductService: EcommerceProductService,
-        private _formBuilder: FormBuilder,        
+        private _ecommerceProductService: RentalService,
+        private _formBuilder: FormBuilder,
         private _matSnackBar: MatSnackBar,
-        private categoryService: CategorysService,
         private registroUtil: RegistroUtil,
         private securityService: SecurityService,
-        private router: Router,        
-        private _s3Service: S3Service,
-        private appCategoryConfig: AppCategoryConfig,
-        private _userService: UserService,
-        private _activatedRoute: ActivatedRoute
+        private router: Router,
+        private _userService: UserService,        
+        private _activatedRoute: ActivatedRoute,
+        private _productService: EcommerceProductService
     )
     {
         // Set the default
@@ -157,7 +109,7 @@ export class RentalComponent implements OnInit, OnDestroy
     ngOnInit(): void
     {        
         // Subscribe to update product on changes
-        this._ecommerceProductService.onProductChanged
+        this._ecommerceProductService.onRentalChanged
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe(rental => {
 
@@ -188,63 +140,74 @@ export class RentalComponent implements OnInit, OnDestroy
             this.checkedStatusProduct = false;
         }
     }
-
-    formatLabel(value: number | null): any {
-        if (!value) {
-          return 0;
+    
+    onSearchProductChange(event): void {
+        if (event.length === 16) {
+            const body = {
+                prod_id: event
+            };
+            this._productService.detailsProduct(body).subscribe(
+                data => {                                   
+                    if (data.res_service === 'ok') {
+                        if (data.data_result.Item != null) {
+                            this.prodInformation = true;
+                            this.product = data.data_result.Item;
+                        } else {
+                            this.prodInformation = false;
+                            this._matSnackBar.open('Artículo no existe o deshabilitado', 'Aceptar', {
+                                verticalPosition: 'top',
+                                duration: 3000
+                            });
+                            this.rentalForm.controls.rent_prod_id.patchValue('');
+                        }
+                    } else {
+                        this.prodInformation = false;
+                    }
+                }
+            );
+        } else {
+            this.prodInformation = false;
         }
-        return value;
     }
 
-    chosenYearHandler(event): void {
-        console.log(event);
+    navigateToProductDetails(): void {
+        this.router.navigateByUrl('/products/product/' + this.product.prod_id + '/' + this.product.prod_slug);
     }
-    chosenMonthHandler(event, dp): void {
-        console.log(event);
-        console.log(dp);
-    }
-    changeEstConversa(event): void {
-        if (event.value > 7) {
-            this.prd_est_conversva = 'Perfecto';
-        }
-        else if (event.value > 4) {
-            this.prd_est_conversva = 'Sin detalles';
-        }
-        else if (event.value > 2) {
-            this.prd_est_conversva = 'Con algún detalle';
-        }
-        else if (event.value > 0) {
-            this.prd_est_conversva = 'Funcional';
-        }
+    navigateToLenderDetails(): void {
+        this.router.navigateByUrl('/lenders/lender/' + this.product.lender.user_id + '/' + this.product.lender.user_slug);
     }
 
-    onSearchLenderChange(event): void {
+    onSearchBorrowChange(event): void {
         if (event.length === 16) {
             const body = {
                 user_id : event
             };
             this._userService.detailsLender(body).subscribe(
                 data => {
+                    console.log(data);
                     if (data.res_service === 'ok'){
                         if (data.data_result.Item != null){
-                            this.lenderInformation = true;
-                            this.lender = data.data_result.Item;                            
+                            this.borrowerInformation = true;
+                            this.borrower = data.data_result.Item;                            
                         } else {
-                            this.lenderInformation = false;
-                            this._matSnackBar.open('Prestamista no existe o deshabilitado', 'Aceptar', {
+                            this.borrowerInformation = false;
+                            this._matSnackBar.open('Prestatario no existe o deshabilitado', 'Aceptar', {
                                 verticalPosition: 'top',
                                 duration: 3000
                             });
                             this.rentalForm.controls.lender_user_id.patchValue('');
                         }
                     } else {
-                        this.lenderInformation = false;
+                        this.borrowerInformation = false;
                     }
                 }
             );
         } else {
-            this.lenderInformation = false;
+            this.borrowerInformation = false;
         }
+    }
+    navigateToBorrower(): void {
+        this.router.navigateByUrl('/borrowers/borrower/' + this.borrower.user_id + '/' + this.borrower.user_slug);  
     }
 
     cargarInfoLender(product): void {        
@@ -255,10 +218,10 @@ export class RentalComponent implements OnInit, OnDestroy
             data => {
                 if (data.res_service === 'ok') {
                     if (data.data_result.Item != null) {
-                        this.lenderInformation = true;
-                        this.lender = data.data_result.Item;
+                        this.borrowerInformation = true;
+                        this.borrower = data.data_result.Item;
                     } else {
-                        this.lenderInformation = false;
+                        this.borrowerInformation = false;
                         this._matSnackBar.open('Prestamista no existe o deshabilitado', 'Aceptar', {
                             verticalPosition: 'top',
                             duration: 3000
@@ -266,7 +229,7 @@ export class RentalComponent implements OnInit, OnDestroy
                         this.rentalForm.controls.lender_user_id.patchValue('');
                     }
                 } else {
-                    this.lenderInformation = false;
+                    this.borrowerInformation = false;
                 }
             }
         );
@@ -282,12 +245,12 @@ export class RentalComponent implements OnInit, OnDestroy
                     data => {
                         if (data.res_service === 'ok') {
                             if (data.data_result.Item != null) {
-                                this.lenderInformation = true;
-                                this.lender = data.data_result.Item;
+                                this.borrowerInformation = true;
+                                this.borrower = data.data_result.Item;
                                 this.rentalForm.controls.lender_user_id.patchValue(params.user_id);
-                                this.readonlyLender = true;
+                                this.readonlyBorrower = true;
                             } else {
-                                this.lenderInformation = false;
+                                this.borrowerInformation = false;
                                 this._matSnackBar.open('Prestamista no existe o deshabilitado', 'Aceptar', {
                                     verticalPosition: 'top',
                                     duration: 3000
@@ -295,7 +258,7 @@ export class RentalComponent implements OnInit, OnDestroy
                                 this.rentalForm.controls.lender_user_id.patchValue('');
                             }
                         } else {
-                            this.lenderInformation = false;
+                            this.borrowerInformation = false;
                         }
                     }
                 );
@@ -304,7 +267,7 @@ export class RentalComponent implements OnInit, OnDestroy
     }
 
     navigateToLender(): void {
-        this.router.navigateByUrl('lenders/lender/' + this.lender.user_id + '/' + this.lender.user_slug);
+        this.router.navigateByUrl('lenders/lender/' + this.borrower.user_id + '/' + this.borrower.user_slug);
     }
 
     /**
@@ -331,13 +294,12 @@ export class RentalComponent implements OnInit, OnDestroy
          
         const prodFormBuild = this._formBuilder.group({         
             rent_id                       : [this.rental.rent_id],   
-            rent_lndr_id                  : [this.rental.rent_lndr_id],
+            rent_borrow_id                : [this.rental.rent_borrow_id],
             rent_prod_id                  : [this.rental.rent_prod_id],
-            rent_start_date               : [this.rental.rent_start_date],
+            rent_range_date               : [this.rental.rent_range_date],            
             rent_start_address_rec        : [this.rental.rent_start_address_rec],
             rent_start_address_rec_ref    : [this.rental.rent_start_address_rec_ref],
-            rent_start_time_range_rec_id  : [this.rental.rent_start_time_range_rec.range_id],
-            rent_end_date                 : [this.rental.rent_end_date],
+            rent_start_time_range_rec_id  : [this.rental.rent_start_time_range_rec.range_id],            
             rent_end_address_rec          : [this.rental.rent_end_address_rec],
             rent_end_address_rec_ref      : [this.rental.rent_end_address_rec_ref],
             rent_end_time_range_rec_id    : [this.rental.rent_end_time_range_rec.range_id],
@@ -347,8 +309,6 @@ export class RentalComponent implements OnInit, OnDestroy
             rent_usur_reg                 : [this.rental.rent_usur_reg],   
             rent_date_upt                 : [this.rental.rent_date_upt],   
             rent_usur_upt                 : [this.rental.rent_usur_upt],
-
-            rent_range_date               : [this.rental.rent_range_date]
         });
         return prodFormBuild;
     }
@@ -379,49 +339,49 @@ export class RentalComponent implements OnInit, OnDestroy
      */
     saveProduct(): void
     {      
-        const productSave: Product = new Product();
-        productSave.prod_id = this.product.prod_id;
-        productSave.lender_user_id = this.rentalForm.value.lender_user_id;
-        productSave.prod_nombre = this.rentalForm.value.prod_nombre;
-        productSave.prod_desc = this.rentalForm.value.prod_desc;
-        productSave.prod_est_converva = {
-            est_value: this.rentalForm.value.prod_est_converva_value,
-            est_desc: this.rentalForm.value.prod_est_converva_desc
-        };
-        productSave.prod_time_uso = {
-            time_value: this.rentalForm.value.prod_time_uso_value,
-            time_id: this.rentalForm.value.prod_time_uso_id
-        };
-        productSave.prod_val_merca = {
-            val_value: this.rentalForm.value.prod_val_merca_value,
-            val_moneda_id: this.rentalForm.value.prod_val_merca_moneda_id,
-            val_ref_price: this.rentalForm.value.prod_val_merca_ref_price
-        };
-        productSave.prod_dir_entrega = this.rentalForm.value.prod_dir_entrega;
-        productSave.prod_hora_entrega = this.rentalForm.value.prod_hora_entrega;
-        productSave.prod_dir_recibe = this.rentalForm.value.prod_dir_recibe;
-        productSave.prod_hora_recibe = this.rentalForm.value.prod_hora_recibe;
-        productSave.prod_tags = this.rentalForm.value.prod_tags;
-        productSave.prod_est_alquiler = 'Disponible';
-        productSave.prod_fec_actualiza = this.registroUtil.obtenerFechaCreacion();
-        productSave.prod_usu_actualiza = this.securityService.getUserLogedId();        
+        // const productSave: Product = new Product();
+        // productSave.prod_id = this.product.prod_id;
+        // productSave.lender_user_id = this.rentalForm.value.lender_user_id;
+        // productSave.prod_nombre = this.rentalForm.value.prod_nombre;
+        // productSave.prod_desc = this.rentalForm.value.prod_desc;
+        // productSave.prod_est_converva = {
+        //     est_value: this.rentalForm.value.prod_est_converva_value,
+        //     est_desc: this.rentalForm.value.prod_est_converva_desc
+        // };
+        // productSave.prod_time_uso = {
+        //     time_value: this.rentalForm.value.prod_time_uso_value,
+        //     time_id: this.rentalForm.value.prod_time_uso_id
+        // };
+        // productSave.prod_val_merca = {
+        //     val_value: this.rentalForm.value.prod_val_merca_value,
+        //     val_moneda_id: this.rentalForm.value.prod_val_merca_moneda_id,
+        //     val_ref_price: this.rentalForm.value.prod_val_merca_ref_price
+        // };
+        // productSave.prod_dir_entrega = this.rentalForm.value.prod_dir_entrega;
+        // productSave.prod_hora_entrega = this.rentalForm.value.prod_hora_entrega;
+        // productSave.prod_dir_recibe = this.rentalForm.value.prod_dir_recibe;
+        // productSave.prod_hora_recibe = this.rentalForm.value.prod_hora_recibe;
+        // productSave.prod_tags = this.rentalForm.value.prod_tags;
+        // productSave.prod_est_alquiler = 'Disponible';
+        // productSave.prod_fec_actualiza = this.registroUtil.obtenerFechaCreacion();
+        // productSave.prod_usu_actualiza = this.securityService.getUserLogedId();        
           
-        this._ecommerceProductService.actualizarProducto(productSave).subscribe(
-            data => {
-                console.log(data);
-                if (data.res_service === 'ok') {
-                    this._matSnackBar.open('Alquiler actualizado', 'Aceptar', {
-                        verticalPosition: 'top',
-                        duration: 3000
-                    });
-                } else {
-                    this._matSnackBar.open('Error actualizando la información del alquiler', 'Aceptar', {
-                        verticalPosition: 'top',
-                        duration: 3000
-                    });
-                }              
-            }
-        );
+        // this._ecommerceProductService.updateRental(productSave).subscribe(
+        //     data => {
+        //         console.log(data);
+        //         if (data.res_service === 'ok') {
+        //             this._matSnackBar.open('Alquiler actualizado', 'Aceptar', {
+        //                 verticalPosition: 'top',
+        //                 duration: 3000
+        //             });
+        //         } else {
+        //             this._matSnackBar.open('Error actualizando la información del alquiler', 'Aceptar', {
+        //                 verticalPosition: 'top',
+        //                 duration: 3000
+        //             });
+        //         }              
+        //     }
+        // );
     }
 
     /**
@@ -492,7 +452,7 @@ export class RentalComponent implements OnInit, OnDestroy
             prod_est_registro: current_status
         };
 
-        this._ecommerceProductService.deleteProduct(bodyDelete).subscribe(
+        this._ecommerceProductService.deleteRental(bodyDelete).subscribe(
             data => {
                 if (data.res_service === 'ok') {
                     this.prod_current_status = current_status_msg;

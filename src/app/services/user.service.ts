@@ -1,21 +1,23 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from '@angular/router';
+import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot, Router } from '@angular/router';
 import { Observable, of, Subject, BehaviorSubject } from 'rxjs';
 import { ServicesConfig } from '../app-config/services.config';
 import { ResponseModel } from '../models/response.model';
 import { tap, catchError } from 'rxjs/operators';
+import { AppCategoryConfig } from '../app-config/app-categorys.config';
 
 @Injectable()
 export class UserService implements Resolve<any>
 {
     routeParams: any;
     lender: any;
+    router: any;
     onProductChanged: BehaviorSubject<any>;
-    private detailsUrl = `${this.globalValues.urlUsers()}/details`;
-    private UpdateUrl = `${this.globalValues.urlUsers()}/update`;
-    private CreateUrl = `${this.globalValues.urlUsers()}/create`;
-    private DeleteUserUrl = `${this.globalValues.urlUsers()}/delete`;
+    private detailsUrl = `${this._globalValues.urlUsers()}/details`;
+    private UpdateUrl = `${this._globalValues.urlUsers()}/update`;
+    private CreateUrl = `${this._globalValues.urlUsers()}/create`;
+    private DeleteUserUrl = `${this._globalValues.urlUsers()}/delete`;
 
     /**
      * Constructor
@@ -24,11 +26,14 @@ export class UserService implements Resolve<any>
      */
     constructor(
         private _httpClient: HttpClient,
-        private globalValues: ServicesConfig
+        private _globalValues: ServicesConfig,
+        private _appCategConfig: AppCategoryConfig,
+        private _router: Router
     )
     {
         // Set the defaults
         this.onProductChanged = new BehaviorSubject({});
+        this.router = _router;
     }
 
     /**
@@ -70,12 +75,22 @@ export class UserService implements Resolve<any>
             }
             else
             {
+                const currentRoute = window.location.href.split('/');
+                let categ_id = '';
+                if (currentRoute[3] === 'lenders') {
+                    categ_id = this._appCategConfig.getLenderCategory();
+                } else if (currentRoute[3] === 'borrowers') {
+                    categ_id = this._appCategConfig.getBorrowerCategory();
+                }
                 const body = {
-                    user_id : this.routeParams.id
+                    user_id : this.routeParams.id,
+                    catg_id: categ_id
                 };                        
                 this._httpClient.post(this.detailsUrl, body)
-                    .subscribe((response: any) => {
-                        this.lender = response.data_result.Item;                                             
+                    .subscribe((response: any) => {          
+                        if (response.data_result.Count > 0 ) {
+                            this.lender = response.data_result.Items[0];      
+                        }                                                            
                         this.onProductChanged.next(this.lender);
                         resolve(response);
                     }, reject);
@@ -83,23 +98,23 @@ export class UserService implements Resolve<any>
         });
     }
 
-    detailsLender(body): Observable<ResponseModel> {
+    detailsLender(body): Observable<ResponseModel> {        
         return this._httpClient.post<ResponseModel>(this.detailsUrl, body).pipe(
-            tap((response: ResponseModel) => this.log(`Resultado del detailsLender = ${response.res_service}`)),
+            tap((response: ResponseModel) => this.log(`Resultado del detailsLender = ${JSON.stringify(response)}`)),
             catchError(this.handleError<ResponseModel>('detailsLender'))
         );
     }
 
     updateLender(lender): Observable<ResponseModel> {
         return this._httpClient.patch<ResponseModel>(this.UpdateUrl, lender).pipe(
-            tap((response: ResponseModel) => this.log(`Resultado del updateLender = ${response.res_service}`)),
+            tap((response: ResponseModel) => this.log(`Resultado del updateLender = ${JSON.stringify(response)}`)),
             catchError(this.handleError<ResponseModel>('updateLender'))
         );
     }
 
     createLender(lender): Observable<ResponseModel> {
         return this._httpClient.post<ResponseModel>(this.CreateUrl, lender).pipe(
-            tap((response: ResponseModel) => this.log(`Resultado del createLender = ${response.res_service}`)),
+            tap((response: ResponseModel) => this.log(`Resultado del createLender = ${JSON.stringify(response)}`)),
             catchError(this.handleError<ResponseModel>('createLender'))
         );
     }
@@ -107,7 +122,7 @@ export class UserService implements Resolve<any>
 
     deleteUser(body): Observable<ResponseModel> {
         return this._httpClient.post<ResponseModel>(this.DeleteUserUrl, body).pipe(
-            tap((response: ResponseModel) => this.log(`Resultado del deleteUser = ${response.res_service}`)),
+            tap((response: ResponseModel) => this.log(`Resultado del deleteUser = ${JSON.stringify(response)}`)),
             catchError(this.handleError<ResponseModel>('deleteUser'))
         );
     }

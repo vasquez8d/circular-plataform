@@ -25,6 +25,10 @@ export class ServicesConfig {
         return 'https://h7g83v5yj7.execute-api.us-east-1.amazonaws.com/dev';
     }
 
+    urlRental(): string {
+        return 'https://mofy4cwezf.execute-api.us-east-1.amazonaws.com/dev';
+    }
+
     currentUrl(): string {
         return this.publishUrl;
     }

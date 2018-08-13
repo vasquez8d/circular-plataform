@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from '@angular/router';
-import { Observable, of, Subject, BehaviorSubject } from 'rxjs';
+import { Observable, of, BehaviorSubject } from 'rxjs';
 import { ServicesConfig } from '../app-config/services.config';
 import { ResponseModel } from '../models/response.model';
 import { tap, catchError } from 'rxjs/operators';
@@ -10,16 +10,12 @@ import { tap, catchError } from 'rxjs/operators';
 export class EcommerceProductService implements Resolve<any>
 {
     routeParams: any;
-    product: any;
-
-    // products: any[];
-    onProductsChanged: BehaviorSubject<any>;
+    product: any;    
 
     onProductChanged: BehaviorSubject<any>;
     private detailsUrl = `${this.globalValues.urlProducts()}/details`;
     private UpdateUrl = `${this.globalValues.urlProducts()}/update`;
-    private CreateUrl = `${this.globalValues.urlProducts()}/create`;
-    // private listUrl = `${this.globalValues.urlProducts()}/list`;
+    private CreateUrl = `${this.globalValues.urlProducts()}/create`;    
     private DeleteUrl = `${this.globalValues.urlProducts()}/delete`;    
 
     /**
@@ -33,8 +29,7 @@ export class EcommerceProductService implements Resolve<any>
     )
     {
         // Set the defaults
-        this.onProductChanged = new BehaviorSubject({});
-        this.onProductsChanged = new BehaviorSubject({});
+        this.onProductChanged = new BehaviorSubject({});        
     }
 
     /**
@@ -51,8 +46,7 @@ export class EcommerceProductService implements Resolve<any>
         return new Promise((resolve, reject) => {
 
             Promise.all([
-                this.getProduct(),
-                // this.getProducts()
+                this.getProduct(),                
             ]).then(
                 () => {
                     resolve();
@@ -61,17 +55,6 @@ export class EcommerceProductService implements Resolve<any>
             );
         });
     }
-
-    // getProducts(): Promise<any> {
-    //     return new Promise((resolve, reject) => {
-    //         this._httpClient.get(this.listUrl)
-    //             .subscribe((response: any) => {
-    //                 this.products = response.data_result.Items;
-    //                 this.onProductsChanged.next(this.products);
-    //                 resolve(response);
-    //             }, reject);
-    //     });
-    // }
 
     /**
      * Get product
@@ -101,9 +84,16 @@ export class EcommerceProductService implements Resolve<any>
         });
     }
 
+    detailsProduct(body): Observable<ResponseModel> {
+        return this._httpClient.post<ResponseModel>(this.detailsUrl, body).pipe(
+            tap((response: ResponseModel) => this.log(`Resultado del detailsProduct = ${response.res_service}`)),
+            catchError(this.handleError<ResponseModel>('detailsProduct'))
+        );
+    }
+
     actualizarProducto(producto): Observable<ResponseModel> {
         return this._httpClient.post<ResponseModel>(this.UpdateUrl, producto).pipe(
-            tap((response: ResponseModel) => this.log(`Resultado del actualizar producto = ${response.res_service}`)),
+            tap((response: ResponseModel) => this.log(`Resultado del actualizar producto = ${JSON.stringify(response)}`)),
             catchError(this.handleError<ResponseModel>('actualizar producto'))
         );
     }

@@ -235,8 +235,7 @@ export class BorrowerComponent implements OnInit, OnDestroy
         LenderSave.user_usur_upt = this.securityService.getUserLogedId();
         LenderSave.user_categ = {
             catg_id: this.appCategoryConfig.getBorrowerCategory()
-        };
-        console.log(LenderSave);
+        };        
         this._lenderService.updateLender(LenderSave).subscribe(
             data => {
                 if (data.res_service === 'ok') {

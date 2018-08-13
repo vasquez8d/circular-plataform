@@ -17,13 +17,10 @@
                     <mat-icon>arrow_back</mat-icon>
                 </button>
 
-                <div fxLayout="column" fxLayoutAlign="start start"
-                     [@animate]="{value:'*',params:{delay:'100ms',x:'-25px'}}">
+                <div fxLayout="column" fxLayoutAlign="start start" [@animate]="{value:'*',params:{delay:'100ms',x:'-25px'}}">
                     <div class="h2" *ngIf="pageType ==='edit'">
                         {{rental.rent_id}}
-                        <button matTooltip="Copiar código" (click)="copyClipBoardLenderId(rental.rent_id)" 
-                                mat-mini-fab 
-                                style="margin-left: 10px;">
+                        <button matTooltip="Copiar código" (click)="copyClipBoardLenderId(rental.rent_id)" mat-mini-fab style="margin-left: 10px;">
                             <mat-icon aria-label="Example icon-button with a heart icon">content_copy</mat-icon>
                         </button>
                     </div>
@@ -37,17 +34,13 @@
             </div>
             <!-- / APP TITLE -->
 
-            <button mat-raised-button
-                    class="save-product-button mat-white-bg"
-                    [disabled]="rentalForm.invalid"
-                    *ngIf="pageType ==='new'" (click)="addProduct()">
+            <button mat-raised-button class="save-product-button mat-white-bg" [disabled]="rentalForm.invalid" *ngIf="pageType ==='new'"
+                (click)="addProduct()">
                 <span>Registrar</span>
             </button>
 
-            <button mat-raised-button id="btnSaveProduct"
-                    class="save-product-button mat-white-bg"
-                    [disabled]="rentalForm.invalid || rentalForm.pristine"
-                    *ngIf="pageType ==='edit'" (click)="saveProduct()">
+            <button mat-raised-button id="btnSaveProduct" class="save-product-button mat-white-bg" [disabled]="rentalForm.invalid || rentalForm.pristine"
+                *ngIf="pageType ==='edit'" (click)="saveProduct()">
                 <span>Guardar</span>
             </button>
         </div>
@@ -64,52 +57,81 @@
                     <mat-tab-group>
 
                         <mat-tab label="Artículo">
-                            <div class="tab-content p-24" fusePerfectScrollbar>                                
+                            <div class="tab-content p-24" fusePerfectScrollbar>
                                 <mat-form-field class="w-50-p">
-                                    <input matInput name="rent_lndr_id" 
-                                           formControlName="rent_lndr_id" 
-                                           (input)="onSearchLenderChange($event.target.value)"
+                                    <input matInput
+                                           formControlName="rent_prod_id" 
+                                           (input)="onSearchProductChange($event.target.value)" 
                                            maxlength="16"
-                                           [readonly]="readonlyLender"
-                                           placeholder="Código del artículo"
+                                           [readonly]="readonlyProduct" 
+                                           placeholder="Código del artículo" 
                                            required>
                                 </mat-form-field>
-                                <mat-card class="result" *ngIf="lenderInformation">
+                                <mat-card class="result" *ngIf="prodInformation">
                                     <mat-card-content>
-                                        <h2 class="example-h2">Información del Prestamista</h2>
+                                        <h2 class="example-h2">Información del Artículo</h2>
                                         <mat-form-field class="w-50-p">
-                                            <input matInput 
-                                                   [value] = "lender.user_names"
-                                                   placeholder="Nombres" readonly>
+                                            <input matInput [value]="product.prod_nombre" placeholder="Nombre" readonly>
                                         </mat-form-field>
                                         <mat-form-field class="w-50-p">
-                                            <input matInput 
-                                                   [value] = "lender.user_num_doc"
-                                                   placeholder="N° Documento" readonly>
+                                            <input matInput [value]="product.prod_categoria.catg_nombre" placeholder="Categoría" readonly>
+                                        </mat-form-field>                                        
+                                        <mat-form-field class="w-100-p">
+                                            <textarea matInput [value]="product.prod_desc" placeholder="Descripción" readonly>
+                                            </textarea>
+                                        </mat-form-field>
+                                        <mat-form-field class="w-100-p">
+                                            <mat-chip-list #tagList>
+                                                <mat-chip *ngFor="let tag of product.prod_tags" [removable]="false">
+                                                    {{tag}}
+                                                    <mat-icon matChipRemove>cancel</mat-icon>
+                                                </mat-chip>
+                                                <input readonly placeholder="Tags del artículo" [matChipInputFor]="tagList" [matChipInputAddOnBlur]="true"/>
+                                            </mat-chip-list>
+                                        </mat-form-field>       
+                                        
+                                        <mat-form-field class="w-50-p">
+                                            <input matInput [value]="product.prod_est_converva.est_text" placeholder="Conservación del artículo" readonly />                                           
                                         </mat-form-field>
                                         <mat-form-field class="w-50-p">
-                                            <input matInput 
-                                                   [value] = "lender.user_full_name1"
-                                                   placeholder="Apellido Paterno" readonly>
+                                            <input matInput [value]="product.lender.user_id" placeholder="Código del Prestamista" readonly />
                                         </mat-form-field>
-                                        <mat-form-field class="w-50-p">
-                                            <input matInput 
-                                                   [value] = "lender.user_full_name1"
-                                                   placeholder="Apellido Materno" readonly>
-                                        </mat-form-field>
-                                        <mat-form-field class="w-50-p">
-                                            <input matInput 
-                                                   [value] = "lender.user_email"
-                                                   placeholder="Correo electrónico" readonly>
-                                        </mat-form-field>
-                                        <mat-form-field class="w-50-p">
-                                            <input matInput 
-                                                   [value] = "lender.user_ubigeo.ubig_dpt + ' / ' + lender.user_ubigeo.ubig_prv + ' / ' + lender.user_ubigeo.ubig_dst"
-                                                   placeholder="Ubigeo" readonly>
-                                        </mat-form-field>
-                                        <button (click)="navigateToLender()" mat-raised-button color="accent">
+
+                                        <div id="card-container">
+                                            <mat-card class="example-card">
+                                                <mat-card-content>
+                                                    <h3>Tiempo de uso:</h3>
+                                                    <section class="example-section">
+                                                        <mat-form-field class="w-50-p">
+                                                            <input matInput placeholder="¿Cúanto?" [value]="product.prod_time_uso.time_value" readonly>
+                                                        </mat-form-field>
+                                                        <mat-form-field class="w-50-p">
+                                                            <input matInput placeholder="Tiempo" [value]="product.prod_time_uso.time_text" readonly>
+                                                        </mat-form-field>
+                                                    </section>
+                                                </mat-card-content>
+                                            </mat-card>
+                                            <mat-card class="example-card">
+                                                <mat-card-content>
+                                                    <h3>Valor en el mercado:</h3>
+                                                    <section class="example-section">
+                                                        <mat-form-field class="w-50-p">
+                                                            <input matInput placeholder="¿Cúanto?" [value]="product.prod_val_merca.val_value" readonly>
+                                                        </mat-form-field>
+                                                        <mat-form-field class="w-50-p">
+                                                            <input matInput placeholder="Moneda" [value]="product.prod_val_merca.val_moneda_text" readonly>
+                                                        </mat-form-field>
+                                                    </section>
+                                                </mat-card-content>
+                                            </mat-card>
+                                        </div>
+                                        <button (click)="navigateToProductDetails()" mat-raised-button color="accent">
+                                            <mat-icon>shopping_basket</mat-icon>
+                                            <span> Ver detalle</span>
+                                        </button>
+                                        <button (click)="navigateToLenderDetails()" style="margin-left: 10px;" mat-raised-button color="accent">
                                             <mat-icon>account_circle</mat-icon>
-                                            <span>  Ver detalle</span>
+                                            <span> Ver Prestamista</span>
                                         </button>
                                     </mat-card-content>
                                 </mat-card>
@@ -117,52 +139,41 @@
                         </mat-tab>
 
                         <mat-tab label="Prestatario">
-                            <div class="tab-content p-24" fusePerfectScrollbar>                                
+                            <div class="tab-content p-24" fusePerfectScrollbar>
                                 <mat-form-field class="w-50-p">
-                                    <input matInput name="rent_prod_id" 
-                                           formControlName="rent_prod_id" 
-                                           (input)="onSearchLenderChange($event.target.value)"
+                                    <input matInput
+                                           formControlName="rent_borrow_id" 
+                                           (input)="onSearchBorrowChange($event.target.value)" 
                                            maxlength="16"
-                                           [readonly]="readonlyLender"
-                                           placeholder="Código del prestatario"
+                                           [readonly]="readonlyBorrower" 
+                                           placeholder="Código del prestatario" 
                                            required>
                                 </mat-form-field>
-                                <mat-card class="result" *ngIf="lenderInformation">
+                                <mat-card class="result" *ngIf="borrowerInformation">
                                     <mat-card-content>
-                                        <h2 class="example-h2">Información del Prestamista</h2>
+                                        <h2 class="example-h2">Información del Prestatario</h2>
                                         <mat-form-field class="w-50-p">
-                                            <input matInput 
-                                                   [value] = "lender.user_names"
-                                                   placeholder="Nombres" readonly>
+                                            <input matInput [value]="borrower.user_names" placeholder="Nombres" readonly>
                                         </mat-form-field>
                                         <mat-form-field class="w-50-p">
-                                            <input matInput 
-                                                   [value] = "lender.user_num_doc"
-                                                   placeholder="N° Documento" readonly>
+                                            <input matInput [value]="borrower.user_num_doc" placeholder="N° Documento" readonly>
                                         </mat-form-field>
                                         <mat-form-field class="w-50-p">
-                                            <input matInput 
-                                                   [value] = "lender.user_full_name1"
-                                                   placeholder="Apellido Paterno" readonly>
+                                            <input matInput [value]="borrower.user_full_name1" placeholder="Apellido Paterno" readonly>
                                         </mat-form-field>
                                         <mat-form-field class="w-50-p">
-                                            <input matInput 
-                                                   [value] = "lender.user_full_name1"
-                                                   placeholder="Apellido Materno" readonly>
+                                            <input matInput [value]="borrower.user_full_name1" placeholder="Apellido Materno" readonly>
                                         </mat-form-field>
                                         <mat-form-field class="w-50-p">
-                                            <input matInput 
-                                                   [value] = "lender.user_email"
-                                                   placeholder="Correo electrónico" readonly>
+                                            <input matInput [value]="borrower.user_email" placeholder="Correo electrónico" readonly>
                                         </mat-form-field>
                                         <mat-form-field class="w-50-p">
-                                            <input matInput 
-                                                   [value] = "lender.user_ubigeo.ubig_dpt + ' / ' + lender.user_ubigeo.ubig_prv + ' / ' + lender.user_ubigeo.ubig_dst"
-                                                   placeholder="Ubigeo" readonly>
+                                            <input matInput [value]="borrower.user_ubigeo.ubig_dpt + ' / ' + borrower.user_ubigeo.ubig_prv + ' / ' + borrower.user_ubigeo.ubig_dst"
+                                                placeholder="Ubigeo" readonly>
                                         </mat-form-field>
-                                        <button (click)="navigateToLender()" mat-raised-button color="accent">
+                                        <button (click)="navigateToBorrower()" mat-raised-button color="accent">
                                             <mat-icon>account_circle</mat-icon>
-                                            <span>  Ver detalle</span>
+                                            <span> Ver detalle</span>
                                         </button>
                                     </mat-card-content>
                                 </mat-card>
@@ -173,109 +184,58 @@
 
                             <div class="tab-content p-24" fusePerfectScrollbar>
                                 <mat-form-field class="w-100-p" *ngIf="pageType ==='edit'">
-                                    <input matInput                                           
-                                           formControlName="rent_id"
-                                           placeholder="Código del alquiler"
-                                           required
-                                           readonly>
+                                    <input matInput formControlName="rent_id" placeholder="Código del alquiler" required readonly>
                                 </mat-form-field>
                                 <mat-form-field class="w-60-p">
-                                    <input matInput
-                                        placeholder="Rango de alquiler"
-                                        [satDatepicker]="picker"
-                                        (click)="picker.open()" 
-                                        (change)="changeRangeRental($event)"
-                                        formControlName="rent_range_date"
-                                        readonly>
-                                    <sat-datepicker #picker 
-                                                    touchUi 
-                                                    (yearSelected)="chosenYearHandler($event)" 
-                                                    (monthSelected)="chosenMonthHandler($event, dp)" 
-                                                    (closedStream)="chosenYearHandler($event)" 
-                                                    [rangeMode]="true">
+                                    <input matInput placeholder="Rango de alquiler" [satDatepicker]="picker" (click)="picker.open()" (change)="changeRangeRental($event)"
+                                        formControlName="rent_range_date" readonly>
+                                    <sat-datepicker #picker touchUi (yearSelected)="chosenYearHandler($event)" (monthSelected)="chosenMonthHandler($event, dp)"
+                                        (closedStream)="chosenYearHandler($event)" [rangeMode]="true">
                                     </sat-datepicker>
                                     <sat-datepicker-toggle matSuffix [for]="picker"></sat-datepicker-toggle>
-                                </mat-form-field>                                
-                                <mat-form-field class="w-50-p">
-                                    <input matInput                                           
-                                           formControlName="rent_start_date"
-                                           placeholder="Fecha de inicio"                                           
-                                           required>
                                 </mat-form-field>
                                 <mat-form-field class="w-50-p">
-                                    <input matInput                                           
-                                           formControlName="rent_end_date"
-                                           placeholder="Fecha de finalización"                                           
-                                           required>
+                                    <input matInput formControlName="rent_start_address_rec" placeholder="Dirección de recepción" required>
                                 </mat-form-field>
-
-                                <!-- <button #daterangePicker type="button" (click)="showDaterangePickerSelector()">Select a range</button> -->
-                                
+                                <mat-form-field class="w-50-p">
+                                    <textarea matInput formControlName="rent_start_address_rec_ref" placeholder="Referencia" required>
+                                    </textarea>
+                                </mat-form-field>
+                                <mat-form-field class="w-60-p">
+                                    <mat-select placeholder="Rango de horarios de recepción" formControlName="rent_start_time_range_rec_id" required>
+                                        <mat-option *ngFor="let rango of listRangoTiempos" [value]="rango.value">
+                                            {{rango.text}}
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                                <mat-form-field class="w-50-p">
+                                    <input matInput formControlName="rent_end_address_rec" placeholder="Dirección de entrega" required>
+                                </mat-form-field>
+                                <mat-form-field class="w-50-p">
+                                    <textarea matInput formControlName="rent_end_address_rec_ref" placeholder="Referencia" required>
+                                    </textarea>
+                                </mat-form-field>
+                                <mat-form-field class="w-60-p">
+                                    <mat-select placeholder="Rango de horarios de entrega" formControlName="rent_end_time_range_rec_id" required>
+                                        <mat-option *ngFor="let rango of listRangoTiempos" [value]="rango.value">
+                                            {{rango.text}}
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
                                 <div id="card-container" *ngIf="pageType ==='edit'">
-                                        <mat-card class="example-card">
-                                                <mat-card-content>
-                                                    <h2 class="example-h2">Estado del producto</h2>
-                                                    <section class="example-section">
-                                                        <mat-slide-toggle (change)="changeStatusProduct($event)" 
-                                                                          [checked]="checkedStatusProduct">
-                                                            {{prod_current_status}}
-                                                        </mat-slide-toggle>
-                                                    </section>                                        
-                                                </mat-card-content>
-                                        </mat-card>                                                                                 
-                                </div>                                                                                                                       
+                                    <mat-card class="example-card">
+                                        <mat-card-content>
+                                            <h2 class="example-h2">Estado del producto</h2>
+                                            <section class="example-section">
+                                                <mat-slide-toggle (change)="changeStatusProduct($event)" [checked]="checkedStatusProduct">
+                                                    {{prod_current_status}}
+                                                </mat-slide-toggle>
+                                            </section>
+                                        </mat-card-content>
+                                    </mat-card>
+                                </div>
                             </div>
                         </mat-tab>
-
-                        <mat-tab label="Direcciones">
-                                <div class="tab-content p-24" fusePerfectScrollbar>
-                                        <mat-form-field class="w-50-p">
-                                            <input matInput                                           
-                                                   formControlName="rent_start_address_rec"
-                                                   placeholder="Dirección de recepción"
-                                                   required>
-                                        </mat-form-field>
-                                        <mat-form-field class="w-50-p">
-                                            <textarea matInput                                           
-                                                   formControlName="rent_start_address_rec_ref"
-                                                   placeholder="Referencia"
-                                                   required>
-                                            </textarea>
-                                        </mat-form-field>
-                                        <mat-form-field class="w-60-p">
-                                            <mat-select placeholder="Rango de horarios de recepción" 
-                                                        formControlName="rent_start_time_range_rec_id"
-                                                        required>
-                                                <mat-option *ngFor="let rango of listRangoTiempos" [value]="rango.value">
-                                                    {{rango.text}}
-                                                </mat-option>
-                                            </mat-select>
-                                        </mat-form-field>
-                                        <mat-form-field class="w-50-p">
-                                            <input matInput                                           
-                                                   formControlName="rent_end_address_rec"
-                                                   placeholder="Dirección de entrega"
-                                                   required>
-                                        </mat-form-field>
-                                        <mat-form-field class="w-50-p">
-                                            <textarea matInput                                           
-                                                   formControlName="rent_end_address_rec_ref"
-                                                   placeholder="Referencia"
-                                                   required>
-                                            </textarea>
-                                        </mat-form-field>           
-                                        <mat-form-field class="w-60-p">
-                                            <mat-select placeholder="Rango de horarios de entrega" 
-                                                        formControlName="rent_end_time_range_rec_id"
-                                                        required>
-                                                <mat-option *ngFor="let rango of listRangoTiempos" [value]="rango.value">
-                                                    {{rango.text}}
-                                                </mat-option>
-                                            </mat-select>
-                                        </mat-form-field>                                                                  
-                                    </div>
-                        </mat-tab>
-
                     </mat-tab-group>
                 </form>
 

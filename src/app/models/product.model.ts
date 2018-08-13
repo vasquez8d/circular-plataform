@@ -4,7 +4,10 @@ import { Injectable } from '@angular/core';
 export class Product
 {
     prod_id: string;
-    lender_user_id: string;
+    lender: {
+        user_id: string,
+        user_slug: string,    
+    };
     prod_nombre: string;
     prod_desc: string;
     prod_tags: string[];
@@ -32,17 +35,20 @@ export class Product
 
     prod_est_converva: {
         est_value: number,
-        est_desc: string
+        est_desc: string,
+        est_text: string,
     };
 
     prod_time_uso: {
         time_value: number,
-        time_id: number
+        time_id: number,
+        time_text: string,
     };
 
     prod_val_merca: {
         val_value: number,
         val_moneda_id: number,
+        val_moneda_text: string,
         val_ref_price: string
     };
 
@@ -55,15 +61,16 @@ export class Product
     {
         product = product || {};
         this.prod_id = product.prod_id || '0';
-        this.lender_user_id = product.lender_user_id || '';
+        this.lender = product.lender || '';
         this.prod_nombre = product.prod_nombre || '';
 
         this.prod_est_converva = product.prod_est_converva || {
             est_value: 0,
-            est_desc: ''
+            est_desc: '',
+            est_text: ''
         };
         this.prod_time_uso = product.prod_time_uso || {
-            time_id: 1
+            time_id: 1,            
         };
         this.prod_val_merca = product.prod_val_merca || {
             val_moneda_id: 1

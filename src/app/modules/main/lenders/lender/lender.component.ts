@@ -30,7 +30,7 @@ export const MY_FORMATS = {
     selector     : 'lender-app',
     templateUrl  : './lender.component.html',
     styleUrls    : ['./lender.component.scss'],
-    providers: [{ provide: MAT_DATE_FORMATS, useValue: MY_FORMATS }],
+    providers    : [{ provide: MAT_DATE_FORMATS, useValue: MY_FORMATS }],
     encapsulation: ViewEncapsulation.None,
     animations   : fuseAnimations
 })
@@ -179,29 +179,36 @@ export class LenderComponent implements OnInit, OnDestroy
      */
     createLenderForm(): FormGroup
     {  
-        let user_fec_nac = '';
-        if (this.lender.user_fec_nac !== ''){
-            user_fec_nac = (new Date(this.lender.user_fec_nac)).toISOString();
-        }         
-        return this._formBuilder.group({
-            user_id             : [this.lender.user_id],            
-            user_names          : [this.lender.user_names],
-            user_full_name1     : [this.lender.user_full_name1],
-            user_full_name2     : [this.lender.user_full_name2],
-            user_fec_nac        : [user_fec_nac],
-            user_email          : [this.lender.user_email],            
-            user_num_phone      : [this.lender.user_num_phone],
-            user_num_doc        : [this.lender.user_num_doc],
-            user_tip_doc        : [this.lender.user_tip_doc.tip_docum_id],
-            lndr_ubigeo_dpt     : [this.lender.user_ubigeo.ubig_dpt],
-            lndr_ubigeo_prv     : [this.lender.user_ubigeo.ubig_prv],
-            lndr_ubigeo_dst_id  : [this.lender.user_ubigeo.ubig_id.substr(4, 2)],
-            user_stat_reg       : [this.lender.user_stat_reg],
-            user_date_reg       : [this.lender.user_date_reg],
-            user_usur_reg       : [this.lender.user_usur_reg],
-            user_date_upt       : [this.lender.user_date_upt],
-            user_usur_upt       : [this.lender.user_usur_upt],
-        });
+        let lenderForm: FormGroup;
+        try {
+            let user_fec_nac = '';
+            if (this.lender.user_fec_nac !== '') {
+                const parts = this.lender.user_fec_nac.split('/');
+                user_fec_nac = (new Date(parts[2], parts[1] - 1, parts[0])).toISOString();                
+            }
+            lenderForm = this._formBuilder.group({
+                user_id: [this.lender.user_id],
+                user_names: [this.lender.user_names],
+                user_full_name1: [this.lender.user_full_name1],
+                user_full_name2: [this.lender.user_full_name2],
+                user_fec_nac: [user_fec_nac],
+                user_email: [this.lender.user_email],
+                user_num_phone: [this.lender.user_num_phone],
+                user_num_doc: [this.lender.user_num_doc],
+                user_tip_doc: [this.lender.user_tip_doc.tip_docum_id],
+                lndr_ubigeo_dpt: [this.lender.user_ubigeo.ubig_dpt],
+                lndr_ubigeo_prv: [this.lender.user_ubigeo.ubig_prv],
+                lndr_ubigeo_dst_id: [this.lender.user_ubigeo.ubig_id.substr(4, 2)],
+                user_stat_reg: [this.lender.user_stat_reg],
+                user_date_reg: [this.lender.user_date_reg],
+                user_usur_reg: [this.lender.user_usur_reg],
+                user_date_upt: [this.lender.user_date_upt],
+                user_usur_upt: [this.lender.user_usur_upt],
+            });
+        } catch (e) {
+            console.log('createLenderForm', e);
+        }
+      return lenderForm;
     }
 
     /**
@@ -214,7 +221,7 @@ export class LenderComponent implements OnInit, OnDestroy
         LenderSave.user_names = this.lenderForm.value.user_names;
         LenderSave.user_full_name1 = this.lenderForm.value.user_full_name1;
         LenderSave.user_full_name2 = this.lenderForm.value.user_full_name2;
-        LenderSave.user_fec_nac = this.lenderForm.value.user_fec_nac.format('DD/MM/YYYY');
+        LenderSave.user_fec_nac = this.registroUtil.obtenerDateFormatFecNac(new Date(this.lenderForm.value.user_fec_nac));
         LenderSave.user_slug = this.registroUtil.obtenerSlugPorNombre(LenderSave.user_names + ' ' + LenderSave.user_full_name1);
         LenderSave.user_num_doc = this.lenderForm.value.user_num_doc;
         LenderSave.user_tip_doc = this.obtenerTipoDocumSeleccionado();
@@ -329,7 +336,7 @@ export class LenderComponent implements OnInit, OnDestroy
         LenderSave.user_names = this.lenderForm.value.user_names;
         LenderSave.user_full_name1 = this.lenderForm.value.user_full_name1;
         LenderSave.user_full_name2 = this.lenderForm.value.user_full_name2;
-        LenderSave.user_fec_nac = this.lenderForm.value.user_fec_nac.format('DD/MM/YYYY');
+        LenderSave.user_fec_nac = this.registroUtil.obtenerDateFormatFecNac(new Date(this.lenderForm.value.user_fec_nac));
         LenderSave.user_slug = this.registroUtil.obtenerSlugPorNombre(LenderSave.user_names + ' ' + LenderSave.user_full_name1);
         LenderSave.user_num_doc = this.lenderForm.value.user_num_doc;
         LenderSave.user_tip_doc = this.obtenerTipoDocumSeleccionado();

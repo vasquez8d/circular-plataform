@@ -8,45 +8,45 @@ import { MatButtonModule, MatChipsModule, MatFormFieldModule,
          MatSliderModule, 
          MatDatepickerModule} from '@angular/material';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
-
 import { FuseSharedModule } from '@fuse/shared.module';
 import { FuseWidgetModule } from '@fuse/components/widget/widget.module';
-import { EcommerceProductsService } from '../../../services/products.service';
-import { EcommerceProductService } from '../../../services/product.service';
 import { UserService } from '../../../services/user.service';
 import { LenderProductsService } from '../../../services/productsxlender.service';
 import { RentsComponent } from './rents/rents.component';
 import { RentalComponent } from './rental/rental.component';
 import { BorrowerRentsComponent } from './borrower/borrower-rents.component';
 import { SatDatepickerModule, SatNativeDateModule } from 'saturn-datepicker';
+import { RentsService } from '../../../services/rents.service';
+import { RentalService } from '../../../services/rental.service';
+import { EcommerceProductService } from '../../../services/product.service';
 
 const routes: Routes = [
     {
         path: '',
         component: RentsComponent,
         resolve: {
-            data: EcommerceProductsService
+            data: RentsService
         }
     },
     {
         path: 'rental/:id/:handle/:user_id',
         component: RentalComponent,
         resolve: {
-            data: EcommerceProductService
+            data: RentalService
         }
     },
     {
         path: 'rental/:id/:handle',
         component: RentalComponent,
         resolve: {
-            data: EcommerceProductService
+            data: RentalService
         }
     },
     {
         path: 'rental/:id',
         component: RentalComponent,
         resolve: {
-            data: EcommerceProductService
+            data: RentalService
         }
     },
     {
@@ -90,7 +90,6 @@ const routes: Routes = [
         FuseSharedModule,
         FuseWidgetModule,
 
-
         SatDatepickerModule,
         SatNativeDateModule,
         MatDatepickerModule,
@@ -98,10 +97,11 @@ const routes: Routes = [
         MatDialogModule
     ],
     providers: [
-        EcommerceProductsService,
-        EcommerceProductService,
+        RentalService,
+        RentsService,
         UserService,
-        LenderProductsService
+        LenderProductsService,
+        EcommerceProductService
     ]
 })
 export class RentsModule {

@@ -8,7 +8,7 @@ import { fuseAnimations } from '@fuse/animations';
 import { FuseUtils } from '@fuse/utils';
 
 import { takeUntil } from 'rxjs/internal/operators';
-import { EcommerceProductsService } from '../../../../services/products.service';
+import { RentsService } from '../../../../services/rents.service';
 
 @Component({
     selector   : 'e-commerce-rents',
@@ -34,7 +34,7 @@ export class RentsComponent implements OnInit
     private _unsubscribeAll: Subject<any>;
 
     constructor(
-        private _ecommerceProductsService: EcommerceProductsService,        
+        private _ecommerceProductsService: RentsService,        
     )
     {
         // Set the private defaults
@@ -76,19 +76,19 @@ export class FilesDataSource extends DataSource<any>
     /**
      * Constructor
      *
-     * @param {EcommerceProductsService} _ecommerceProductsService
+     * @param {RentsService} _ecommerceProductsService
      * @param {MatPaginator} _matPaginator
      * @param {MatSort} _matSort
      */
     constructor(
-        private _ecommerceProductsService: EcommerceProductsService,
+        private _ecommerceProductsService: RentsService,
         private _matPaginator: MatPaginator,
         private _matSort: MatSort
     )
     {
         super();
 
-        this.filteredData = this._ecommerceProductsService.products;
+        this.filteredData = this._ecommerceProductsService.rents;
     }
 
     /**
@@ -99,7 +99,7 @@ export class FilesDataSource extends DataSource<any>
     connect(): Observable<any[]>
     {
         const displayDataChanges = [
-            this._ecommerceProductsService.onProductsChanged,
+            this._ecommerceProductsService.onRentsChanged,
             this._matPaginator.page,
             this._filterChange,
             this._matSort.sortChange
@@ -108,7 +108,7 @@ export class FilesDataSource extends DataSource<any>
         return merge(...displayDataChanges)
             .pipe(
                 map(() => {
-                        let data = this._ecommerceProductsService.products.slice();
+                        let data = this._ecommerceProductsService.rents.slice();
 
                         data = this.filterData(data);
 
