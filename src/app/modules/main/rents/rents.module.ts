@@ -3,55 +3,55 @@ import { RouterModule, Routes } from '@angular/router';
 import { MatButtonModule, MatChipsModule, MatFormFieldModule, 
          MatIconModule, MatInputModule, MatPaginatorModule, 
          MatRippleModule, MatSelectModule, MatSnackBarModule, 
-         MatSortModule, MatTableModule, MatTabsModule, MatDialogModule, MatSlideToggleModule, MatCardModule, MatTooltipModule, MatSliderModule } from '@angular/material';
+         MatSortModule, MatTableModule, MatTabsModule, MatDialogModule, 
+         MatSlideToggleModule, MatCardModule, MatTooltipModule, 
+         MatSliderModule, 
+         MatDatepickerModule} from '@angular/material';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 
 import { FuseSharedModule } from '@fuse/shared.module';
 import { FuseWidgetModule } from '@fuse/components/widget/widget.module';
-import { EcommerceProductsComponent } from './products-list/products.component';
 import { EcommerceProductsService } from '../../../services/products.service';
 import { EcommerceProductService } from '../../../services/product.service';
-import { EcommerceProductComponent } from './product/product.component';
-import { ImageUploadComponent } from '../images/imageUpload/image-upload.component';
-import { ImageViewComponent } from '../images/imageViewer/imageview.component';
-import { ImageUploadModule } from '../images/imageUpload/image-upload.module';
-import { ImageViewModule } from '../images/imageViewer/imageview.module';
-import { LenderProductComponent } from './lender/producxlender.component';
 import { UserService } from '../../../services/user.service';
 import { LenderProductsService } from '../../../services/productsxlender.service';
+import { RentsComponent } from './rents/rents.component';
+import { RentalComponent } from './rental/rental.component';
+import { BorrowerRentsComponent } from './borrower/borrower-rents.component';
+import { SatDatepickerModule, SatNativeDateModule } from 'saturn-datepicker';
 
 const routes: Routes = [
     {
         path: '',
-        component: EcommerceProductsComponent,
+        component: RentsComponent,
         resolve: {
             data: EcommerceProductsService
         }
     },
     {
-        path: 'product/:id/:handle/:user_id',
-        component: EcommerceProductComponent,
+        path: 'rental/:id/:handle/:user_id',
+        component: RentalComponent,
         resolve: {
             data: EcommerceProductService
         }
     },
     {
-        path: 'product/:id/:handle',
-        component: EcommerceProductComponent,
+        path: 'rental/:id/:handle',
+        component: RentalComponent,
         resolve: {
             data: EcommerceProductService
         }
     },
     {
-        path: 'product/:id',
-        component: EcommerceProductComponent,
+        path: 'rental/:id',
+        component: RentalComponent,
         resolve: {
             data: EcommerceProductService
         }
     },
     {
-        path: 'lender/:id/:handle',
-        component: LenderProductComponent,
+        path: 'borrower/:id/:handle',
+        component: BorrowerRentsComponent,
         resolve: {
             data: LenderProductsService
         }
@@ -60,13 +60,9 @@ const routes: Routes = [
 
 @NgModule({
     declarations: [
-        EcommerceProductsComponent,
-        EcommerceProductComponent,
-        LenderProductComponent
-    ],
-    entryComponents : [
-        ImageViewComponent,
-        ImageUploadComponent
+        RentalComponent,
+        RentsComponent,
+        BorrowerRentsComponent
     ],
     imports: [
         RouterModule.forChild(routes),
@@ -94,10 +90,12 @@ const routes: Routes = [
         FuseSharedModule,
         FuseWidgetModule,
 
-        MatDialogModule,
 
-        ImageViewModule,
-        ImageUploadModule
+        SatDatepickerModule,
+        SatNativeDateModule,
+        MatDatepickerModule,
+
+        MatDialogModule
     ],
     providers: [
         EcommerceProductsService,
@@ -106,5 +104,5 @@ const routes: Routes = [
         LenderProductsService
     ]
 })
-export class ProductsModule {
+export class RentsModule {
 }

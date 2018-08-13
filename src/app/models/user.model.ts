@@ -26,6 +26,8 @@ export class UserModel {
         ubig_id: string,
         ubig_dst: string
     };
+    user_address: any;
+    user_address_ref: any;
     user_stat_reg: any;
     user_date_reg: any;
     user_usur_reg: any;
@@ -60,6 +62,8 @@ export class UserModel {
             ubig_dst: '',
             ubig_id: '0000'
         };
+        this.user_address = user.user_address || '';
+        this.user_address_ref = user.user_address_ref || '';
         this.user_stat_reg = user.user_stat_reg || '1';
         this.user_date_reg = user.user_date_reg || null;
         this.user_usur_reg = user.user_usur_reg || null;

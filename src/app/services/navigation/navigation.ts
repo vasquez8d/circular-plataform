@@ -27,6 +27,13 @@ export const navigation: FuseNavigation[] = [
                 type    : 'item',
                 icon    : 'insert_emoticon',
                 url: '/borrowers'
+            },
+            {
+                id      : 'rents',
+                title   : 'Alquileres',
+                type    : 'item',
+                icon    : 'cached',
+                url: '/rents'
             }
         ]
     },

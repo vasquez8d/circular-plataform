@@ -32,4 +32,12 @@ export class RegistroUtil {
 
     return dateFormat;
   }
+
+  obtenerDateFormatFecNac(dateraw): string {
+    const date = dateraw;
+    const dateFormat = ('00' + date.getDate()).slice(-2) + '/' + 
+                    ('00' + (date.getMonth() + 1)).slice(-2) + '/' + 
+                    date.getFullYear();
+    return dateFormat;
+  }
 }

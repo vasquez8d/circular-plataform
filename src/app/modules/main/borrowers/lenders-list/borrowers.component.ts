@@ -6,7 +6,7 @@ import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
 import { fuseAnimations } from '@fuse/animations';
 import { FuseUtils } from '@fuse/utils';
 import { takeUntil } from 'rxjs/internal/operators';
-import { UsersService } from '../../../../services/users.service';
+import { BorrowersService } from '../../../../services/borrowers.service';
 
 @Component({
     selector   : 'app-borrowers',
@@ -32,7 +32,7 @@ export class BorrowersComponent implements OnInit
     private _unsubscribeAll: Subject<any>;
 
     constructor(
-        private _lendersService: UsersService,        
+        private _lendersService: BorrowersService,        
     )
     {
         // Set the private defaults
@@ -79,7 +79,7 @@ export class FilesDataSource extends DataSource<any>
      * @param {MatSort} _matSort
      */
     constructor(
-        private _lendersService: UsersService,
+        private _lendersService: BorrowersService,
         private _matPaginator: MatPaginator,
         private _matSort: MatSort
     )

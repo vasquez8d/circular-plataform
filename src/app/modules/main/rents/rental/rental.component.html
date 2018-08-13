@@ -1,0 +1,290 @@
+<div id="product" class="page-layout carded fullwidth inner-scroll">
+
+    <!-- TOP BACKGROUND -->
+    <div class="top-bg mat-indigo-bg"></div>
+    <!-- / TOP BACKGROUND -->
+
+    <!-- CENTER -->
+    <div class="center">
+
+        <!-- HEADER -->
+        <div class="header mat-indigo-bg" fxLayout="row" fxLayoutAlign="space-between center">
+
+            <!-- APP TITLE -->
+            <div fxLayout="row" fxLayoutAlign="start center">
+
+                <button mat-icon-button class="mr-0 mr-sm-16" [routerLink]="'/rents'">
+                    <mat-icon>arrow_back</mat-icon>
+                </button>
+
+                <div fxLayout="column" fxLayoutAlign="start start"
+                     [@animate]="{value:'*',params:{delay:'100ms',x:'-25px'}}">
+                    <div class="h2" *ngIf="pageType ==='edit'">
+                        {{rental.rent_id}}
+                        <button matTooltip="Copiar código" (click)="copyClipBoardLenderId(rental.rent_id)" 
+                                mat-mini-fab 
+                                style="margin-left: 10px;">
+                            <mat-icon aria-label="Example icon-button with a heart icon">content_copy</mat-icon>
+                        </button>
+                    </div>
+                    <div class="h2" *ngIf="pageType ==='new'">
+                        Nuevo Alquiler
+                    </div>
+                    <div class="subtitle secondary-text">
+                        <span>Detalles del alquiler</span>
+                    </div>
+                </div>
+            </div>
+            <!-- / APP TITLE -->
+
+            <button mat-raised-button
+                    class="save-product-button mat-white-bg"
+                    [disabled]="rentalForm.invalid"
+                    *ngIf="pageType ==='new'" (click)="addProduct()">
+                <span>Registrar</span>
+            </button>
+
+            <button mat-raised-button id="btnSaveProduct"
+                    class="save-product-button mat-white-bg"
+                    [disabled]="rentalForm.invalid || rentalForm.pristine"
+                    *ngIf="pageType ==='edit'" (click)="saveProduct()">
+                <span>Guardar</span>
+            </button>
+        </div>
+        <!-- / HEADER -->
+
+        <!-- CONTENT CARD -->
+        <div class="content-card mat-white-bg">
+
+            <!-- CONTENT -->
+            <div class="content">
+
+                <form name="rentalForm" [formGroup]="rentalForm" class="product w-100-p" fxLayout="column" fxFlex>
+
+                    <mat-tab-group>
+
+                        <mat-tab label="Artículo">
+                            <div class="tab-content p-24" fusePerfectScrollbar>                                
+                                <mat-form-field class="w-50-p">
+                                    <input matInput name="rent_lndr_id" 
+                                           formControlName="rent_lndr_id" 
+                                           (input)="onSearchLenderChange($event.target.value)"
+                                           maxlength="16"
+                                           [readonly]="readonlyLender"
+                                           placeholder="Código del artículo"
+                                           required>
+                                </mat-form-field>
+                                <mat-card class="result" *ngIf="lenderInformation">
+                                    <mat-card-content>
+                                        <h2 class="example-h2">Información del Prestamista</h2>
+                                        <mat-form-field class="w-50-p">
+                                            <input matInput 
+                                                   [value] = "lender.user_names"
+                                                   placeholder="Nombres" readonly>
+                                        </mat-form-field>
+                                        <mat-form-field class="w-50-p">
+                                            <input matInput 
+                                                   [value] = "lender.user_num_doc"
+                                                   placeholder="N° Documento" readonly>
+                                        </mat-form-field>
+                                        <mat-form-field class="w-50-p">
+                                            <input matInput 
+                                                   [value] = "lender.user_full_name1"
+                                                   placeholder="Apellido Paterno" readonly>
+                                        </mat-form-field>
+                                        <mat-form-field class="w-50-p">
+                                            <input matInput 
+                                                   [value] = "lender.user_full_name1"
+                                                   placeholder="Apellido Materno" readonly>
+                                        </mat-form-field>
+                                        <mat-form-field class="w-50-p">
+                                            <input matInput 
+                                                   [value] = "lender.user_email"
+                                                   placeholder="Correo electrónico" readonly>
+                                        </mat-form-field>
+                                        <mat-form-field class="w-50-p">
+                                            <input matInput 
+                                                   [value] = "lender.user_ubigeo.ubig_dpt + ' / ' + lender.user_ubigeo.ubig_prv + ' / ' + lender.user_ubigeo.ubig_dst"
+                                                   placeholder="Ubigeo" readonly>
+                                        </mat-form-field>
+                                        <button (click)="navigateToLender()" mat-raised-button color="accent">
+                                            <mat-icon>account_circle</mat-icon>
+                                            <span>  Ver detalle</span>
+                                        </button>
+                                    </mat-card-content>
+                                </mat-card>
+                            </div>
+                        </mat-tab>
+
+                        <mat-tab label="Prestatario">
+                            <div class="tab-content p-24" fusePerfectScrollbar>                                
+                                <mat-form-field class="w-50-p">
+                                    <input matInput name="rent_prod_id" 
+                                           formControlName="rent_prod_id" 
+                                           (input)="onSearchLenderChange($event.target.value)"
+                                           maxlength="16"
+                                           [readonly]="readonlyLender"
+                                           placeholder="Código del prestatario"
+                                           required>
+                                </mat-form-field>
+                                <mat-card class="result" *ngIf="lenderInformation">
+                                    <mat-card-content>
+                                        <h2 class="example-h2">Información del Prestamista</h2>
+                                        <mat-form-field class="w-50-p">
+                                            <input matInput 
+                                                   [value] = "lender.user_names"
+                                                   placeholder="Nombres" readonly>
+                                        </mat-form-field>
+                                        <mat-form-field class="w-50-p">
+                                            <input matInput 
+                                                   [value] = "lender.user_num_doc"
+                                                   placeholder="N° Documento" readonly>
+                                        </mat-form-field>
+                                        <mat-form-field class="w-50-p">
+                                            <input matInput 
+                                                   [value] = "lender.user_full_name1"
+                                                   placeholder="Apellido Paterno" readonly>
+                                        </mat-form-field>
+                                        <mat-form-field class="w-50-p">
+                                            <input matInput 
+                                                   [value] = "lender.user_full_name1"
+                                                   placeholder="Apellido Materno" readonly>
+                                        </mat-form-field>
+                                        <mat-form-field class="w-50-p">
+                                            <input matInput 
+                                                   [value] = "lender.user_email"
+                                                   placeholder="Correo electrónico" readonly>
+                                        </mat-form-field>
+                                        <mat-form-field class="w-50-p">
+                                            <input matInput 
+                                                   [value] = "lender.user_ubigeo.ubig_dpt + ' / ' + lender.user_ubigeo.ubig_prv + ' / ' + lender.user_ubigeo.ubig_dst"
+                                                   placeholder="Ubigeo" readonly>
+                                        </mat-form-field>
+                                        <button (click)="navigateToLender()" mat-raised-button color="accent">
+                                            <mat-icon>account_circle</mat-icon>
+                                            <span>  Ver detalle</span>
+                                        </button>
+                                    </mat-card-content>
+                                </mat-card>
+                            </div>
+                        </mat-tab>
+
+                        <mat-tab label="Información">
+
+                            <div class="tab-content p-24" fusePerfectScrollbar>
+                                <mat-form-field class="w-100-p" *ngIf="pageType ==='edit'">
+                                    <input matInput                                           
+                                           formControlName="rent_id"
+                                           placeholder="Código del alquiler"
+                                           required
+                                           readonly>
+                                </mat-form-field>
+                                <mat-form-field class="w-60-p">
+                                    <input matInput
+                                        placeholder="Rango de alquiler"
+                                        [satDatepicker]="picker"
+                                        (click)="picker.open()" 
+                                        (change)="changeRangeRental($event)"
+                                        formControlName="rent_range_date"
+                                        readonly>
+                                    <sat-datepicker #picker 
+                                                    touchUi 
+                                                    (yearSelected)="chosenYearHandler($event)" 
+                                                    (monthSelected)="chosenMonthHandler($event, dp)" 
+                                                    (closedStream)="chosenYearHandler($event)" 
+                                                    [rangeMode]="true">
+                                    </sat-datepicker>
+                                    <sat-datepicker-toggle matSuffix [for]="picker"></sat-datepicker-toggle>
+                                </mat-form-field>                                
+                                <mat-form-field class="w-50-p">
+                                    <input matInput                                           
+                                           formControlName="rent_start_date"
+                                           placeholder="Fecha de inicio"                                           
+                                           required>
+                                </mat-form-field>
+                                <mat-form-field class="w-50-p">
+                                    <input matInput                                           
+                                           formControlName="rent_end_date"
+                                           placeholder="Fecha de finalización"                                           
+                                           required>
+                                </mat-form-field>
+
+                                <!-- <button #daterangePicker type="button" (click)="showDaterangePickerSelector()">Select a range</button> -->
+                                
+                                <div id="card-container" *ngIf="pageType ==='edit'">
+                                        <mat-card class="example-card">
+                                                <mat-card-content>
+                                                    <h2 class="example-h2">Estado del producto</h2>
+                                                    <section class="example-section">
+                                                        <mat-slide-toggle (change)="changeStatusProduct($event)" 
+                                                                          [checked]="checkedStatusProduct">
+                                                            {{prod_current_status}}
+                                                        </mat-slide-toggle>
+                                                    </section>                                        
+                                                </mat-card-content>
+                                        </mat-card>                                                                                 
+                                </div>                                                                                                                       
+                            </div>
+                        </mat-tab>
+
+                        <mat-tab label="Direcciones">
+                                <div class="tab-content p-24" fusePerfectScrollbar>
+                                        <mat-form-field class="w-50-p">
+                                            <input matInput                                           
+                                                   formControlName="rent_start_address_rec"
+                                                   placeholder="Dirección de recepción"
+                                                   required>
+                                        </mat-form-field>
+                                        <mat-form-field class="w-50-p">
+                                            <textarea matInput                                           
+                                                   formControlName="rent_start_address_rec_ref"
+                                                   placeholder="Referencia"
+                                                   required>
+                                            </textarea>
+                                        </mat-form-field>
+                                        <mat-form-field class="w-60-p">
+                                            <mat-select placeholder="Rango de horarios de recepción" 
+                                                        formControlName="rent_start_time_range_rec_id"
+                                                        required>
+                                                <mat-option *ngFor="let rango of listRangoTiempos" [value]="rango.value">
+                                                    {{rango.text}}
+                                                </mat-option>
+                                            </mat-select>
+                                        </mat-form-field>
+                                        <mat-form-field class="w-50-p">
+                                            <input matInput                                           
+                                                   formControlName="rent_end_address_rec"
+                                                   placeholder="Dirección de entrega"
+                                                   required>
+                                        </mat-form-field>
+                                        <mat-form-field class="w-50-p">
+                                            <textarea matInput                                           
+                                                   formControlName="rent_end_address_rec_ref"
+                                                   placeholder="Referencia"
+                                                   required>
+                                            </textarea>
+                                        </mat-form-field>           
+                                        <mat-form-field class="w-60-p">
+                                            <mat-select placeholder="Rango de horarios de entrega" 
+                                                        formControlName="rent_end_time_range_rec_id"
+                                                        required>
+                                                <mat-option *ngFor="let rango of listRangoTiempos" [value]="rango.value">
+                                                    {{rango.text}}
+                                                </mat-option>
+                                            </mat-select>
+                                        </mat-form-field>                                                                  
+                                    </div>
+                        </mat-tab>
+
+                    </mat-tab-group>
+                </form>
+
+            </div>
+            <!-- / CONTENT -->
+
+        </div>
+        <!-- / CONTENT CARD -->
+
+    </div>
+    <!-- / CENTER -->
+</div>

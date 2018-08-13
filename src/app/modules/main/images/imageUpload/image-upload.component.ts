@@ -25,9 +25,9 @@ export class ImageUploadComponent implements OnInit {
         this.dialogRef.close();
     }
 
-    handleFileInput(event): void {
+    handleFileInput(event): void {        
         const files = event.target.files;
-        const file = files[0];
+        const file = files[0];        
       if (files && file) {
           const reader = new FileReader();
           reader.onload = this._handleReaderLoaded.bind(this);
@@ -55,6 +55,23 @@ export class ImageUploadComponent implements OnInit {
             this.image_desc = fileDesc;
         }else{
             this.saveDocumentStatus = false;
+        }
+    }
+
+    checkStatusButtonKeypress(event): void {
+        if (event.key === 'Enter') {
+            if (this.saveDocumentStatus) {
+                this.addDocument();
+            }
+        } else {
+            const fileName = (<HTMLInputElement>document.getElementById('txtFileName')).value;
+            const fileDesc = (<HTMLInputElement>document.getElementById('txtDescImage')).value;
+            if (fileName !== '' && fileName != null && fileDesc !== '' && fileDesc != null){
+                this.saveDocumentStatus = true;
+                this.image_desc = fileDesc;
+            }else{
+                this.saveDocumentStatus = false;
+            }
         }
     }
 

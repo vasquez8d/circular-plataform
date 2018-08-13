@@ -5,7 +5,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { ServicesConfig } from '../app-config/services.config';
 
 @Injectable()
-export class UsersService implements Resolve<any>
+export class LendersService implements Resolve<any>
 {
     products: any[];
     onProductsChanged: BehaviorSubject<any>;

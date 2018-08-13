@@ -6,18 +6,17 @@ import { MatButtonModule, MatChipsModule, MatFormFieldModule,
          MatSortModule, MatTableModule, MatTabsModule, MatDialogModule, MatSlideToggleModule, MatCardModule, 
          MatTooltipModule, MatDatepickerModule } from '@angular/material';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
-import { AgmCoreModule } from '@agm/core';
 import { FuseSharedModule } from '@fuse/shared.module';
 import { FuseWidgetModule } from '@fuse/components/widget/widget.module';
 
 import { LenderComponent } from './lender/lender.component';
 import { LendersComponent } from './lenders-list/lenders.component';
-import { UsersService } from '../../../services/users.service';
 import { UserService } from '../../../services/user.service';
 import { ImageViewComponent } from '../images/imageViewer/imageview.component';
 import { ImageUploadComponent } from '../images/imageUpload/image-upload.component';
 import { ImageViewModule } from '../images/imageViewer/imageview.module';
 import { ImageUploadModule } from '../images/imageUpload/image-upload.module';
+import { LendersService } from '../../../services/lenders.service';
 
 
 const routes: Routes = [
@@ -25,7 +24,7 @@ const routes: Routes = [
         path: '',
         component: LendersComponent,
         resolve: {
-            data: UsersService
+            data: LendersService
         }
     },
     {
@@ -74,9 +73,6 @@ const routes: Routes = [
         MatTooltipModule,
         MatDatepickerModule,
         NgxChartsModule,
-        AgmCoreModule.forRoot({
-            apiKey: 'AIzaSyD81ecsCj4yYpcXSLFcYU97PvRsE_X8Bx8'
-        }),
 
         FuseSharedModule,
         FuseWidgetModule,
@@ -84,7 +80,7 @@ const routes: Routes = [
         ImageUploadModule        
     ],
     providers: [
-        UsersService,
+        LendersService,
         UserService,
     ]
 })

@@ -1,19 +1,19 @@
 <div id="product" class="page-layout carded fullwidth inner-scroll">
 
     <!-- TOP BACKGROUND -->
-    <div class="top-bg mat-amber-bg"></div>
+    <div class="top-bg mat-cyan-bg"></div>
     <!-- / TOP BACKGROUND -->
 
     <!-- CENTER -->
     <div class="center">
 
         <!-- HEADER -->
-        <div class="header mat-amber-bg" fxLayout="row" fxLayoutAlign="space-between center">
+        <div class="header mat-cyan-bg" fxLayout="row" fxLayoutAlign="space-between center">
 
             <!-- APP TITLE -->
             <div fxLayout="row" fxLayoutAlign="start center">
 
-                <button mat-icon-button class="mr-0 mr-sm-16" [routerLink]="'/lenders'">
+                <button mat-icon-button class="mr-0 mr-sm-16" [routerLink]="'/borrowers'">
                     <mat-icon>arrow_back</mat-icon>
                 </button>
 
@@ -25,23 +25,23 @@
                 <div fxLayout="column" fxLayoutAlign="start start"
                      [@animate]="{value:'*',params:{delay:'100ms',x:'-25px'}}">
                     <div class="h2" *ngIf="pageType ==='edit'">
-                        {{lender.user_names}}
-                        <button matTooltip="Copiar código" (click)="copyClipBoardLenderId(lender.user_id)" mat-mini-fab style="margin-left: 10px;">
+                        {{borrower.user_names}}
+                        <button matTooltip="Copiar código" (click)="copyClipBoardLenderId(borrower.user_id)" mat-mini-fab style="margin-left: 10px;">
                             <mat-icon aria-label="Example icon-button with a heart icon">content_copy</mat-icon>
                         </button>
-                        <button matTooltip="Ver articulos relacionados" (click)="navigateProducsXLender(lender.user_id, lender.user_slug)" mat-mini-fab style="margin-left: 10px;">
-                            <mat-icon aria-label="Example icon-button with a heart icon">storage</mat-icon>
+                        <button matTooltip="Ver alquileres" (click)="navigateProducsXLender(borrower.user_id, borrower.user_slug)" mat-mini-fab style="margin-left: 10px;">
+                            <mat-icon aria-label="Example icon-button with a heart icon">autorenew</mat-icon>
                         </button>
-                        <button matTooltip="Agregar un artículo" (click)="navigateCreateProduct(lender.user_id, lender.user_slug)" mat-mini-fab
+                        <button matTooltip="Agregar un alquiler" (click)="navigateCreateProduct(borrower.user_id, borrower.user_slug)" mat-mini-fab
                             style="margin-left: 10px;">
                             <mat-icon aria-label="Example icon-button with a heart icon">playlist_add</mat-icon>
                         </button>
                     </div>
                     <div class="h2" *ngIf="pageType ==='new'">
-                        Nuevo Prestamista
+                        Nuevo Prestatario
                     </div>
                     <div class="subtitle secondary-text">
-                        <span>Detalles del prestamista</span>
+                        <span>Detalles del prestatario</span>
                     </div>
                 </div>
             </div>
@@ -49,14 +49,14 @@
             
             <button mat-raised-button
                     class="save-product-button mat-white-bg"
-                    [disabled]="lenderForm.invalid"
+                    [disabled]="borrowerForm.invalid"
                     *ngIf="pageType ==='new'" (click)="addLender()">
                 <span>Registrar</span>
             </button>
 
             <button mat-raised-button id="btnSaveLender"
                     class="save-product-button mat-white-bg"
-                    [disabled]="lenderForm.invalid || lenderForm.pristine"
+                    [disabled]="borrowerForm.invalid || borrowerForm.pristine"
                     *ngIf="pageType ==='edit'" (click)="saveLender()">
                 <span>Guardar</span>
             </button>
@@ -69,7 +69,7 @@
             <!-- CONTENT -->
             <div class="content">
 
-                <form name="lenderForm" [formGroup]="lenderForm" class="product w-100-p" fxLayout="column" fxFlex>
+                <form name="borrowerForm" [formGroup]="borrowerForm" class="product w-100-p" fxLayout="column" fxFlex>
 
                     <mat-tab-group>
 
@@ -77,17 +77,17 @@
 
                             <div class="tab-content p-24" fusePerfectScrollbar>
 
-                                <mat-form-field class="w-50-p">
+                                <mat-form-field class="w-50-p" *ngIf="pageType ==='edit'">
                                     <input matInput   
                                            readonly                                        
                                            formControlName="user_id"
-                                           placeholder="Código del prestamista"
+                                           placeholder="Código del prestatario"
                                            required>
                                 </mat-form-field>
                                 <mat-form-field class="w-100-p">
                                     <input matInput                                           
                                            formControlName="user_names"
-                                           placeholder="Nombres del prestamista"
+                                           placeholder="Nombres del prestatario"
                                            required>
                                 </mat-form-field>
                                 <mat-form-field class="w-50-p">
@@ -117,22 +117,6 @@
                                            placeholder="Número de documento"
                                            required>
                                 </mat-form-field> 
-                                <!-- <mat-form-field >
-                                    <input matInput
-                                           type="date"
-                                           name="user_num_doc"
-                                           formControlName="user_num_doc"
-                                           placeholder="Fecha de nacimiento"
-                                           required>
-                                </mat-form-field>  -->
-
-                                <!-- <mat-form-field class="w-50-p">
-                                    <input matInput [matDatepicker]="startDatePicker" 
-                                           placeholder="Fecha de nacimiento" formControlName="user_num_doc" 
-                                           required>
-                                    <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
-                                    <mat-datepicker #startDatePicker></mat-datepicker>
-                                </mat-form-field> -->
 
                                 <mat-form-field class="w-30-p">
                                     <input matInput 
@@ -159,7 +143,7 @@
 
                                 <mat-card class="result" *ngIf="pageType ==='edit'">
                                     <mat-card-content>
-                                        <h2 class="example-h2">Estado del prestamista</h2>
+                                        <h2 class="example-h2">Estado del prestatario</h2>
 
                                         <section class="example-section">
                                             <mat-slide-toggle (change)="changeStatusLender($event)" [checked]="checkedStatusUser">
@@ -226,7 +210,18 @@
                                            placeholder="Correo electrónico"
                                            required>
                                 </mat-form-field>
-
+                                <mat-form-field class="w-100-p">
+                                    <input matInput                                           
+                                           formControlName="user_address"
+                                           placeholder="Dirección"
+                                           required>
+                                </mat-form-field>
+                                <mat-form-field class="w-100-p">
+                                    <input matInput                                           
+                                           formControlName="user_address_ref"
+                                           placeholder="Referencia"
+                                           required>
+                                </mat-form-field>
                                 <mat-form-field class="w-30-p">
                                     <input matInput                                           
                                            formControlName="lndr_ubigeo_dpt"
@@ -255,37 +250,26 @@
 
                             <div class="tab-content p-24" fusePerfectScrollbar>
 
-                                <!-- <mat-form-field class="w-100-p">
-                                    <input matInput
-                                           name="user_stat_reg"
-                                           formControlName="user_stat_reg"
-                                           placeholder="Estado de registro"
-                                           readonly>
-                                </mat-form-field> -->
                                 <mat-form-field class="w-50-p">
                                     <input matInput
-                                           name="user_date_reg"
                                            formControlName="user_date_reg"
                                            placeholder="Fecha de registro"
                                            readonly>
                                 </mat-form-field>
                                 <mat-form-field class="w-50-p">
                                     <input matInput
-                                           name="user_usur_reg"
                                            formControlName="user_usur_reg"
                                            placeholder="Usuario de registro"
                                            readonly>
                                 </mat-form-field>                                                            
-                                <mat-form-field *ngIf="lender.lndr_fec_actualiza != null" class="w-50-p">
+                                <mat-form-field *ngIf="borrower.lndr_fec_actualiza != null" class="w-50-p">
                                     <input matInput
-                                           name="user_date_upt"
                                            formControlName="user_date_upt"
                                            placeholder="Fecha de actualización"
                                            readonly>
                                 </mat-form-field> 
-                                <mat-form-field *ngIf="lender.lndr_usu_actualiza != null" class="w-50-p">
+                                <mat-form-field *ngIf="borrower.lndr_usu_actualiza != null" class="w-50-p">
                                     <input matInput
-                                           name="user_usur_upt"
                                            formControlName="user_usur_upt"
                                            placeholder="Usuario de actualización"
                                            readonly>
@@ -293,26 +277,6 @@
                             </div>
 
                         </mat-tab>
-
-                        <!-- <mat-tab label="Product Images">
-                            <div class="tab-content p-24" fusePerfectScrollbar>
-                                <div fxLayout="row wrap" fxLayoutAlign="start start">
-
-                                    <div *ngIf="product.images.length === 0"
-                                         class="product-image" fxlayout="row" fxLayoutAlign="center center">
-                                        <img class="media"
-                                             [src]="'assets/images/ecommerce/product-image-placeholder.png'">
-                                    </div>
-
-                                    <div *ngFor="let image of product.images">
-                                        <div *ngIf="product.images.length > 0"
-                                             class="product-image" fxlayout="row" fxLayoutAlign="center center">
-                                            <img class="media" [src]="image.url">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </mat-tab> -->
 
                     </mat-tab-group>
                 </form>

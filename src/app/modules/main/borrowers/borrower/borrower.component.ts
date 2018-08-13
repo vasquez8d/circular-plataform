@@ -36,9 +36,9 @@ export const MY_FORMATS = {
 })
 export class BorrowerComponent implements OnInit, OnDestroy
 {
-    lender: UserModel;
+    borrower: UserModel;
     pageType: string;
-    lenderForm: FormGroup;
+    borrowerForm: FormGroup;
     listadoDistritosLima = [];
     fileToUpload: File = null;
     
@@ -87,7 +87,7 @@ export class BorrowerComponent implements OnInit, OnDestroy
     )
     {
         // Set the default
-        this.lender = new UserModel();
+        this.borrower = new UserModel();
 
         // Set the private defaults
         this._unsubscribeAll = new Subject();
@@ -109,17 +109,17 @@ export class BorrowerComponent implements OnInit, OnDestroy
             .subscribe(lender => {
                 if ( lender )
                 {
-                    this.lender = new UserModel(lender);                                        
+                    this.borrower = new UserModel(lender);                                        
                     this.pageType = 'edit';
-                    this.cargarDocumentos(this.lender.user_url_documen);
+                    this.cargarDocumentos(this.borrower.user_url_documen);
                     this.loadCurrentStatusLender(lender);
                 }
                 else
                 {
                     this.pageType = 'new';
-                    this.lender = new UserModel();
+                    this.borrower = new UserModel();
                 }
-                this.lenderForm = this.createLenderForm();
+                this.borrowerForm = this.createBorrowerForm();
             });
     }
 
@@ -141,7 +141,7 @@ export class BorrowerComponent implements OnInit, OnDestroy
         documents.forEach(element => {
             const datas3Body = {
                 app_key: element.image_key,
-                app_catg_id: this.appCategoryConfig.getLenderCategory()
+                app_catg_id: this.appCategoryConfig.getBorrowerCategory()
             };            
             this._s3Service.getImageS3(datas3Body).subscribe(
                 data => {       
@@ -177,30 +177,38 @@ export class BorrowerComponent implements OnInit, OnDestroy
      *
      * @returns {FormGroup}
      */
-    createLenderForm(): FormGroup
-    {  
+    createBorrowerForm(): FormGroup
+    {     
         let user_fec_nac = '';
-        if (this.lender.user_fec_nac !== ''){
-            user_fec_nac = (new Date(this.lender.user_fec_nac)).toISOString();
-        }         
+        try {
+            if (this.borrower.user_fec_nac !== ''){
+                const parts = this.borrower.user_fec_nac.split('/');
+                user_fec_nac = (new Date(parts[2], parts[1] - 1, parts[0])).toISOString();
+            } 
+        } catch (e) {
+            console.log('createBorrowerForm', e);
+        }
+                
         return this._formBuilder.group({
-            user_id             : [this.lender.user_id],            
-            user_names          : [this.lender.user_names],
-            user_full_name1     : [this.lender.user_full_name1],
-            user_full_name2     : [this.lender.user_full_name2],
+            user_id             : [this.borrower.user_id],            
+            user_names          : [this.borrower.user_names],
+            user_full_name1     : [this.borrower.user_full_name1],
+            user_full_name2     : [this.borrower.user_full_name2],
             user_fec_nac        : [user_fec_nac],
-            user_email          : [this.lender.user_email],            
-            user_num_phone      : [this.lender.user_num_phone],
-            user_num_doc        : [this.lender.user_num_doc],
-            user_tip_doc        : [this.lender.user_tip_doc.tip_docum_id],
-            lndr_ubigeo_dpt     : [this.lender.user_ubigeo.ubig_dpt],
-            lndr_ubigeo_prv     : [this.lender.user_ubigeo.ubig_prv],
-            lndr_ubigeo_dst_id  : [this.lender.user_ubigeo.ubig_id.substr(4, 2)],
-            user_stat_reg       : [this.lender.user_stat_reg],
-            user_date_reg       : [this.lender.user_date_reg],
-            user_usur_reg       : [this.lender.user_usur_reg],
-            user_date_upt       : [this.lender.user_date_upt],
-            user_usur_upt       : [this.lender.user_usur_upt],
+            user_email          : [this.borrower.user_email],            
+            user_num_phone      : [this.borrower.user_num_phone],
+            user_num_doc        : [this.borrower.user_num_doc],
+            user_tip_doc        : [this.borrower.user_tip_doc.tip_docum_id],
+            lndr_ubigeo_dpt     : [this.borrower.user_ubigeo.ubig_dpt],
+            lndr_ubigeo_prv     : [this.borrower.user_ubigeo.ubig_prv],
+            lndr_ubigeo_dst_id  : [this.borrower.user_ubigeo.ubig_id.substr(4, 2)],
+            user_address        : [this.borrower.user_address],
+            user_address_ref    : [this.borrower.user_address_ref],
+            user_stat_reg       : [this.borrower.user_stat_reg],
+            user_date_reg       : [this.borrower.user_date_reg],
+            user_usur_reg       : [this.borrower.user_usur_reg],
+            user_date_upt       : [this.borrower.user_date_upt],
+            user_usur_upt       : [this.borrower.user_usur_upt],
         });
     }
 
@@ -210,26 +218,29 @@ export class BorrowerComponent implements OnInit, OnDestroy
     saveLender(): void
     {
         const LenderSave: UserModel = new UserModel();
-        LenderSave.user_id = this.lender.user_id;
-        LenderSave.user_names = this.lenderForm.value.user_names;
-        LenderSave.user_full_name1 = this.lenderForm.value.user_full_name1;
-        LenderSave.user_full_name2 = this.lenderForm.value.user_full_name2;
-        LenderSave.user_fec_nac = this.lenderForm.value.user_fec_nac.format('DD/MM/YYYY');
+        LenderSave.user_id = this.borrower.user_id;
+        LenderSave.user_names = this.borrowerForm.value.user_names;
+        LenderSave.user_full_name1 = this.borrowerForm.value.user_full_name1;
+        LenderSave.user_full_name2 = this.borrowerForm.value.user_full_name2;
+        LenderSave.user_fec_nac = this.registroUtil.obtenerDateFormatFecNac(new Date(this.borrowerForm.value.user_fec_nac));
         LenderSave.user_slug = this.registroUtil.obtenerSlugPorNombre(LenderSave.user_names + ' ' + LenderSave.user_full_name1);
-        LenderSave.user_num_doc = this.lenderForm.value.user_num_doc;
+        LenderSave.user_num_doc = this.borrowerForm.value.user_num_doc;
         LenderSave.user_tip_doc = this.obtenerTipoDocumSeleccionado();
-        LenderSave.user_num_phone = this.lenderForm.value.user_num_phone;
-        LenderSave.user_email = this.lenderForm.value.user_email;
+        LenderSave.user_num_phone = this.borrowerForm.value.user_num_phone;
+        LenderSave.user_email = this.borrowerForm.value.user_email;
         LenderSave.user_ubigeo = this.obtenerUbigeoDistrito();
+        LenderSave.user_address = this.borrowerForm.value.user_address;
+        LenderSave.user_address_ref = this.borrowerForm.value.user_address_ref;
         LenderSave.user_date_upt = this.registroUtil.obtenerFechaCreacion();
         LenderSave.user_usur_upt = this.securityService.getUserLogedId();
         LenderSave.user_categ = {
-            catg_id: this.appCategoryConfig.getLenderCategory()
+            catg_id: this.appCategoryConfig.getBorrowerCategory()
         };
+        console.log(LenderSave);
         this._lenderService.updateLender(LenderSave).subscribe(
             data => {
                 if (data.res_service === 'ok') {
-                    this._matSnackBar.open('Prestamista actualizado', 'Aceptar', {
+                    this._matSnackBar.open('Prestatario actualizado', 'Aceptar', {
                         verticalPosition: 'top',
                         duration: 3000
                     }); 
@@ -240,8 +251,8 @@ export class BorrowerComponent implements OnInit, OnDestroy
                         this.listImages.forEach(function (element, index, theArray){
                             const dataUpload = {
                                 imageString64: element.data,
-                                app_id: this.lender.user_id,
-                                app_categ_id: this.appCategoryConfig.getLenderCategory()                        
+                                app_id: this.borrower.user_id,
+                                app_categ_id: this.appCategoryConfig.getBorrowerCategory()                        
                             };
                             const existImage = this.listCurrentImages.find(x => x.image_key === element.desc.image_key);
                             if (existImage == null) {
@@ -253,9 +264,9 @@ export class BorrowerComponent implements OnInit, OnDestroy
                                         };
                                         listImagesGuardar.push(data_image);                                                                              
                                         const dataUploadFileName = {
-                                            app_id: this.lender.user_id,
+                                            app_id: this.borrower.user_id,
                                             app_url_documen: listImagesGuardar,
-                                            app_categ: this.appCategoryConfig.getLenderCategory()
+                                            app_categ: this.appCategoryConfig.getBorrowerCategory()
                                         };
                                         theArray[index] = {
                                             data: element.data,
@@ -289,7 +300,7 @@ export class BorrowerComponent implements OnInit, OnDestroy
                         }, this);
                     }
                 } else { 
-                    this._matSnackBar.open('Error actualizando la información del prestamista', 'Aceptar', {
+                    this._matSnackBar.open('Error actualizando la información del prestatario', 'Aceptar', {
                         verticalPosition: 'top',
                         duration: 3000
                     }); 
@@ -299,15 +310,15 @@ export class BorrowerComponent implements OnInit, OnDestroy
     }
 
     obtenerTipoDocumSeleccionado(): any {
-        return this.listadoTiposDocumento.find(x => x.tip_docum_id === this.lenderForm.value.user_tip_doc);
+        return this.listadoTiposDocumento.find(x => x.tip_docum_id === this.borrowerForm.value.user_tip_doc);
     }
 
     obtenerUbigeoDistrito(): any {
         return {
             ubig_dpt: 'Lima',
             ubig_prv: 'Lima',
-            ubig_dst: this.listadoDistritosLima.find(x => x.dst_id === this.lenderForm.value.lndr_ubigeo_dst_id).dst_nombre,
-            ubig_id: '1501' + this.listadoDistritosLima.find(x => x.dst_id === this.lenderForm.value.lndr_ubigeo_dst_id).dst_id
+            ubig_dst: this.listadoDistritosLima.find(x => x.dst_id === this.borrowerForm.value.lndr_ubigeo_dst_id).dst_nombre,
+            ubig_id: '1501' + this.listadoDistritosLima.find(x => x.dst_id === this.borrowerForm.value.lndr_ubigeo_dst_id).dst_id
         };
     }
 
@@ -326,26 +337,28 @@ export class BorrowerComponent implements OnInit, OnDestroy
     {
 
         const LenderSave: UserModel = new UserModel();        
-        LenderSave.user_names = this.lenderForm.value.user_names;
-        LenderSave.user_full_name1 = this.lenderForm.value.user_full_name1;
-        LenderSave.user_full_name2 = this.lenderForm.value.user_full_name2;
-        LenderSave.user_fec_nac = this.lenderForm.value.user_fec_nac.format('DD/MM/YYYY');
+        LenderSave.user_names = this.borrowerForm.value.user_names;
+        LenderSave.user_full_name1 = this.borrowerForm.value.user_full_name1;
+        LenderSave.user_full_name2 = this.borrowerForm.value.user_full_name2;
+        LenderSave.user_fec_nac = this.borrowerForm.value.user_fec_nac.format('DD/MM/YYYY');
         LenderSave.user_slug = this.registroUtil.obtenerSlugPorNombre(LenderSave.user_names + ' ' + LenderSave.user_full_name1);
-        LenderSave.user_num_doc = this.lenderForm.value.user_num_doc;
+        LenderSave.user_num_doc = this.borrowerForm.value.user_num_doc;
         LenderSave.user_tip_doc = this.obtenerTipoDocumSeleccionado();
-        LenderSave.user_num_phone = this.lenderForm.value.user_num_phone;
-        LenderSave.user_email = this.lenderForm.value.user_email;
+        LenderSave.user_num_phone = this.borrowerForm.value.user_num_phone;
+        LenderSave.user_email = this.borrowerForm.value.user_email;
+        LenderSave.user_address = this.borrowerForm.value.user_address;
+        LenderSave.user_address_ref = this.borrowerForm.value.user_address_ref;
         LenderSave.user_ubigeo = this.obtenerUbigeoDistrito();
         LenderSave.user_date_reg = this.registroUtil.obtenerFechaCreacion();
         LenderSave.user_usur_reg = this.securityService.getUserLogedId();
         LenderSave.user_categ = {
-            catg_id: this.appCategoryConfig.getLenderCategory(),
-            catg_name: 'Lender'  
+            catg_id: this.appCategoryConfig.getBorrowerCategory(),
+            catg_name: 'Borrower'  
         };        
         this._lenderService.createLender(LenderSave).subscribe(
             data => {                
                 if (data.res_service === 'ok') {
-                    this._matSnackBar.open('Prestamista registrado', 'Aceptar', {
+                    this._matSnackBar.open('Prestatario registrado', 'Aceptar', {
                         verticalPosition: 'top',
                         duration: 3000
                     });
@@ -354,7 +367,7 @@ export class BorrowerComponent implements OnInit, OnDestroy
                         const dataUpload = {
                             imageString64: element.data,
                             app_id: data.data_result.user_id,
-                            app_categ_id: this.appCategoryConfig.getLenderCategory()                             
+                            app_categ_id: this.appCategoryConfig.getBorrowerCategory()                             
                         };
                         this._s3Service.uploadImageS3(dataUpload).subscribe(
                             responseUpload => {                                                               
@@ -366,7 +379,7 @@ export class BorrowerComponent implements OnInit, OnDestroy
                                 const dataUploadFileName = {
                                     app_id: data.data_result.user_id,
                                     app_url_documen: listImagesGuardar,
-                                    app_categ: this.appCategoryConfig.getLenderCategory()
+                                    app_categ: this.appCategoryConfig.getBorrowerCategory()
                                 };                                                           
                                 this._s3Service.uploadFileName(dataUploadFileName).subscribe(
                                     resultUploadFileName => {
@@ -380,9 +393,9 @@ export class BorrowerComponent implements OnInit, OnDestroy
                         );
                     });
                     
-                    this.router.navigateByUrl('/lenders/lender/' + data.data_result.user_id + '/' + LenderSave.user_slug);
+                    this.router.navigateByUrl('/borrowers/borrower/' + data.data_result.user_id + '/' + LenderSave.user_slug);
                 } else {
-                    this._matSnackBar.open('Error modificando la información del prestamista', 'Aceptar', {
+                    this._matSnackBar.open('Error modificando la información del prestatario', 'Aceptar', {
                         verticalPosition: 'top',
                         duration: 3000,
                         panelClass: 'mat-error-dialog'
@@ -442,7 +455,7 @@ export class BorrowerComponent implements OnInit, OnDestroy
         }
 
         const bodyDelete = {
-            user_id: this.lender.user_id,
+            user_id: this.borrower.user_id,
             user_stat_reg: current_status
         };
 
@@ -450,7 +463,7 @@ export class BorrowerComponent implements OnInit, OnDestroy
             data => {                
                 if (data.res_service === 'ok'){
                     this.lndr_current_status = current_status_msg;
-                    this._matSnackBar.open('Prestamista ' + current_status_msg, 'Aceptar', {
+                    this._matSnackBar.open('Prestatario ' + current_status_msg, 'Aceptar', {
                         verticalPosition: 'top',
                         duration: 3000
                     });

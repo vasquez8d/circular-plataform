@@ -41,6 +41,11 @@ const appRoutes: Routes = [
         path        : 'borrowers',
         canActivate : [LoginGuard],
         loadChildren: './modules/main/borrowers/borrowers.module#BorrowerModule'
+    },
+    {
+        path        : 'rents',
+        canActivate : [LoginGuard],
+        loadChildren: './modules/main/rents/rents.module#RentsModule'
     },          
     {
         path        : '**',
