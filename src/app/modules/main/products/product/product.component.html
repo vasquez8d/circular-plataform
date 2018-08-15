@@ -26,7 +26,7 @@
                      [@animate]="{value:'*',params:{delay:'100ms',x:'-25px'}}">
                     <div class="h2" *ngIf="pageType ==='edit'">
                         {{product.prod_nombre}}
-                        <button matTooltip="Copiar código" (click)="copyClipBoardLenderId(product.prod_id)" mat-mini-fab style="margin-left: 10px;">
+                        <button matTooltip="Copiar código" (click)="copyClipBoardProductId(product.prod_id)" mat-mini-fab style="margin-left: 10px;">
                             <mat-icon aria-label="Example icon-button with a heart icon">content_copy</mat-icon>
                         </button>
                     </div>

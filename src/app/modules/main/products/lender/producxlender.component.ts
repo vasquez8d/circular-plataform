@@ -12,6 +12,7 @@ import { ActivatedRoute, Router } from '../../../../../../node_modules/@angular/
 import { UserService } from '../../../../services/user.service';
 import { LenderProductsService } from '../../../../services/productsxlender.service';
 import { UserModel } from '../../../../models/user.model';
+import { AppCategoryConfig } from '../../../../app-config/app-categorys.config';
 
 @Component({
     selector: 'e-commerce-producxlender',
@@ -45,7 +46,8 @@ export class LenderProductComponent implements OnInit {
         private _ecommerceProductsService: LenderProductsService,        
         private _activatedRoute: ActivatedRoute,
         private _userService: UserService,
-        private _router: Router
+        private _router: Router,
+        private _appCategConfig: AppCategoryConfig
     ) {
         // Set the private defaults
         this._unsubscribeAll = new Subject();
@@ -83,7 +85,8 @@ export class LenderProductComponent implements OnInit {
         this._activatedRoute.params.subscribe(params => {
             if (params.id) {
                 const body = {
-                    user_id: params.id
+                    user_id : event,
+                    catg_id : this._appCategConfig.getLenderCategory()
                 };
                 this._userService.detailsLender(body).subscribe(
                     data => {

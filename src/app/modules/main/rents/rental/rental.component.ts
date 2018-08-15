@@ -15,6 +15,7 @@ import { RentalModel } from '../../../../models/rental.model';
 import { MAT_DATE_FORMATS } from '@angular/material/core';
 import { RentalService } from '../../../../services/rental.service';
 import { EcommerceProductService } from '../../../../services/product.service';
+import { AppCategoryConfig } from '../../../../app-config/app-categorys.config';
 
 export const MY_FORMATS = {
     parse: {
@@ -89,7 +90,8 @@ export class RentalComponent implements OnInit, OnDestroy
         private router: Router,
         private _userService: UserService,        
         private _activatedRoute: ActivatedRoute,
-        private _productService: EcommerceProductService
+        private _productService: EcommerceProductService,
+        private _appCategConfig: AppCategoryConfig
     )
     {
         // Set the default
@@ -140,7 +142,6 @@ export class RentalComponent implements OnInit, OnDestroy
             this.checkedStatusProduct = false;
         }
     }
-    
     onSearchProductChange(event): void {
         if (event.length === 16) {
             const body = {
@@ -180,22 +181,23 @@ export class RentalComponent implements OnInit, OnDestroy
     onSearchBorrowChange(event): void {
         if (event.length === 16) {
             const body = {
-                user_id : event
+                user_id : event,
+                catg_id : this._appCategConfig.getBorrowerCategory()
             };
             this._userService.detailsLender(body).subscribe(
                 data => {
                     console.log(data);
-                    if (data.res_service === 'ok'){
-                        if (data.data_result.Item != null){
-                            this.borrowerInformation = true;
-                            this.borrower = data.data_result.Item;                            
+                    if (data.res_service === 'ok'){                        
+                        if (data.data_result.Count > 0){
+                                this.borrowerInformation = true;
+                                this.borrower = data.data_result.Items[0]; 
                         } else {
                             this.borrowerInformation = false;
                             this._matSnackBar.open('Prestatario no existe o deshabilitado', 'Aceptar', {
                                 verticalPosition: 'top',
                                 duration: 3000
                             });
-                            this.rentalForm.controls.lender_user_id.patchValue('');
+                            this.rentalForm.controls.rent_borrow_id.patchValue('');
                         }
                     } else {
                         this.borrowerInformation = false;
@@ -207,12 +209,14 @@ export class RentalComponent implements OnInit, OnDestroy
         }
     }
     navigateToBorrower(): void {
+        console.log(this.borrower);
         this.router.navigateByUrl('/borrowers/borrower/' + this.borrower.user_id + '/' + this.borrower.user_slug);  
     }
 
     cargarInfoLender(product): void {        
         const body = {
-            user_id: product.lender_user_id
+            user_id : event,
+            catg_id : this._appCategConfig.getLenderCategory()
         };
         this._userService.detailsLender(body).subscribe(
             data => {
@@ -239,7 +243,8 @@ export class RentalComponent implements OnInit, OnDestroy
         this._activatedRoute.params.subscribe(params => {
             if (params.user_id){
                 const body = {
-                    user_id: params.user_id
+                    user_id : event,
+                    catg_id : this._appCategConfig.getLenderCategory()
                 };
                 this._userService.detailsLender(body).subscribe(
                     data => {

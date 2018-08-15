@@ -207,9 +207,9 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
             this._userService.detailsLender(body).subscribe(
                 data => {
                     if (data.res_service === 'ok'){
-                        if (data.data_result.Item != null){
+                        if (data.data_result.Count > 0){
                             this.lenderInformation = true;
-                            this.lender = data.data_result.Item;                            
+                            this.lender = data.data_result.Items[0];                            
                         } else {
                             this.lenderInformation = false;
                             this._matSnackBar.open('Prestamista no existe o deshabilitado', 'Aceptar', {
@@ -233,12 +233,14 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
             user_id: product.lender.user_id,            
             catg_id: this._appCategConfig.getLenderCategory()
         };
+        console.log(body);
         this._userService.detailsLender(body).subscribe(
             data => {
+                console.log(data);
                 if (data.res_service === 'ok') {
-                    if (data.data_result.Item != null) {
+                    if (data.data_result.Count > 0){
                         this.lenderInformation = true;
-                        this.lender = data.data_result.Item;
+                        this.lender = data.data_result.Items[0]; 
                     } else {
                         this.lenderInformation = false;
                         this._matSnackBar.open('Prestamista no existe o deshabilitado', 'Aceptar', {
@@ -261,12 +263,14 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
                     user_id: params.user_id,
                     catg_id: this._appCategConfig.getLenderCategory()
                 };
+                console.log(body);
                 this._userService.detailsLender(body).subscribe(
                     data => {
+                        console.log(data);
                         if (data.res_service === 'ok') {
-                            if (data.data_result.Item != null) {
+                            if (data.data_result.Count > 0){
                                 this.lenderInformation = true;
-                                this.lender = data.data_result.Item;
+                                this.lender = data.data_result.Items[0]; 
                                 this.productForm.controls.lender_user_id.patchValue(params.user_id);
                                 this.readonlyLender = true;
                             } else {
@@ -671,14 +675,14 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
         });
     }
 
-    copyClipBoardLenderId(user_id): void {
+    copyClipBoardProductId(prod_id): void {
 
         const selBox = document.createElement('textarea');
         selBox.style.position = 'fixed';
         selBox.style.left = '0';
         selBox.style.top = '0';
         selBox.style.opacity = '0';
-        selBox.value = user_id;
+        selBox.value = prod_id;
         document.body.appendChild(selBox);
         selBox.focus();
         selBox.select();
@@ -686,6 +690,8 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
         document.body.removeChild(selBox);
 
         document.execCommand('copy');
+
+        // localStorage.setItem('circular_prod_id', prod_id);
 
         this._matSnackBar.open('Código copiado', 'Aceptar', {
             verticalPosition: 'top',
