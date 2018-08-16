@@ -86,9 +86,16 @@ export class LenderProductComponent implements OnInit {
             if (params.id) {
                 const body = {
                     user_id : event,
-                    catg_id : this._appCategConfig.getLenderCategory()
+                    catg_ids : [
+                        {
+                            catg_id : this._appCategConfig.getLenderCategory()
+                        },
+                        {
+                            catg_id : this._appCategConfig.getLenderBorrowerCategory()
+                        }
+                    ]
                 };
-                this._userService.detailsLender(body).subscribe(
+                this._userService.detailsUser(body).subscribe(
                     data => {
                         if (data.res_service === 'ok'){
                             this.user =  data.data_result.Item;
@@ -96,11 +103,6 @@ export class LenderProductComponent implements OnInit {
                         }
                     }
                 );
-                // this._ecommerceProductsService.listProductsxLender(body).subscribe(
-                //     data => {
-                //         console.log(data);
-                //     }
-                // );
             }
         });
     }

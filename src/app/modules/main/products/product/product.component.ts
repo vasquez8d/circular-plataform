@@ -200,11 +200,20 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
 
     onSearchLenderChange(event): void {
         if (event.length === 16) {
+
             const body = {
                 user_id : event,
-                catg_id : this._appCategConfig.getLenderCategory()
+                catg_ids : [
+                    {
+                        catg_id : this._appCategConfig.getLenderCategory()
+                    },
+                    {
+                        catg_id : this._appCategConfig.getLenderBorrowerCategory()
+                    }
+                ]
             };
-            this._userService.detailsLender(body).subscribe(
+            
+            this._userService.detailsUser(body).subscribe(
                 data => {
                     if (data.res_service === 'ok'){
                         if (data.data_result.Count > 0){
@@ -230,12 +239,19 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
 
     cargarInfoLender(product): void {        
         const body = {
-            user_id: product.lender.user_id,            
-            catg_id: this._appCategConfig.getLenderCategory()
+            user_id : product.lender.user_id,
+            catg_ids : [
+                {
+                    catg_id : this._appCategConfig.getLenderCategory()
+                },
+                {
+                    catg_id : this._appCategConfig.getLenderBorrowerCategory()
+                }
+            ]
         };
         console.log(body);
-        this._userService.detailsLender(body).subscribe(
-            data => {
+        this._userService.detailsUser(body).subscribe(
+            data => {                
                 console.log(data);
                 if (data.res_service === 'ok') {
                     if (data.data_result.Count > 0){
@@ -260,13 +276,18 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
         this._activatedRoute.params.subscribe(params => {
             if (params.user_id){
                 const body = {
-                    user_id: params.user_id,
-                    catg_id: this._appCategConfig.getLenderCategory()
+                    user_id : event,
+                    catg_ids : [
+                        {
+                            catg_id : this._appCategConfig.getLenderCategory()
+                        },
+                        {
+                            catg_id : this._appCategConfig.getLenderBorrowerCategory()
+                        }
+                    ]
                 };
-                console.log(body);
-                this._userService.detailsLender(body).subscribe(
-                    data => {
-                        console.log(data);
+                this._userService.detailsUser(body).subscribe(
+                    data => {                        
                         if (data.res_service === 'ok') {
                             if (data.data_result.Count > 0){
                                 this.lenderInformation = true;

@@ -182,11 +182,17 @@ export class RentalComponent implements OnInit, OnDestroy
         if (event.length === 16) {
             const body = {
                 user_id : event,
-                catg_id : this._appCategConfig.getBorrowerCategory()
+                catg_ids : [
+                    {
+                        catg_id : this._appCategConfig.getBorrowerCategory()
+                    },
+                    {
+                        catg_id : this._appCategConfig.getLenderBorrowerCategory()
+                    }
+                ]
             };
-            this._userService.detailsLender(body).subscribe(
-                data => {
-                    console.log(data);
+            this._userService.detailsUser(body).subscribe(
+                data => {                    
                     if (data.res_service === 'ok'){                        
                         if (data.data_result.Count > 0){
                                 this.borrowerInformation = true;
@@ -214,11 +220,20 @@ export class RentalComponent implements OnInit, OnDestroy
     }
 
     cargarInfoLender(product): void {        
+
         const body = {
             user_id : event,
-            catg_id : this._appCategConfig.getLenderCategory()
+            catg_ids : [
+                {
+                    catg_id : this._appCategConfig.getLenderCategory()
+                },
+                {
+                    catg_id : this._appCategConfig.getLenderBorrowerCategory()
+                }
+            ]
         };
-        this._userService.detailsLender(body).subscribe(
+
+        this._userService.detailsUser(body).subscribe(
             data => {
                 if (data.res_service === 'ok') {
                     if (data.data_result.Item != null) {
@@ -242,11 +257,20 @@ export class RentalComponent implements OnInit, OnDestroy
     cargarInfoNewLender(): void {
         this._activatedRoute.params.subscribe(params => {
             if (params.user_id){
+
                 const body = {
                     user_id : event,
-                    catg_id : this._appCategConfig.getLenderCategory()
+                    catg_ids : [
+                        {
+                            catg_id : this._appCategConfig.getLenderCategory()
+                        },
+                        {
+                            catg_id : this._appCategConfig.getLenderBorrowerCategory()
+                        }
+                    ]
                 };
-                this._userService.detailsLender(body).subscribe(
+
+                this._userService.detailsUser(body).subscribe(
                     data => {
                         if (data.res_service === 'ok') {
                             if (data.data_result.Item != null) {
