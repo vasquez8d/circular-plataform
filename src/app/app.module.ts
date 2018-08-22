@@ -46,7 +46,11 @@ const appRoutes: Routes = [
         path        : 'rents',
         canActivate : [LoginGuard],
         loadChildren: './modules/main/rents/rents.module#RentsModule'
-    },          
+    },      
+    {
+        path        : 'payment',        
+        loadChildren: './modules/main/payment/payment.module#PaymentModule'
+    },       
     {
         path        : '**',
         canActivate : [LoginGuard],
@@ -56,7 +60,7 @@ const appRoutes: Routes = [
 
 @NgModule({
     declarations: [
-        AppComponent
+        AppComponent        
     ],
     imports     : [
         BrowserModule,
