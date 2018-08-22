@@ -1,9 +1,7 @@
 <script-hack>
-    Culqi.publicKey = 'pk_live_iJuhEE0PgyDTvyFD'; 
-    Culqi.init();    
-    my.namespace.publicFunc('alexs')
-    <!-- onclick="console.log('alex')" -->
-</script-hack>                                           
+    Culqi.publicKey = 'pk_test_C91ocdg4q8xeCRf2'; 
+    Culqi.init();
+</script-hack>
 <div id="maintenance" fxLayout="column">
     
     <div id="maintenance-form-wrapper" fxLayout="column" fxLayoutAlign="center center">
@@ -78,18 +76,26 @@
                                             </mat-error>
                                         </mat-form-field>
                                     </div>
-                                                                                
                                     <div>
                                         <button button mat-raised-button matStepperPrevious style="margin-left: 10px;">
                                             Retroceder
                                             <mat-icon>navigate_before</mat-icon>
                                         </button>
-                                        <button [disabled]="paymentFormGroup.invalid" button mat-raised-button color="accent" style="margin-left: 10px;">
-                                            Pagar
+                                        <button *ngIf="!cardValidate" [disabled]="paymentFormGroup.invalid" button mat-raised-button 
+                                                 color="accent" 
+                                                 onclick="my.namespace.validateCard(Culqi)"
+                                                 style="margin-left: 10px;">
+                                                 Validar Tarjeta
+                                            <mat-icon>check_circle</mat-icon>
+                                        </button>
+                                        <button *ngIf="cardValidate" [disabled]="paymentFormGroup.invalid" button mat-raised-button 
+                                                color="accent" 
+                                                (click)="createPayment()"
+                                                style="margin-left: 10px;">
+                                                Pagar S/ 100.00
                                             <mat-icon>credit_card</mat-icon>
                                         </button>
-                                    </div>
-                                    
+                                    </div>                                    
                             </form>
                         </div>
                     </div>
@@ -105,7 +111,9 @@
                     </div>
                 </mat-step>
             </mat-horizontal-stepper>
-
+            <div class="my-container">
+                <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '14px' }"></ngx-loading>                
+            </div>            
         </div>
     </div>
 </div>

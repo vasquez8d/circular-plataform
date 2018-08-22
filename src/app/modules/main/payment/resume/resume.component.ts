@@ -5,6 +5,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import * as card from '../../../../../assets/js/payment.js';
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
+import { MatSnackBar } from '@angular/material';
 
 @Component({
   selector: 'app-resume',
@@ -24,6 +25,12 @@ export class ResumeComponent implements OnInit, OnDestroy {
 
   cardIsCreated = false;
   paymentSuccess = false;
+  cardValidate = false;
+
+  public loading = false;
+
+  oCulqi: any;
+
   private _unsubscribeAll: Subject<any>;
 
   /**
@@ -34,7 +41,8 @@ export class ResumeComponent implements OnInit, OnDestroy {
   constructor(   
     private _fuseConfigService: FuseConfigService, 
     private _formBuilder: FormBuilder,
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    private _matSnackBar: MatSnackBar,        
   ) {    
     this._fuseConfigService.config = {
       layout: {
@@ -91,18 +99,43 @@ export class ResumeComponent implements OnInit, OnDestroy {
         this.onFormValuesChanged();
       });
 
-      window.my = window.my || {};
-      window.my.namespace = window.my.namespace || {};
-      window.my.namespace.publicFunc = this.publicFunc.bind(this);
+      (<any>window).my = (<any>window).my || {};
+      (<any>window).my.namespace = (<any>window).my.namespace || {};
+      (<any>window).my.namespace.validateCard = this.validateCard.bind(this);
   }
 
-  publicFunc(value): void {
-    this.ngZone.run(() => this.privateFunc(value));
+  validateCard(value): void {
+    this.ngZone.run(() => this.fValidateCard(value));
   }
 
-  privateFunc(value): void {
-    console.log(value);
+  fValidateCard(Culqi): any {
+    this.loading = true;
+    Culqi.createToken();
+    this.oCulqi = Culqi;
+    setTimeout(() => {
+      this.cardValidate = true;
+      this.loading = false;
+    }, 10000);
   }
+  
+  createPayment(): void {    
+    if (this.oCulqi.token) {
+      console.log(this.oCulqi.token);
+      // Guardar el token en la BD
+    } else {
+      this._matSnackBar.open('No se pudo procesar correctamente tu tarjeta, volver a intentar.', 'Aceptar', {
+        verticalPosition: 'top',
+        duration: 3000
+      });
+      // Guardar el intento en la BD
+      this.cardValidate = false;
+      this.paymentFormGroup.controls.number.patchValue('');
+      this.paymentFormGroup.controls.cvc.patchValue('');
+      this.paymentFormGroup.controls.expiry.patchValue('');
+      this.paymentFormGroup.controls.name.patchValue('');
+    }
+  }
+
   /**
    * On destroy
    */
