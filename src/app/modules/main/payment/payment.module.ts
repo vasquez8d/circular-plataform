@@ -6,6 +6,7 @@ import { RouterModule } from '@angular/router';
 import { MatStepperModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatIconModule, MatSnackBarModule } from '@angular/material';
 import { ScriptHackModule } from '../../../utils/script-hack/script-hack.module';
 import { LoadingModule } from 'ngx-loading';
+import { PaymentService } from '../../../services/payment.service';
 
 const routes = [
   {
@@ -31,6 +32,9 @@ const routes = [
     ScriptHackModule,
     RouterModule.forChild(routes),
   ],
-  declarations: [ResumeComponent]
+  declarations: [ResumeComponent],
+  providers: [ 
+    PaymentService
+  ]
 })
 export class PaymentModule { }

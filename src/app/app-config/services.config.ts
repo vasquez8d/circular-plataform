@@ -29,6 +29,10 @@ export class ServicesConfig {
         return 'https://mofy4cwezf.execute-api.us-east-1.amazonaws.com/dev';
     }
 
+    urlPayments(): string {
+        return 'https://dunjvv0pid.execute-api.us-east-1.amazonaws.com/dev';
+    }
+
     currentUrl(): string {
         return this.publishUrl;
     }

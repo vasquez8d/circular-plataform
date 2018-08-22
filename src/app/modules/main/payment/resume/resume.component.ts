@@ -6,6 +6,7 @@ import * as card from '../../../../../assets/js/payment.js';
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { MatSnackBar } from '@angular/material';
+import { PaymentService } from '../../../../services/payment.service.js';
 
 @Component({
   selector: 'app-resume',
@@ -43,6 +44,7 @@ export class ResumeComponent implements OnInit, OnDestroy {
     private _formBuilder: FormBuilder,
     private ngZone: NgZone,
     private _matSnackBar: MatSnackBar,        
+    private _paymentService: PaymentService
   ) {    
     this._fuseConfigService.config = {
       layout: {
@@ -120,14 +122,39 @@ export class ResumeComponent implements OnInit, OnDestroy {
   
   createPayment(): void {    
     if (this.oCulqi.token) {
-      console.log(this.oCulqi.token);
+      const dataToken = {
+        body: this.oCulqi.token,
+        token_status: 'ok'
+      };
+      console.log(dataToken);      
+      this._paymentService.postCreateTokenPayment(dataToken).subscribe(
+        data => {
+          console.log(data);
+        }
+      );
+      // ,
+      // "metadata": {
+      //   "M": {
+      //     "dni": {
+      //       "S": response.metadata.dni
+      //     }
+      //   }
+      // }
       // Guardar el token en la BD
-    } else {
+    } else {      
       this._matSnackBar.open('No se pudo procesar correctamente tu tarjeta, volver a intentar.', 'Aceptar', {
         verticalPosition: 'top',
         duration: 3000
       });
-      // Guardar el intento en la BD
+      const dataToken = {
+        body: this.oCulqi.error,
+        token_status: 'error'
+      };      
+      this._paymentService.postCreateTokenPayment(dataToken).subscribe(
+        data => {
+          console.log(data);
+        }
+      );      
       this.cardValidate = false;
       this.paymentFormGroup.controls.number.patchValue('');
       this.paymentFormGroup.controls.cvc.patchValue('');
