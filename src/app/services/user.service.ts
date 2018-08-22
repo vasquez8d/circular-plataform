@@ -76,18 +76,31 @@ export class UserService implements Resolve<any>
             else
             {
                 const currentRoute = window.location.href.split('/');
+                console.log(currentRoute);
                 let categ_id = '';
                 if (currentRoute[3] === 'lenders') {
                     categ_id = this._appCategConfig.getLenderCategory();
                 } else if (currentRoute[3] === 'borrowers') {
                     categ_id = this._appCategConfig.getBorrowerCategory();
+                } else if (currentRoute[3] === 'rents') {
+                    categ_id = this._appCategConfig.getBorrowerCategory();
                 }
+                // const body = {
+                //     user_id : this.routeParams.id,
+                //     catg_id: categ_id
+                // };       
                 const body = {
                     user_id : this.routeParams.id,
-                    catg_id: categ_id
-                };                        
+                    catg_ids : [
+                        {
+                            catg_id : categ_id
+                        }
+                    ]
+                };     
+                console.log(body);                            
                 this._httpClient.post(this.detailsUrl, body)
-                    .subscribe((response: any) => {          
+                    .subscribe((response: any) => {   
+                        console.log(response);                            
                         if (response.data_result.Count > 0 ) {
                             this.lender = response.data_result.Items[0];      
                         }                                                            
@@ -98,10 +111,10 @@ export class UserService implements Resolve<any>
         });
     }
 
-    detailsLender(body): Observable<ResponseModel> {        
+    detailsUser(body): Observable<ResponseModel> {        
         return this._httpClient.post<ResponseModel>(this.detailsUrl, body).pipe(
-            tap((response: ResponseModel) => this.log(`Resultado del detailsLender = ${JSON.stringify(response)}`)),
-            catchError(this.handleError<ResponseModel>('detailsLender'))
+            tap((response: ResponseModel) => this.log(`Resultado del detailsUser = ${JSON.stringify(response)}`)),
+            catchError(this.handleError<ResponseModel>('detailsUser'))
         );
     }
 

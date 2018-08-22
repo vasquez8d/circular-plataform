@@ -58,14 +58,14 @@
 
                         <mat-tab label="Artículo">
                             <div class="tab-content p-24" fusePerfectScrollbar>
-                                <mat-form-field class="w-50-p">
+                                <mat-form-field class="w-20-p" appearance="outline">
+                                    <mat-label>Código del artículo</mat-label>
                                     <input matInput
                                            formControlName="rent_prod_id" 
                                            (input)="onSearchProductChange($event.target.value)" 
                                            maxlength="16"
-                                           [readonly]="readonlyProduct" 
-                                           placeholder="Código del artículo" 
-                                           required>
+                                           [readonly]="readonlyProduct"
+                                           required>                                    
                                 </mat-form-field>
                                 <mat-card class="result" *ngIf="prodInformation">
                                     <mat-card-content>
@@ -83,8 +83,7 @@
                                         <mat-form-field class="w-100-p">
                                             <mat-chip-list #tagList>
                                                 <mat-chip *ngFor="let tag of product.prod_tags" [removable]="false">
-                                                    {{tag}}
-                                                    <mat-icon matChipRemove>cancel</mat-icon>
+                                                    {{tag}}                                                    
                                                 </mat-chip>
                                                 <input readonly placeholder="Tags del artículo" [matChipInputFor]="tagList" [matChipInputAddOnBlur]="true"/>
                                             </mat-chip-list>
@@ -140,14 +139,14 @@
 
                         <mat-tab label="Prestatario">
                             <div class="tab-content p-24" fusePerfectScrollbar>
-                                <mat-form-field class="w-50-p">
+                                <mat-form-field class="w-20-p" appearance="outline">
+                                    <mat-label>Código del prestatario</mat-label>
                                     <input matInput
                                            formControlName="rent_borrow_id" 
                                            (input)="onSearchBorrowChange($event.target.value)" 
                                            maxlength="16"
-                                           [readonly]="readonlyBorrower" 
-                                           placeholder="Código del prestatario" 
-                                           required>
+                                           [readonly]="readonlyProduct"
+                                           required>                                    
                                 </mat-form-field>
                                 <mat-card class="result" *ngIf="borrowerInformation">
                                     <mat-card-content>
