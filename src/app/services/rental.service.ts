@@ -13,10 +13,10 @@ export class RentalService implements Resolve<any>
     rental: any;    
 
     onRentalChanged: BehaviorSubject<any>;
-    private DetailsUrl = `${this.globalValues.urlRental()}/details`;
-    private UpdateUrl = `${this.globalValues.urlRental()}/update`;
-    private CreateUrl = `${this.globalValues.urlRental()}/create`;    
-    private DeleteUrl = `${this.globalValues.urlRental()}/delete`;
+    private DetailsUrl = `${this.globalValues.urlRents()}/details`;
+    private UpdateUrl = `${this.globalValues.urlRents()}/update`;
+    private CreateUrl = `${this.globalValues.urlRents()}/create`;    
+    private DeleteUrl = `${this.globalValues.urlRents()}/delete`;
 
     /**
      * Constructor
@@ -67,7 +67,7 @@ export class RentalService implements Resolve<any>
             }
             else {
                 const body = {
-                    prod_id: this.routeParams.id
+                    rent_id: this.routeParams.id
                 };
                 this._httpClient.post(this.DetailsUrl, body)
                     .subscribe((response: any) => {
@@ -81,22 +81,22 @@ export class RentalService implements Resolve<any>
 
     updateRental(producto): Observable<ResponseModel> {
         return this._httpClient.post<ResponseModel>(this.UpdateUrl, producto).pipe(
-            tap((response: ResponseModel) => this.log(`Resultado del actualizar producto = ${response.res_service}`)),
-            catchError(this.handleError<ResponseModel>('actualizar producto'))
+            tap((response: ResponseModel) => this.log(`Resultado updateRental = ${response.res_service}`)),
+            catchError(this.handleError<ResponseModel>('updateRental'))
         );
     }
 
     createRental(producto): Observable<ResponseModel> {
         return this._httpClient.post<ResponseModel>(this.CreateUrl, producto).pipe(
-            tap((response: ResponseModel) => this.log(`Resultado del registrarProducto = ${JSON.stringify(response)}`)),
-            catchError(this.handleError<ResponseModel>('registrarProducto'))
+            tap((response: ResponseModel) => this.log(`Resultado createRental = ${JSON.stringify(response)}`)),
+            catchError(this.handleError<ResponseModel>('createRental'))
         );
     }
 
     deleteRental(body): Observable<ResponseModel> {
         return this._httpClient.post<ResponseModel>(this.DeleteUrl, body).pipe(
-            tap((response: ResponseModel) => this.log(`Resultado del deleteProduct = ${response.res_service}`)),
-            catchError(this.handleError<ResponseModel>('deleteProduct'))
+            tap((response: ResponseModel) => this.log(`Resultado deleteRental = ${response.res_service}`)),
+            catchError(this.handleError<ResponseModel>('deleteRental'))
         );
     }
 
@@ -118,7 +118,7 @@ export class RentalService implements Resolve<any>
                 value: 1,
                 text: 'De 8:00 a.m. a 11:00 a.m.',
                 min: '8:00',
-                max: '9:00'
+                max: '11:00'
             },
             {
                 value: 2,

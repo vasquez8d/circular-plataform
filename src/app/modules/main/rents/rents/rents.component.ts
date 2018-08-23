@@ -19,7 +19,7 @@ import { RentsService } from '../../../../services/rents.service';
 export class RentsComponent implements OnInit
 {
     dataSource: FilesDataSource | null;
-    displayedColumns = ['prod_id', 'prod_nombre', 'prod_categoria', 'prod_est_alquiler', 'prod_est_registro'];
+    displayedColumns = ['rent_id', 'rent_borrow_id', 'rent_prod_id', 'rent_start', 'rent_end', 'rent_status', 'rent_stat_reg'];
 
     @ViewChild(MatPaginator)
     paginator: MatPaginator;
@@ -183,27 +183,29 @@ export class FilesDataSource extends DataSource<any>
 
         return data.sort((a, b) => {
             let propertyA: number | string = '';
-            let propertyB: number | string = '';
-
+            let propertyB: number | string = '';            
             switch ( this._matSort.active )
             {
-                case 'prod_id':
-                    [propertyA, propertyB] = [a.prod_id, b.prod_id];
+                case 'rent_id':
+                    [propertyA, propertyB] = [a.rent_id, b.rent_id];
                     break;
-                case 'prod_nombre':
-                    [propertyA, propertyB] = [a.prod_nombre, b.prod_nombre];
+                case 'rent_borrow_id':
+                    [propertyA, propertyB] = [a.rent_borrow_id, b.rent_borrow_id];
                     break;
-                case 'prod_categoria':
-                    [propertyA, propertyB] = [a.prod_categoria, b.prod_categoria];
+                case 'rent_prod_id':
+                    [propertyA, propertyB] = [a.rent_prod_id, b.rent_prod_id];
                     break;
-                // case 'prod_precio_dia':
-                //     [propertyA, propertyB] = [a.prod_precio_dia, b.prod_precio_dia];
-                //     break;
-                case 'prod_est_alquiler':
-                    [propertyA, propertyB] = [a.prod_est_alquiler, b.prod_est_alquiler];
+                case 'rent_start':
+                    [propertyA, propertyB] = [a.rent_start, b.rent_start];
                     break;
-                case 'prod_est_registro':
-                    [propertyA, propertyB] = [a.prod_est_registro, b.prod_est_registro];
+                case 'rent_end':
+                    [propertyA, propertyB] = [a.rent_end, b.rent_end];
+                    break;
+                case 'rent_status':
+                    [propertyA, propertyB] = [a.rent_status, b.rent_status];
+                    break;
+                case 'rent_stat_reg':
+                    [propertyA, propertyB] = [a.rent_stat_reg, b.rent_stat_reg];
                     break;
             }
             const valueA = isNaN(+propertyA) ? propertyA : +propertyA;

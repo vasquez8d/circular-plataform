@@ -9,7 +9,7 @@ export class RentsService implements Resolve<any>
 {
     rents: any[];
     onRentsChanged: BehaviorSubject<any>;
-    private ListUrl = `${this.globalValues.urlProducts()}/list`;
+    private ListUrl = `${this.globalValues.urlRents()}/list`;
 
     /**
      * Constructor
@@ -35,7 +35,7 @@ export class RentsService implements Resolve<any>
         return new Promise((resolve, reject) => {
 
             Promise.all([
-                this.getProducts()
+                this.gerRentsList()
             ]).then(
                 () => {
                     resolve();
@@ -50,10 +50,11 @@ export class RentsService implements Resolve<any>
      *
      * @returns {Promise<any>}
      */
-    getProducts(): Promise<any> {
+    gerRentsList(): Promise<any> {
         return new Promise((resolve, reject) => {
             this._httpClient.get(this.ListUrl)
                 .subscribe((response: any) => {
+                    console.log(response);
                     this.rents = response.data_result.Items;
                     this.onRentsChanged.next(this.rents);
                     resolve(response);

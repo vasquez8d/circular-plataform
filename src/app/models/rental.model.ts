@@ -7,8 +7,8 @@ export class RentalModel {
     rent_prod_id: any;
     
     rent_range_date: {
-        rent_start: string;
-        rent_end: string;
+        rent_start: any;
+        rent_end: any;
     };
 
     rent_start_address_rec: string;
@@ -29,10 +29,11 @@ export class RentalModel {
     };
     
     rent_status: any;
-
     rent_stat_reg: any;
+    
     rent_date_reg: any;
     rent_usur_reg: any;
+
     rent_date_upt: any;
     rent_usur_upt: any;
     

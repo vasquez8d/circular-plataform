@@ -54,7 +54,7 @@ export class RentalComponent implements OnInit, OnDestroy
 
     // Status de producto
     public checkedStatusProduct = false;
-    public prod_current_status = '';
+    public rent_current_status = '';
 
     // Estado de conversacion
     public prd_est_conversva = '';
@@ -76,13 +76,13 @@ export class RentalComponent implements OnInit, OnDestroy
     /**
      * Constructor
      *
-     * @param {EcommerceProductService} _ecommerceProductService
+     * @param {RentalService} _rentalService
      * @param {FormBuilder} _formBuilder
      * @param {Location} _location
      * @param {MatSnackBar} _matSnackBar
      */
     constructor(
-        private _ecommerceProductService: RentalService,
+        private _rentalService: RentalService,
         private _formBuilder: FormBuilder,
         private _matSnackBar: MatSnackBar,
         private registroUtil: RegistroUtil,
@@ -91,7 +91,7 @@ export class RentalComponent implements OnInit, OnDestroy
         private _userService: UserService,        
         private _activatedRoute: ActivatedRoute,
         private _productService: EcommerceProductService,
-        private _appCategConfig: AppCategoryConfig
+        private _appCategConfig: AppCategoryConfig,        
     )
     {
         // Set the default
@@ -110,35 +110,39 @@ export class RentalComponent implements OnInit, OnDestroy
      */
     ngOnInit(): void
     {        
+        this.cargarRangoTiempos();
         // Subscribe to update product on changes
-        this._ecommerceProductService.onRentalChanged
+        this._rentalService.onRentalChanged
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe(rental => {
 
                 if ( rental )
                 {
                     this.rental = new RentalModel(rental);
-                    this.pageType = 'edit';                    
-                    this.loadCurrentStatusProduct(rental);
-                    this.cargarInfoLender(rental);
+                    this.pageType = 'edit';
+                    this.loadCurrentRentalStatus(rental);
+                    this.cargarInfoProduct(rental);
+                    this.cargarInfoBorrower(rental);                    
                 }
                 else
                 {
                     this.pageType = 'new';
                     this.rental = new RentalModel();
-                    this.cargarInfoNewLender();
+                    // this.cargarInfoNewLender();
                 }
 
                 this.rentalForm = this.createRentalForm();
             });
     }
-
-    loadCurrentStatusProduct(product): void {
-        if (product.prod_est_registro === '1') {
-            this.prod_current_status = 'Habilitado';
+    cargarRangoTiempos(): void {
+        this.listRangoTiempos = this._rentalService.getRangeHours();
+    }
+    loadCurrentRentalStatus(rental): void {
+        if (rental.rent_stat_reg === '1') {
+            this.rent_current_status = 'Habilitado';
             this.checkedStatusProduct = true;
         } else {
-            this.prod_current_status = 'Deshabilitado';
+            this.rent_current_status = 'Deshabilitado';
             this.checkedStatusProduct = false;
         }
     }
@@ -214,38 +218,58 @@ export class RentalComponent implements OnInit, OnDestroy
             this.borrowerInformation = false;
         }
     }
-    navigateToBorrower(): void {
-        console.log(this.borrower);
+    navigateToBorrower(): void {        
         this.router.navigateByUrl('/borrowers/borrower/' + this.borrower.user_id + '/' + this.borrower.user_slug);  
     }
-
-    cargarInfoLender(product): void {        
-
+    cargarInfoProduct(rental): void {
         const body = {
-            user_id : event,
-            catg_ids : [
-                {
-                    catg_id : this._appCategConfig.getLenderCategory()
-                },
-                {
-                    catg_id : this._appCategConfig.getLenderBorrowerCategory()
-                }
-            ]
+            prod_id: rental.rent_prod_id
         };
-
-        this._userService.detailsUser(body).subscribe(
+        this._productService.detailsProduct(body).subscribe(
             data => {
                 if (data.res_service === 'ok') {
                     if (data.data_result.Item != null) {
-                        this.borrowerInformation = true;
-                        this.borrower = data.data_result.Item;
+                        this.prodInformation = true;
+                        this.product = data.data_result.Item;
                     } else {
-                        this.borrowerInformation = false;
-                        this._matSnackBar.open('Prestamista no existe o deshabilitado', 'Aceptar', {
+                        this.prodInformation = false;
+                        this._matSnackBar.open('Artículo no existe o deshabilitado', 'Aceptar', {
                             verticalPosition: 'top',
                             duration: 3000
                         });
-                        this.rentalForm.controls.lender_user_id.patchValue('');
+                        this.rentalForm.controls.rent_prod_id.patchValue('');
+                    }
+                } else {
+                    this.prodInformation = false;
+                }
+            }
+        );
+    }
+    cargarInfoBorrower(rental): void {
+        const body = {
+            user_id: rental.rent_borrow_id,
+            catg_ids: [
+                {
+                    catg_id: this._appCategConfig.getBorrowerCategory()
+                },
+                {
+                    catg_id: this._appCategConfig.getLenderBorrowerCategory()
+                }
+            ]
+        };
+        this._userService.detailsUser(body).subscribe(
+            data => {
+                if (data.res_service === 'ok') {
+                    if (data.data_result.Count > 0) {
+                        this.borrowerInformation = true;
+                        this.borrower = data.data_result.Items[0];
+                    } else {
+                        this.borrowerInformation = false;
+                        this._matSnackBar.open('Prestatario no existe o deshabilitado', 'Aceptar', {
+                            verticalPosition: 'top',
+                            duration: 3000
+                        });
+                        this.rentalForm.controls.rent_borrow_id.patchValue('');
                     }
                 } else {
                     this.borrowerInformation = false;
@@ -253,47 +277,46 @@ export class RentalComponent implements OnInit, OnDestroy
             }
         );
     }
+    // cargarInfoNewLender(): void {
+    //     this._activatedRoute.params.subscribe(params => {
+    //         if (params.user_id){
 
-    cargarInfoNewLender(): void {
-        this._activatedRoute.params.subscribe(params => {
-            if (params.user_id){
+    //             const body = {
+    //                 user_id : event,
+    //                 catg_ids : [
+    //                     {
+    //                         catg_id : this._appCategConfig.getLenderCategory()
+    //                     },
+    //                     {
+    //                         catg_id : this._appCategConfig.getLenderBorrowerCategory()
+    //                     }
+    //                 ]
+    //             };
 
-                const body = {
-                    user_id : event,
-                    catg_ids : [
-                        {
-                            catg_id : this._appCategConfig.getLenderCategory()
-                        },
-                        {
-                            catg_id : this._appCategConfig.getLenderBorrowerCategory()
-                        }
-                    ]
-                };
-
-                this._userService.detailsUser(body).subscribe(
-                    data => {
-                        if (data.res_service === 'ok') {
-                            if (data.data_result.Item != null) {
-                                this.borrowerInformation = true;
-                                this.borrower = data.data_result.Item;
-                                this.rentalForm.controls.lender_user_id.patchValue(params.user_id);
-                                this.readonlyBorrower = true;
-                            } else {
-                                this.borrowerInformation = false;
-                                this._matSnackBar.open('Prestamista no existe o deshabilitado', 'Aceptar', {
-                                    verticalPosition: 'top',
-                                    duration: 3000
-                                });
-                                this.rentalForm.controls.lender_user_id.patchValue('');
-                            }
-                        } else {
-                            this.borrowerInformation = false;
-                        }
-                    }
-                );
-            }
-        });
-    }
+    //             this._userService.detailsUser(body).subscribe(
+    //                 data => {
+    //                     if (data.res_service === 'ok') {
+    //                         if (data.data_result.Item != null) {
+    //                             this.borrowerInformation = true;
+    //                             this.borrower = data.data_result.Item;
+    //                             this.rentalForm.controls.lender_user_id.patchValue(params.user_id);
+    //                             this.readonlyBorrower = true;
+    //                         } else {
+    //                             this.borrowerInformation = false;
+    //                             this._matSnackBar.open('Prestamista no existe o deshabilitado', 'Aceptar', {
+    //                                 verticalPosition: 'top',
+    //                                 duration: 3000
+    //                             });
+    //                             this.rentalForm.controls.lender_user_id.patchValue('');
+    //                         }
+    //                     } else {
+    //                         this.borrowerInformation = false;
+    //                     }
+    //                 }
+    //             );
+    //         }
+    //     });
+    // }
 
     navigateToLender(): void {
         this.router.navigateByUrl('lenders/lender/' + this.borrower.user_id + '/' + this.borrower.user_slug);
@@ -319,13 +342,28 @@ export class RentalComponent implements OnInit, OnDestroy
      * @returns {FormGroup}
      */
     createRentalForm(): FormGroup
-    {
-         
+    {                
+        let rangeDates;
+        if (this.pageType === 'edit') {
+            let fec_start = '';
+            const parts_start = this.rental.rent_range_date.rent_start.split('/');
+            fec_start = (new Date(parts_start[2], parts_start[1] - 1, parts_start[0])).toISOString();    
+            
+            let fec_end = '';
+            const parts_end = this.rental.rent_range_date.rent_end.split('/');
+            fec_end = (new Date(parts_end[2], parts_end[1] - 1, parts_end[0])).toISOString(); 
+
+            rangeDates = {
+                begin: fec_start,
+                end: fec_end
+            };
+        }
+
         const prodFormBuild = this._formBuilder.group({         
             rent_id                       : [this.rental.rent_id],   
             rent_borrow_id                : [this.rental.rent_borrow_id],
             rent_prod_id                  : [this.rental.rent_prod_id],
-            rent_range_date               : [this.rental.rent_range_date],            
+            rent_range_date               : [rangeDates],            
             rent_start_address_rec        : [this.rental.rent_start_address_rec],
             rent_start_address_rec_ref    : [this.rental.rent_start_address_rec_ref],
             rent_start_time_range_rec_id  : [this.rental.rent_start_time_range_rec.range_id],            
@@ -338,7 +376,7 @@ export class RentalComponent implements OnInit, OnDestroy
             rent_usur_reg                 : [this.rental.rent_usur_reg],   
             rent_date_upt                 : [this.rental.rent_date_upt],   
             rent_usur_upt                 : [this.rental.rent_usur_upt],
-        });
+        });        
         return prodFormBuild;
     }
 
@@ -416,30 +454,50 @@ export class RentalComponent implements OnInit, OnDestroy
     /**
      * Add product
      */
-    addProduct(): void
+    addRental(): void
     {
         const rentalSave: RentalModel = new RentalModel();
-        rentalSave.rent_range_date = this.rentalForm.value.rent_range_date;
+        rentalSave.rent_borrow_id = this.rentalForm.value.rent_borrow_id;
+        rentalSave.rent_prod_id = this.rentalForm.value.rent_prod_id;
+        rentalSave.rent_range_date = {
+            rent_start: this.registroUtil.obtenerDateFormatFecNac(this.rentalForm.value.rent_range_date.begin),
+            rent_end: this.registroUtil.obtenerDateFormatFecNac(this.rentalForm.value.rent_range_date.end)
+        };
+
+        rentalSave.rent_start_address_rec = this.rentalForm.value.rent_start_address_rec;
+        rentalSave.rent_start_address_rec_ref = this.rentalForm.value.rent_start_address_rec_ref;
+        rentalSave.rent_start_time_range_rec = {
+            max_range: this.listRangoTiempos.find(x => x.value === this.rentalForm.value.rent_start_time_range_rec_id).max,
+            min_range: this.listRangoTiempos.find(x => x.value === this.rentalForm.value.rent_start_time_range_rec_id).min,
+            range_id: this.rentalForm.value.rent_start_time_range_rec_id.toString()
+        };
+        
+        rentalSave.rent_end_address_rec = this.rentalForm.value.rent_end_address_rec;
+        rentalSave.rent_end_address_rec_ref = this.rentalForm.value.rent_end_address_rec_ref;
+        rentalSave.rent_end_time_range_rec = {
+            max_range: this.listRangoTiempos.find(x => x.value === this.rentalForm.value.rent_end_time_range_rec_id).max,
+            min_range: this.listRangoTiempos.find(x => x.value === this.rentalForm.value.rent_end_time_range_rec_id).min,
+            range_id: this.rentalForm.value.rent_end_time_range_rec_id.toString()
+        };
+
         rentalSave.rent_status = 'Registrado';
         rentalSave.rent_date_reg = this.registroUtil.obtenerFechaCreacion();
-        rentalSave.rent_usur_reg = this.securityService.getUserLogedId();
-        console.log(rentalSave);
-        // this._ecommerceProductService.registrarProducto(productSave).subscribe(
-        //     data => {
-        //         if (data.res_service === 'ok') {
-        //             this._matSnackBar.open('Artículo registrado', 'Aceptar', {
-        //                 verticalPosition: 'top',
-        //                 duration: 3000
-        //             });
-        //         } else {
-        //             this._matSnackBar.open('Error registrando el alquiler', 'Aceptar', {
-        //                 verticalPosition: 'top',
-        //                 duration: 3000
-        //             });
-        //         }         
-        //         // this.router.navigateByUrl('/products');
-        //     }
-        // );
+        rentalSave.rent_usur_reg = this.securityService.getUserLogedId();           
+        this._rentalService.createRental(rentalSave).subscribe(
+            data => {                
+                if (data.res_service === 'ok') {
+                    this._matSnackBar.open('Alquiler registrado', 'Aceptar', {
+                        verticalPosition: 'top',
+                        duration: 3000
+                    });
+                } else {
+                    this._matSnackBar.open('Error registrando el alquiler', 'Aceptar', {
+                        verticalPosition: 'top',
+                        duration: 3000
+                    });
+                }                         
+            }
+        );
     }
 
     copyClipBoardLenderId(user_id): void {
@@ -481,10 +539,10 @@ export class RentalComponent implements OnInit, OnDestroy
             prod_est_registro: current_status
         };
 
-        this._ecommerceProductService.deleteRental(bodyDelete).subscribe(
+        this._rentalService.deleteRental(bodyDelete).subscribe(
             data => {
                 if (data.res_service === 'ok') {
-                    this.prod_current_status = current_status_msg;
+                    this.rent_current_status = current_status_msg;
                     this._matSnackBar.open('Artículo ' + current_status_msg, 'Aceptar', {
                         verticalPosition: 'top',
                         duration: 3000

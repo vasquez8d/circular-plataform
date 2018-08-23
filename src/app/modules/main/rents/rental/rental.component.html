@@ -35,7 +35,7 @@
             <!-- / APP TITLE -->
 
             <button mat-raised-button class="save-product-button mat-white-bg" [disabled]="rentalForm.invalid" *ngIf="pageType ==='new'"
-                (click)="addProduct()">
+                (click)="addRental()">
                 <span>Registrar</span>
             </button>
 
@@ -224,10 +224,10 @@
                                 <div id="card-container" *ngIf="pageType ==='edit'">
                                     <mat-card class="example-card">
                                         <mat-card-content>
-                                            <h2 class="example-h2">Estado del producto</h2>
+                                            <h2 class="example-h2">Estado del Alquiler</h2>
                                             <section class="example-section">
                                                 <mat-slide-toggle (change)="changeStatusProduct($event)" [checked]="checkedStatusProduct">
-                                                    {{prod_current_status}}
+                                                    {{rent_current_status}}
                                                 </mat-slide-toggle>
                                             </section>
                                         </mat-card-content>
