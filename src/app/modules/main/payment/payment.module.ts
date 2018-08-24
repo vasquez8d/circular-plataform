@@ -10,7 +10,7 @@ import { PaymentService } from '../../../services/payment.service';
 
 const routes = [
   {
-    path: '/:rent_id',
+    path: ':rent_id/secured',
     component: ResumeComponent
   }
 ];

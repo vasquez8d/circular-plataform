@@ -10,7 +10,7 @@ export class RentalModel {
         rent_start: any;
         rent_end: any;
     };
-
+    payment_link: string;
     rent_start_address_rec: string;
     rent_start_address_rec_ref: string;
     rent_start_time_range_rec: {
@@ -28,7 +28,13 @@ export class RentalModel {
         range_id: number;
     };
     
-    rent_status: any;
+    rent_status: [
+        {
+            status_id: number;
+            status_text: string;
+            status_date: string;
+        }
+    ];
     rent_stat_reg: any;
     
     rent_date_reg: any;
@@ -63,7 +69,7 @@ export class RentalModel {
             max_range: '',
             range_id: 1
         };
-
+        this.payment_link = rental.payment_link || '';
         this.rent_status = rental.rent_status || '';
         this.rent_stat_reg = rental.rent_stat_reg || '';
         this.rent_date_reg = rental.rent_date_reg || '';

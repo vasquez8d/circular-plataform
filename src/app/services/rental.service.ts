@@ -15,6 +15,8 @@ export class RentalService implements Resolve<any>
     onRentalChanged: BehaviorSubject<any>;
     private DetailsUrl = `${this.globalValues.urlRents()}/details`;
     private UpdateUrl = `${this.globalValues.urlRents()}/update`;
+    private UpdateLinkUrl = `${this.globalValues.urlRents()}/updatelink`;
+    private UpdateProdUrl = `${this.globalValues.urlRents()}/updateproduct`;
     private CreateUrl = `${this.globalValues.urlRents()}/create`;    
     private DeleteUrl = `${this.globalValues.urlRents()}/delete`;
 
@@ -79,10 +81,24 @@ export class RentalService implements Resolve<any>
         });
     }
 
-    updateRental(producto): Observable<ResponseModel> {
-        return this._httpClient.post<ResponseModel>(this.UpdateUrl, producto).pipe(
+    updateRental(rental): Observable<ResponseModel> {
+        return this._httpClient.patch<ResponseModel>(this.UpdateUrl, rental).pipe(
             tap((response: ResponseModel) => this.log(`Resultado updateRental = ${response.res_service}`)),
             catchError(this.handleError<ResponseModel>('updateRental'))
+        );
+    }
+
+    updatePaymentLink(body): Observable<ResponseModel> {
+        return this._httpClient.patch<ResponseModel>(this.UpdateLinkUrl, body).pipe(
+            tap((response: ResponseModel) => this.log(`Resultado updatePaymentLink = ${response.res_service}`)),
+            catchError(this.handleError<ResponseModel>('updatePaymentLink'))
+        );
+    }
+
+    updateProductStatus(body): Observable<ResponseModel> {
+        return this._httpClient.patch<ResponseModel>(this.UpdateProdUrl, body).pipe(
+            tap((response: ResponseModel) => this.log(`Resultado updateProductStatus = ${response.res_service}`)),
+            catchError(this.handleError<ResponseModel>('updateProductStatus'))
         );
     }
 

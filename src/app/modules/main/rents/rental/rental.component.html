@@ -58,15 +58,26 @@
 
                         <mat-tab label="Artículo">
                             <div class="tab-content p-24" fusePerfectScrollbar>
-                                <mat-form-field class="w-20-p" appearance="outline">
+                                
+                                <mat-form-field class="w-20-p" appearance="outline" *ngIf="pageType ==='new'">
+                                    <mat-label>Código del artículo</mat-label>
+                                    <input matInput 
+                                           formControlName="rent_prod_id" 
+                                           (input)="onSearchProductChange($event.target.value)" 
+                                           maxlength="16"
+                                           [readonly]="readonlyProduct"
+                                           required>
+                                </mat-form-field>
+
+                                <mat-form-field class="w-20-p" appearance="outline" *ngIf="pageType ==='edit'">
                                     <mat-label>Código del artículo</mat-label>
                                     <input matInput
                                            formControlName="rent_prod_id" 
                                            (input)="onSearchProductChange($event.target.value)" 
                                            maxlength="16"
-                                           [readonly]="readonlyProduct"
-                                           required>                                    
+                                           readonly>
                                 </mat-form-field>
+                                    
                                 <mat-card class="result" *ngIf="prodInformation">
                                     <mat-card-content>
                                         <h2 class="example-h2">Información del Artículo</h2>
@@ -221,7 +232,27 @@
                                         </mat-option>
                                     </mat-select>
                                 </mat-form-field>
+                                <mat-form-field class="w-50-p" *ngIf="pageType ==='edit'">
+                                    <input matInput formControlName="payment_link" placeholder="Link de pago" readonly>                                    
+                                </mat-form-field>
+                                <button *ngIf="pageType ==='edit'" matTooltip="Copiar link" (click)="copyClipBoardLenderLink(rental.payment_link)" mat-mini-fab style="margin-left: 10px;">
+                                        <mat-icon aria-label="Example icon-button with a heart icon">insert_link</mat-icon>
+                                </button>
                                 <div id="card-container" *ngIf="pageType ==='edit'">
+                                    <mat-card class="example-card">
+                                        <mat-card-content>
+                                            <h2 class="example-h2">Estatus del Alquiler</h2>
+                                            <section class="example-section">
+                                                <mat-form-field class="w-100-p">
+                                                    <mat-select placeholder="Actual estado" formControlName="rent_status_id" required>
+                                                        <mat-option *ngFor="let status of listEstatusRental" [value]="status.value">
+                                                            {{status.text}}
+                                                        </mat-option>
+                                                    </mat-select>
+                                                </mat-form-field>
+                                            </section>
+                                        </mat-card-content>
+                                    </mat-card>                                    
                                     <mat-card class="example-card">
                                         <mat-card-content>
                                             <h2 class="example-h2">Estado del Alquiler</h2>
@@ -231,8 +262,8 @@
                                                 </mat-slide-toggle>
                                             </section>
                                         </mat-card-content>
-                                    </mat-card>
-                                </div>
+                                    </mat-card>                                          
+                                </div> 
                             </div>
                         </mat-tab>
                     </mat-tab-group>

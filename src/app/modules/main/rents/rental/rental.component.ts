@@ -58,16 +58,28 @@ export class RentalComponent implements OnInit, OnDestroy
 
     // Estado de conversacion
     public prd_est_conversva = '';
-    public listTipoMonedas = [
+
+    // Status rental
+    public listCurrentStatus = [];
+    public listEstatusRental = [
         {
-            value : 1,
-            text  : 'Soles'
+            value: 1,
+            text: 'Registrado'
         },
         {
-            value : 2,
-            text  : 'Dólares'
-        }
+            value: 2,
+            text: 'Pagado'
+        },
+        {
+            value: 3,
+            text: 'Entregado'
+        },
+        {
+            value: 4,
+            text: 'Devuelto'
+        },
     ];
+
     public listRangoTiempos = [];
     
     // Private
@@ -152,11 +164,22 @@ export class RentalComponent implements OnInit, OnDestroy
                 prod_id: event
             };
             this._productService.detailsProduct(body).subscribe(
-                data => {                                   
+                data => {       
+                    console.log(data);                            
                     if (data.res_service === 'ok') {
                         if (data.data_result.Item != null) {
-                            this.prodInformation = true;
-                            this.product = data.data_result.Item;
+
+                            if (data.data_result.Item.prod_est_alquiler === 'Alquilado') {
+                                this.prodInformation = false;
+                                this._matSnackBar.open('El artículo ya se encuentra en alquiler', 'Aceptar', {
+                                    verticalPosition: 'top',
+                                    duration: 5000
+                                });
+                                this.rentalForm.controls.rent_prod_id.patchValue('');
+                            } else {
+                                this.prodInformation = true;
+                                this.product = data.data_result.Item;
+                            }                            
                         } else {
                             this.prodInformation = false;
                             this._matSnackBar.open('Artículo no existe o deshabilitado', 'Aceptar', {
@@ -358,7 +381,17 @@ export class RentalComponent implements OnInit, OnDestroy
                 end: fec_end
             };
         }
-
+        let last_status_id = 1;
+        if (this.rental.rent_status.length > 0){
+            this.listCurrentStatus = this.rental.rent_status;
+            this.rental.rent_status.forEach(element => {                
+                if (element.status_id > last_status_id) {
+                    last_status_id = element.status_id;
+                } else {
+                    last_status_id = element.status_id;
+                }                        
+            });
+        }
         const prodFormBuild = this._formBuilder.group({         
             rent_id                       : [this.rental.rent_id],   
             rent_borrow_id                : [this.rental.rent_borrow_id],
@@ -370,13 +403,14 @@ export class RentalComponent implements OnInit, OnDestroy
             rent_end_address_rec          : [this.rental.rent_end_address_rec],
             rent_end_address_rec_ref      : [this.rental.rent_end_address_rec_ref],
             rent_end_time_range_rec_id    : [this.rental.rent_end_time_range_rec.range_id],
-            rent_status                   : [this.rental.rent_status],   
+            rent_status_id                : [last_status_id],   
+            payment_link                  : [this.rental.payment_link],
             rent_stat_reg                 : [this.rental.rent_stat_reg],   
             rent_date_reg                 : [this.rental.rent_date_reg],   
             rent_usur_reg                 : [this.rental.rent_usur_reg],   
             rent_date_upt                 : [this.rental.rent_date_upt],   
             rent_usur_upt                 : [this.rental.rent_usur_upt],
-        });        
+        });              
         return prodFormBuild;
     }
 
@@ -405,50 +439,49 @@ export class RentalComponent implements OnInit, OnDestroy
      * Save product
      */
     saveProduct(): void
-    {      
-        // const productSave: Product = new Product();
-        // productSave.prod_id = this.product.prod_id;
-        // productSave.lender_user_id = this.rentalForm.value.lender_user_id;
-        // productSave.prod_nombre = this.rentalForm.value.prod_nombre;
-        // productSave.prod_desc = this.rentalForm.value.prod_desc;
-        // productSave.prod_est_converva = {
-        //     est_value: this.rentalForm.value.prod_est_converva_value,
-        //     est_desc: this.rentalForm.value.prod_est_converva_desc
-        // };
-        // productSave.prod_time_uso = {
-        //     time_value: this.rentalForm.value.prod_time_uso_value,
-        //     time_id: this.rentalForm.value.prod_time_uso_id
-        // };
-        // productSave.prod_val_merca = {
-        //     val_value: this.rentalForm.value.prod_val_merca_value,
-        //     val_moneda_id: this.rentalForm.value.prod_val_merca_moneda_id,
-        //     val_ref_price: this.rentalForm.value.prod_val_merca_ref_price
-        // };
-        // productSave.prod_dir_entrega = this.rentalForm.value.prod_dir_entrega;
-        // productSave.prod_hora_entrega = this.rentalForm.value.prod_hora_entrega;
-        // productSave.prod_dir_recibe = this.rentalForm.value.prod_dir_recibe;
-        // productSave.prod_hora_recibe = this.rentalForm.value.prod_hora_recibe;
-        // productSave.prod_tags = this.rentalForm.value.prod_tags;
-        // productSave.prod_est_alquiler = 'Disponible';
-        // productSave.prod_fec_actualiza = this.registroUtil.obtenerFechaCreacion();
-        // productSave.prod_usu_actualiza = this.securityService.getUserLogedId();        
-          
-        // this._ecommerceProductService.updateRental(productSave).subscribe(
-        //     data => {
-        //         console.log(data);
-        //         if (data.res_service === 'ok') {
-        //             this._matSnackBar.open('Alquiler actualizado', 'Aceptar', {
-        //                 verticalPosition: 'top',
-        //                 duration: 3000
-        //             });
-        //         } else {
-        //             this._matSnackBar.open('Error actualizando la información del alquiler', 'Aceptar', {
-        //                 verticalPosition: 'top',
-        //                 duration: 3000
-        //             });
-        //         }              
-        //     }
-        // );
+    {
+        const rentalSave: RentalModel = new RentalModel();
+        rentalSave.rent_id = this.rentalForm.value.rent_id;
+        rentalSave.rent_borrow_id = this.rentalForm.value.rent_borrow_id;
+        rentalSave.rent_prod_id = this.rentalForm.value.rent_prod_id;
+        rentalSave.rent_range_date = {
+            rent_start: this.registroUtil.obtenerDateFormatFecNac(this.rentalForm.value.rent_range_date.begin),
+            rent_end: this.registroUtil.obtenerDateFormatFecNac(this.rentalForm.value.rent_range_date.end)
+        };
+
+        rentalSave.rent_start_address_rec = this.rentalForm.value.rent_start_address_rec;
+        rentalSave.rent_start_address_rec_ref = this.rentalForm.value.rent_start_address_rec_ref;
+        rentalSave.rent_start_time_range_rec = {
+            max_range: this.listRangoTiempos.find(x => x.value === this.rentalForm.value.rent_start_time_range_rec_id).max,
+            min_range: this.listRangoTiempos.find(x => x.value === this.rentalForm.value.rent_start_time_range_rec_id).min,
+            range_id: this.rentalForm.value.rent_start_time_range_rec_id
+        };
+
+        rentalSave.rent_end_address_rec = this.rentalForm.value.rent_end_address_rec;
+        rentalSave.rent_end_address_rec_ref = this.rentalForm.value.rent_end_address_rec_ref;
+        rentalSave.rent_end_time_range_rec = {
+            max_range: this.listRangoTiempos.find(x => x.value === this.rentalForm.value.rent_end_time_range_rec_id).max,
+            min_range: this.listRangoTiempos.find(x => x.value === this.rentalForm.value.rent_end_time_range_rec_id).min,
+            range_id: this.rentalForm.value.rent_end_time_range_rec_id
+        };
+        rentalSave.rent_status = this.obtenerListStatusRental();
+        rentalSave.rent_date_upt = this.registroUtil.obtenerFechaCreacion();
+        rentalSave.rent_usur_upt = this.securityService.getUserLogedId();
+        this._rentalService.updateRental(rentalSave).subscribe(
+            data => {
+                if (data.res_service === 'ok') {
+                    this._matSnackBar.open('Alquiler actualizado', 'Aceptar', {
+                        verticalPosition: 'top',
+                        duration: 3000
+                    });
+                } else {
+                    this._matSnackBar.open('Error actualizando el alquiler', 'Aceptar', {
+                        verticalPosition: 'top',
+                        duration: 3000
+                    });
+                }
+            }
+        );
     }
 
     /**
@@ -478,11 +511,10 @@ export class RentalComponent implements OnInit, OnDestroy
             max_range: this.listRangoTiempos.find(x => x.value === this.rentalForm.value.rent_end_time_range_rec_id).max,
             min_range: this.listRangoTiempos.find(x => x.value === this.rentalForm.value.rent_end_time_range_rec_id).min,
             range_id: this.rentalForm.value.rent_end_time_range_rec_id.toString()
-        };
-
-        rentalSave.rent_status = 'Registrado';
+        };        
+        rentalSave.rent_status = this.obtenerListStatusRental();
         rentalSave.rent_date_reg = this.registroUtil.obtenerFechaCreacion();
-        rentalSave.rent_usur_reg = this.securityService.getUserLogedId();           
+        rentalSave.rent_usur_reg = this.securityService.getUserLogedId();        
         this._rentalService.createRental(rentalSave).subscribe(
             data => {                
                 if (data.res_service === 'ok') {
@@ -490,6 +522,28 @@ export class RentalComponent implements OnInit, OnDestroy
                         verticalPosition: 'top',
                         duration: 3000
                     });
+                    const bodyPaymentLink = {
+                        rent_id: data.data_result.rent_id,
+                        payment_link: 'https://www.circular.pe/payment/' + data.data_result.rent_id + '/secured'
+                    };
+                    this._rentalService.updatePaymentLink(bodyPaymentLink).subscribe(
+                        dataPaymentLink => {
+                            this._matSnackBar.open('Link de pago creado', 'Aceptar', {
+                                verticalPosition: 'top',
+                                duration: 3000
+                            });
+                            this.router.navigateByUrl('rents/rental/' + data.data_result.rent_id + '/details');
+                        }
+                    );
+                    const bodyUpdateStatus = {
+                        prod_id: this.rentalForm.value.rent_prod_id,
+                        prod_est_alquiler: 'Alquilado'
+                    };
+                    this._rentalService.updateProductStatus(bodyUpdateStatus).subscribe(
+                        dataUpdateProduct => {
+                            console.log('status actualizado alquilado');
+                        }
+                    );
                 } else {
                     this._matSnackBar.open('Error registrando el alquiler', 'Aceptar', {
                         verticalPosition: 'top',
@@ -498,6 +552,42 @@ export class RentalComponent implements OnInit, OnDestroy
                 }                         
             }
         );
+    }
+
+    obtenerListStatusRental(): any {
+        if (this.listCurrentStatus.length > 0){                                 
+            const exist_id = this.listCurrentStatus.find(x => x.status_id === this.rentalForm.value.rent_status_id);
+            if (!exist_id) {
+                let bodyUpdateStatus;           
+                this.listCurrentStatus.push(
+                    {
+                        status_id: this.rentalForm.value.rent_status_id,
+                        status_text: this.listEstatusRental.find(x => x.value === this.rentalForm.value.rent_status_id).text,
+                        status_date: this.registroUtil.obtenerFechaCreacion()
+                    }
+                );
+                if (this.rentalForm.value.rent_status_id === 4) {
+                    bodyUpdateStatus = {
+                        prod_id: this.rentalForm.value.rent_prod_id,
+                        prod_est_alquiler: 'Disponible'
+                    };
+                    this._rentalService.updateProductStatus(bodyUpdateStatus).subscribe(
+                        data => {
+                            console.log('status actualizado disponible');
+                        }
+                    );
+                }
+            }
+            return this.listCurrentStatus;
+        } else {   
+            return [
+                {
+                    status_id: this.rentalForm.value.rent_status_id.toString(),
+                    status_text: this.listEstatusRental.find(x => x.value === this.rentalForm.value.rent_status_id).text,
+                    status_date: this.registroUtil.obtenerFechaCreacion()
+                }
+            ];
+        }
     }
 
     copyClipBoardLenderId(user_id): void {
@@ -517,6 +607,27 @@ export class RentalComponent implements OnInit, OnDestroy
         document.execCommand('copy');
 
         this._matSnackBar.open('Código copiado', 'Aceptar', {
+            verticalPosition: 'top',
+            duration: 3000
+        });
+    }
+
+    copyClipBoardLenderLink(link): void {
+        const selBox = document.createElement('textarea');
+        selBox.style.position = 'fixed';
+        selBox.style.left = '0';
+        selBox.style.top = '0';
+        selBox.style.opacity = '0';
+        selBox.value = link;
+        document.body.appendChild(selBox);
+        selBox.focus();
+        selBox.select();
+        document.execCommand('copy');
+        document.body.removeChild(selBox);
+
+        document.execCommand('copy');
+
+        this._matSnackBar.open('Link     copiado', 'Aceptar', {
             verticalPosition: 'top',
             duration: 3000
         });
