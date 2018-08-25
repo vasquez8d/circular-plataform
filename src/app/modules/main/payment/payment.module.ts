@@ -7,6 +7,7 @@ import { MatStepperModule, MatFormFieldModule, MatInputModule, MatButtonModule, 
 import { ScriptHackModule } from '../../../utils/script-hack/script-hack.module';
 import { LoadingModule } from 'ngx-loading';
 import { PaymentService } from '../../../services/payment.service';
+import { RentalService } from '../../../services/rental.service';
 
 const routes = [
   {

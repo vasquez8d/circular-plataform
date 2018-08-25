@@ -11,6 +11,7 @@ import { tap, catchError } from 'rxjs/operators';
 export class PaymentService {
     
     private postCreateToken = `${this.globalValues.urlPayments()}/token`;
+    private DetailsUrl = `${this.globalValues.urlRents()}/details`;
 
     constructor(
         private _httpClient: HttpClient,
@@ -21,6 +22,13 @@ export class PaymentService {
         return this._httpClient.post<ResponseModel>(this.postCreateToken, token).pipe(
             tap((response: ResponseModel) => this.log(`Resultado postCreateTokenPayment = ${response}`)),
             catchError(this.handleError<ResponseModel>('postCreateTokenPayment'))
+        );
+    }
+
+    detailsRental(body): Observable<ResponseModel> {
+        return this._httpClient.post<ResponseModel>(this.DetailsUrl, body).pipe(
+            tap((response: ResponseModel) => this.log(`Resultado detailsRental = ${response.res_service}`)),
+            catchError(this.handleError<ResponseModel>('detailsRental'))
         );
     }
 

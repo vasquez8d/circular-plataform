@@ -7,6 +7,9 @@ import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { MatSnackBar } from '@angular/material';
 import { PaymentService } from '../../../../services/payment.service.js';
+import { RentalService } from '../../../../services/rental.service.js';
+import { ActivatedRoute } from '@angular/router';
+import { RentalModel } from '../../../../models/rental.model.js';
 
 @Component({
   selector: 'app-resume',
@@ -32,6 +35,8 @@ export class ResumeComponent implements OnInit, OnDestroy {
 
   oCulqi: any;
 
+  public rental: any;
+
   private _unsubscribeAll: Subject<any>;
 
   /**
@@ -44,7 +49,8 @@ export class ResumeComponent implements OnInit, OnDestroy {
     private _formBuilder: FormBuilder,
     private ngZone: NgZone,
     private _matSnackBar: MatSnackBar,        
-    private _paymentService: PaymentService
+    private _paymentService: PaymentService,    
+    private _activateRoute: ActivatedRoute
   ) {    
     this._fuseConfigService.config = {
       layout: {
@@ -104,6 +110,39 @@ export class ResumeComponent implements OnInit, OnDestroy {
       (<any>window).my = (<any>window).my || {};
       (<any>window).my.namespace = (<any>window).my.namespace || {};
       (<any>window).my.namespace.validateCard = this.validateCard.bind(this);
+
+      this.cargarInfoRental();
+
+  }
+  
+  cargarInfoRental(): void {
+    this._activateRoute.params.subscribe(params => {
+      if (params.rent_id) {
+        const bodyRental = {
+          rent_id: params.rent_id
+        };
+        this._paymentService.detailsRental(bodyRental).subscribe(
+          data => {            
+            if (data.res_service === 'ok' && data.data_result.Item != null) {
+              this.rental = new RentalModel(data.data_result.Item);
+              console.log(this.rental);
+              let last_status_id = 1;
+              if (this.rental.rent_status.length > 0) {
+                this.rental.rent_status.forEach(element => {
+                  if (element.status_id > last_status_id) {
+                    last_status_id = element.status_id;
+                  } else {
+                    last_status_id = element.status_id;
+                  }
+                });
+              }
+            } else {
+              console.log('no_existe_rental');
+            }
+          }
+        );        
+      }
+    });
   }
 
   validateCard(value): void {
