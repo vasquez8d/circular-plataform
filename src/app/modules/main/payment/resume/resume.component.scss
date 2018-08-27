@@ -48,12 +48,8 @@
   max-width: 500px;
 }
 
-.image-container {
-    
-}
-
 .resume-imagen {
-    width: 250px;
+    width: 240px;
     height: auto;
 }
 
@@ -79,4 +75,90 @@
 .bloc1, .bloc2
 {
     display:inline;
+}
+
+.grid-container {
+    margin: 20px;
+}
+
+.dashboard-card {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    right: 15px;
+    bottom: 15px;
+}
+
+.more-button {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+}
+
+.dashboard-card-content {
+    text-align: center;
+}
+
+.card-number {
+    width: 350px !important;
+    font-size: 20px;
+}
+
+.card-name {
+    width: 350px !important;
+    font-size: 18px;
+}
+
+.card-fexp {
+    width: 170px !important;
+    font-size: 12px;
+}
+
+.card-cvc {
+    width: 170px !important;
+    font-size: 12px;
+}
+
+.card-payment-btn {
+    margin-top: 10px;
+    width: 300px !important;
+    background-color: forestgreen;
+}
+
+@media only screen and (max-width: 600px) {
+    .card-number {
+        width: 300px !important;
+        font-size: 20px;
+    }
+    .card-name {
+        width: 300px !important;
+        font-size: 18px;
+    }
+    .card-fexp {
+        width: 150px !important;
+        font-size: 12px;
+    }
+    .card-cvc {
+        width: 150px !important;
+        font-size: 12px;
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    .card-number {
+        width: 300px !important;
+        font-size: 20px;
+    }
+    .card-name {
+        width: 300px !important;
+        font-size: 18px;
+    }
+    .card-fexp {
+        width: 150px !important;
+        font-size: 12px;
+    }
+    .card-cvc {
+        width: 150px !important;
+        font-size: 12px;
+    }
 }

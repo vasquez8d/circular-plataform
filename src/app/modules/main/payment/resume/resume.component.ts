@@ -52,6 +52,8 @@ export class ResumeComponent implements OnInit, OnDestroy {
   public total_days_price = '';
   public circular_com_price = '';
 
+  public pago_realizado = false;
+
   step = 0;
 
   /**
@@ -223,16 +225,23 @@ export class ResumeComponent implements OnInit, OnDestroy {
   
   createPayment(): void {    
     if (this.oCulqi.token) {
-      const dataToken = {
-        body: this.oCulqi.token,
-        token_status: 'ok'
-      };
-      console.log(dataToken);      
-      this._paymentService.postCreateTokenPayment(dataToken).subscribe(
-        data => {
-          console.log(data);
-        }
-      );
+
+      if (!this.pago_realizado) {
+        const dataToken = {
+          body: this.oCulqi.token,
+          token_status: 'ok'
+        };
+        console.log(dataToken);
+        this._paymentService.postCreateTokenPayment(dataToken).subscribe(
+          data => {
+            this.pago_realizado = true;
+            console.log(data);
+          }
+        );
+      } else {
+        console.log('pago_ya_realizado');
+      }
+
       // ,
       // "metadata": {
       //   "M": {

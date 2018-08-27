@@ -2,14 +2,14 @@
     Culqi.publicKey = 'pk_test_C91ocdg4q8xeCRf2'; 
     Culqi.init();
 </script-hack>
-<div id="maintenance" fxLayout="column">
+<div id="maintenance" fxLayout="column" fusePerfectScrollbar>
     
     <div id="maintenance-form-wrapper" fxLayout="column" fxLayoutAlign="center center">
 
         <div id="maintenance-form" [@animate]="{value:'*',params:{duration:'300ms',y:'100px'}}">
 
             <h1>Alquiler de {{product.prod_nombre}} </h1>   
-            <mat-horizontal-stepper [linear]="true" #stepper (click)="firstClick()" *ngIf="paymentView" fusePerfectScrollbar>
+            <mat-horizontal-stepper [linear]="true" #stepper (click)="firstClick()" *ngIf="paymentView">
                 <mat-step [stepControl]="resumenFormGroup">
                     <form [formGroup]="resumenFormGroup">
                         <ng-template matStepLabel>Resumen del alquiler</ng-template>
@@ -40,13 +40,13 @@
                                                             readonly>
                                                         </textarea>
                                                 </mat-form-field>
-                                                <mat-form-field class="w-50-p">
+                                                <mat-form-field class="w-40-p" style="margin-left: 5px; margin-right: 5px;">
                                                     <input matInput                                                                
                                                         placeholder="Tiempo de uso"
                                                         value="{{product.prod_time_uso.time_value}} {{product.prod_time_uso.time_text}}"
                                                         readonly>
                                                 </mat-form-field>
-                                                <mat-form-field class="w-50-p">
+                                                <mat-form-field class="w-40-p" style="margin-left: 5px; margin-right: 5px;">
                                                     <input matInput                                                                
                                                         placeholder="Estado de conservación"
                                                         value="{{product.prod_est_converva.est_text}} - {{product.prod_est_converva.est_desc}}"
@@ -71,28 +71,32 @@
                                         </mat-panel-description>
                                         </mat-expansion-panel-header>
 
-                                        <mat-form-field class="w-50-p">
+                                        <mat-form-field class="w-40-p" style="margin-left: 5px; margin-right: 5px;">
                                             <input matInput placeholder="Dirección de envío" 
                                                    value="{{rental.rent_end_address_rec}}"
                                                 readonly>
                                         </mat-form-field>
-                                        <mat-form-field class="w-50-p">
+                                        <mat-form-field class="w-40-p" style="margin-left: 5px; margin-right: 5px;">
                                             <input matInput placeholder="Horario disponible" 
                                                    value="{{rental.rent_end_time_range_rec.min_range}} a {{rental.rent_end_time_range_rec.max_range}}"
                                                 readonly>
                                         </mat-form-field>
-                                        <mat-form-field class="w-100-p">
-                                            <textarea matInput placeholder="Referencia" 
-                                                      value="{{rental.rent_end_address_rec_ref}}"
-                                                readonly>
-                                            </textarea>
-                                        </mat-form-field>
-                                        <mat-form-field class="w-50-p">
+
+                                        <div class="tab-content p-30">
+                                            <mat-form-field class="w-80-p" style="margin-left: 5px; margin-right: 5px;">
+                                                <textarea matInput placeholder="Referencia" 
+                                                          value="{{rental.rent_end_address_rec_ref}}" 
+                                                          readonly>
+                                                </textarea>
+                                            </mat-form-field>
+                                        </div>
+                                        
+                                        <mat-form-field class="w-40-p" style="margin-left: 5px; margin-right: 5px;">
                                             <input matInput placeholder="Inicio de alquiler" 
                                                    value="{{rental.rent_range_date.rent_start}}"
                                                 readonly>
                                         </mat-form-field>
-                                        <mat-form-field class="w-50-p">
+                                        <mat-form-field class="w-40-p" style="margin-left: 5px; margin-right: 5px;">
                                             <input matInput placeholder="Fin de alquiler" 
                                                    value="{{rental.rent_range_date.rent_end}}"
                                                 readonly>
@@ -181,12 +185,12 @@
                 </mat-step>
                 <mat-step [stepControl]="paymentFormGroup">
                     <div class="card-container">                
-                        <div class="card-wrapper" style="margin-bottom: 20px; margin-top: 10px;"></div>
+                        <div class="card-wrapper credit-card" style="margin-bottom: 20px; margin-top: 10px;"></div>
                         <div class="form-container">
                             <form [formGroup]="paymentFormGroup" name="paymentFormGroup" id="paymentFormGroup">
                                     <ng-template matStepLabel>Pago del alquiler</ng-template>
                                     <div class="tab-content p-12">
-                                        <mat-form-field class="w-100-p">
+                                        <mat-form-field class="w-100-p card-number">
                                             <input matInput name="number" placeholder="Número de tarjeta" formControlName="number" id="card[number]" required>
                                             <mat-icon matSuffix>credit_card</mat-icon>
                                             <mat-error *ngIf="paymentFormGroupErrors.number.required">
@@ -195,7 +199,7 @@
                                         </mat-form-field>
                                     </div>
                                     <div class="tab-content p-12">
-                                        <mat-form-field class="w-100-p">
+                                        <mat-form-field class="w-100-p card-name">
                                             <input matInput name="name" placeholder="Nombre en la tarjeta" formControlName="name" required>
                                             <mat-icon matSuffix>account_circle</mat-icon>
                                             <mat-error *ngIf="paymentFormGroupErrors.name.required">
@@ -204,15 +208,15 @@
                                         </mat-form-field>
                                     </div>
                                     <div class="tab-content p-6">
-                                        <mat-form-field class="w-40-p" style="margin-left: 15px;">
-                                            <input matInput name="expiry" placeholder="Fecha de expiración" (change)="changeFecExp(expiry.value)" formControlName="expiry"
+                                        <mat-form-field class="w-40-p card-fexp" style="margin-left: 5px; margin-right: 5px;">
+                                            <input matInput name="expiry" placeholder="Fec. expira" (change)="changeFecExp(expiry.value)" formControlName="expiry"
                                                 required #expiry>
                                             <mat-icon matSuffix>calendar_today</mat-icon>
                                             <mat-error *ngIf="paymentFormGroupErrors.expiry.required">
                                                 La fec. exp. es requerido.
                                             </mat-error>
                                         </mat-form-field>
-                                        <mat-form-field class="w-40-p" style="margin-left: 15px;">
+                                        <mat-form-field class="w-40-p card-cvc" style="margin-left: 5px; margin-right: 5px;">
                                             <input matInput name="cvc" placeholder="CVC" formControlName="cvc" required id="card[cvv]">
                                             <mat-icon matSuffix>vpn_key</mat-icon>
                                             <mat-error *ngIf="paymentFormGroupErrors.cvc.required">
@@ -223,7 +227,7 @@
                                         <input id="card[exp_year]" hidden [value]="card_year" type="text" />
                                     </div>
                                     <div class="tab-content p-12">
-                                        <mat-form-field class="w-100-p">
+                                        <mat-form-field class="w-100-p card-name">
                                             <input matInput name="email" placeholder="Correo Electrónico" formControlName="email" required type="email" id="card[email]">
                                             <mat-icon matSuffix>contact_mail</mat-icon>
                                             <mat-error *ngIf="paymentFormGroupErrors.email.required">
@@ -250,7 +254,11 @@
                                                 Pagar S/ 100.00
                                             <mat-icon>credit_card</mat-icon>
                                         </button>
-                                    </div>                                    
+                                        <button mat-button color="primary" 
+                                                *ngIf="pago_realizado" 
+                                                [disabled]="paymentFormGroup.invalid" 
+                                                matStepperNext>Continuar</button>
+                                    </div>                                     
                             </form>
                         </div>
                     </div>
