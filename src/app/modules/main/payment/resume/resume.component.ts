@@ -7,7 +7,6 @@ import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { MatSnackBar } from '@angular/material';
 import { PaymentService } from '../../../../services/payment.service.js';
-import { RentalService } from '../../../../services/rental.service.js';
 import { ActivatedRoute } from '@angular/router';
 import { RentalModel } from '../../../../models/rental.model.js';
 import { S3Service } from '../../../../services/s3.service';
@@ -39,7 +38,7 @@ export class ResumeComponent implements OnInit, OnDestroy {
 
   oCulqi: any;
 
-  public rental: any;
+  public rental = new RentalModel();
   public product = new Product();
   public productImage = {
     data: 'any'
@@ -50,6 +49,8 @@ export class ResumeComponent implements OnInit, OnDestroy {
   public paymentView = true;
 
   public defaultImage = true; 
+  public total_days_price = '';
+  public circular_com_price = '';
 
   step = 0;
 
@@ -160,14 +161,15 @@ export class ResumeComponent implements OnInit, OnDestroy {
                   dataProduct => {                                    
                     if (dataProduct.res_service === 'ok' && dataProduct.data_result.Item != null) {
                       this.product = dataProduct.data_result.Item;
-                      console.log(this.product);
                       this.cargarImagesS3Product(this.product.prod_url_documen);
+                      this.total_days_price = (Number(this.rental.rent_days) * Number(this.rental.rent_days_price)).toFixed(2);
+                      this.circular_com_price = (Number(this.total_days_price) * (Number(this.rental.rent_commission / 100))).toFixed(2);
                     } else {
                       console.log('el producto no esta disponible o no existe');
                       // this.paymentView = true;
                     }
                   } 
-                )
+                );
               } else {  
                 console.log('ya fue pagado');
                 // this.paymentView = true;
@@ -308,16 +310,15 @@ export class ResumeComponent implements OnInit, OnDestroy {
     }
   }
 
-
-  setStep(index: number) {
+  setStep(index: number): void {
     this.step = index;
   }
 
-  nextStep() {
+  nextStep(): void {
     this.step++;
   }
 
-  prevStep() {
+  prevStep(): void {
     this.step--;
   }  
 

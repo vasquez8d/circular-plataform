@@ -27,7 +27,7 @@
                                         </mat-expansion-panel-header>
 
                                         <div class="block_container">
-                                            <div class="bloc1">
+                                            <div class="bloc1" style="margin-right: 30px;">
                                                 <img *ngIf="!defaultImage" src="data:image/jpg;base64,{{productImage.data}}" class="resume-imagen">
                                                 <img *ngIf="defaultImage" src="assets/images/circular/prodgr_default_300.png" class="resume-imagen">
                                             </div>  
@@ -63,16 +63,39 @@
                                     <mat-expansion-panel [expanded]="step === 1" (opened)="setStep(1)" hideToggle="true">
                                         <mat-expansion-panel-header>
                                         <mat-panel-title>
-                                            Envío
+                                            Envío y Periodo
                                         </mat-panel-title>
                                         <mat-panel-description>
-                                            Información del envío
-                                            <mat-icon>map</mat-icon>
+                                            Información del envío y periodo del alquiler.
+                                            <mat-icon>motorcycle</mat-icon>
                                         </mat-panel-description>
                                         </mat-expansion-panel-header>
 
-                                        <mat-form-field>
-                                        <input matInput placeholder="Country">
+                                        <mat-form-field class="w-50-p">
+                                            <input matInput placeholder="Dirección de envío" 
+                                                   value="{{rental.rent_end_address_rec}}"
+                                                readonly>
+                                        </mat-form-field>
+                                        <mat-form-field class="w-50-p">
+                                            <input matInput placeholder="Horario disponible" 
+                                                   value="{{rental.rent_end_time_range_rec.min_range}} a {{rental.rent_end_time_range_rec.max_range}}"
+                                                readonly>
+                                        </mat-form-field>
+                                        <mat-form-field class="w-100-p">
+                                            <textarea matInput placeholder="Referencia" 
+                                                      value="{{rental.rent_end_address_rec_ref}}"
+                                                readonly>
+                                            </textarea>
+                                        </mat-form-field>
+                                        <mat-form-field class="w-50-p">
+                                            <input matInput placeholder="Inicio de alquiler" 
+                                                   value="{{rental.rent_range_date.rent_start}}"
+                                                readonly>
+                                        </mat-form-field>
+                                        <mat-form-field class="w-50-p">
+                                            <input matInput placeholder="Fin de alquiler" 
+                                                   value="{{rental.rent_range_date.rent_end}}"
+                                                readonly>
                                         </mat-form-field>
 
                                         <mat-action-row>
@@ -88,13 +111,64 @@
                                         </mat-panel-title>
                                         <mat-panel-description>
                                             Información del precio
-                                            <mat-icon>date_range</mat-icon>
+                                            <mat-icon>credit_card</mat-icon>
                                         </mat-panel-description>
-                                        </mat-expansion-panel-header>
+                                        </mat-expansion-panel-header>                                        
+
+                                        <div class="tab-content p-30">
+                                            <mat-form-field class="w-20-p" style="margin-left:2px; margin-right: 2px;">
+                                                <input matInput placeholder="Tiempo de alquiler" 
+                                                       value="{{rental.rent_days}} días" 
+                                                       matTooltip="Número de días que el artículo será alquilado"
+                                                       readonly>
+                                                <mat-icon matSuffix>date_range</mat-icon>
+                                            </mat-form-field>
+                                            <mat-form-field class="w-30-p" style="margin-left:2px; margin-right: 2px;">
+                                                <input matInput placeholder="Precio por día" 
+                                                       value="S/. {{rental.rent_days_price}}" 
+                                                       matTooltip="Precio del artículo por día"
+                                                       readonly>                                                
+                                            </mat-form-field>
+                                            <mat-form-field class="w-30-p" style="margin-left:2px; margin-right: 2px;">
+                                                <input matInput placeholder="Total del alquiler" 
+                                                       value="S/. {{total_days_price}}" 
+                                                       matTooltip="Precio calculado en base al número de días por el precio por día."
+                                                       readonly>                                                
+                                            </mat-form-field>
+                                        </div>
+
+                                        <mat-form-field class="w-40-p" style="margin-left:5px; margin-right: 5px;">
+                                            <input matInput placeholder="Precio por envío recepción" 
+                                                   value="S/. {{rental.rent_shipping_delivery}}"     
+                                                   matTooltip="Precio por movilizar el artículo hacia tu dirección."                                              
+                                                   readonly>
+                                            <mat-icon matSuffix>motorcycle</mat-icon>
+                                        </mat-form-field>
+                                        <mat-form-field class="w-40-p" style="margin-left:5px; margin-right: 5px;">
+                                            <input matInput placeholder="Precio por envío devolución" 
+                                                   value="S/. {{rental.rent_shipping_return}}"    
+                                                   matTooltip="Precio para movilizar el artículo hacia su dueño al finalizar el alquiler."                                               
+                                                   readonly>
+                                            <mat-icon matSuffix>motorcycle</mat-icon>
+                                        </mat-form-field>
+                                        <mat-form-field class="w-40-p" style="margin-left:5px; margin-right: 5px;">
+                                            <input matInput placeholder="Comisión Circular" 
+                                                   value="S/. {{circular_com_price}}"   
+                                                   matTooltip="Comisión por procesos operativos de Circular, se calcula en base al total del alquiler."                                                
+                                                   readonly>
+                                            <mat-icon matSuffix>group_work</mat-icon>
+                                        </mat-form-field>
+                                        <mat-form-field class="w-40-p" style="margin-left:5px; margin-right: 5px;">
+                                            <input matInput placeholder="Total a pagar" 
+                                                   value="S/. {{rental.rent_total_price}}"                                                   
+                                                   matTooltip="Precio total a pagar del alquiler"
+                                                   readonly>
+                                            <mat-icon matSuffix>monetization_on</mat-icon>
+                                        </mat-form-field>
 
                                         <mat-action-row>
                                         <button mat-button color="warn" (click)="prevStep()">Anterior</button>
-                                        <button mat-button color="primary" matStepperNext (click)="firstClick()" >Siguiente</button>
+                                        <button mat-button color="primary" matStepperNext (click)="firstClick()" >Pagar</button>
                                         </mat-action-row>
                                     </mat-expansion-panel>
                                 </mat-accordion>

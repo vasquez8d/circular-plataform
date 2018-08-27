@@ -4,7 +4,7 @@ import { ResumeComponent } from './resume/resume.component';
 import { FuseSharedModule } from '@fuse/shared.module';
 import { RouterModule } from '@angular/router';
 import { MatStepperModule, MatFormFieldModule, MatInputModule, MatButtonModule, 
-         MatIconModule, MatSnackBarModule, MatCardModule, MatExpansionModule } from '@angular/material';
+         MatIconModule, MatSnackBarModule, MatCardModule, MatExpansionModule, MatTooltipModule } from '@angular/material';
 import { ScriptHackModule } from '../../../utils/script-hack/script-hack.module';
 import { LoadingModule } from 'ngx-loading';
 import { PaymentService } from '../../../services/payment.service';
@@ -30,7 +30,7 @@ const routes = [
     MatSnackBarModule,
     
     MatExpansionModule,
-
+    MatTooltipModule,
     LoadingModule,
     MatCardModule,
     ScriptHackModule,
