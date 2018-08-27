@@ -16,6 +16,7 @@ import { MAT_DATE_FORMATS } from '@angular/material/core';
 import { RentalService } from '../../../../services/rental.service';
 import { EcommerceProductService } from '../../../../services/product.service';
 import { AppCategoryConfig } from '../../../../app-config/app-categorys.config';
+import { ServicesConfig } from '../../../../app-config/services.config';
 
 export const MY_FORMATS = {
     parse: {
@@ -82,6 +83,9 @@ export class RentalComponent implements OnInit, OnDestroy
 
     public listRangoTiempos = [];
     
+    public viewTotalPrice = false;
+    public rental_total_price = '';
+    public rentalPricerReadonly = false;
     // Private
     private _unsubscribeAll: Subject<any>;
 
@@ -103,7 +107,8 @@ export class RentalComponent implements OnInit, OnDestroy
         private _userService: UserService,        
         private _activatedRoute: ActivatedRoute,
         private _productService: EcommerceProductService,
-        private _appCategConfig: AppCategoryConfig,        
+        private _appCategConfig: AppCategoryConfig ,
+        private _servicesConfig: ServicesConfig
     )
     {
         // Set the default
@@ -134,7 +139,10 @@ export class RentalComponent implements OnInit, OnDestroy
                     this.pageType = 'edit';
                     this.loadCurrentRentalStatus(rental);
                     this.cargarInfoProduct(rental);
-                    this.cargarInfoBorrower(rental);                    
+                    this.cargarInfoBorrower(rental);
+                    this.rentalPricerReadonly = true;         
+                    this.viewTotalPrice = true;           
+                    this.rental_total_price = this.rental.rent_total_price;
                 }
                 else
                 {
@@ -164,8 +172,7 @@ export class RentalComponent implements OnInit, OnDestroy
                 prod_id: event
             };
             this._productService.detailsProduct(body).subscribe(
-                data => {       
-                    console.log(data);                            
+                data => {                                                
                     if (data.res_service === 'ok') {
                         if (data.data_result.Item != null) {
 
@@ -404,6 +411,14 @@ export class RentalComponent implements OnInit, OnDestroy
             rent_end_address_rec_ref      : [this.rental.rent_end_address_rec_ref],
             rent_end_time_range_rec_id    : [this.rental.rent_end_time_range_rec.range_id],
             rent_status_id                : [last_status_id],   
+
+            rent_days                     : [this.rental.rent_days],
+            rent_days_price               : [this.rental.rent_days_price],
+            rent_shipping_delivery        : [this.rental.rent_shipping_delivery],
+            rent_shipping_return          : [this.rental.rent_shipping_return], 
+            rent_commission               : [this.rental.rent_commission],   
+            rent_total_price              : [this.rental.rent_total_price],      
+
             payment_link                  : [this.rental.payment_link],
             rent_stat_reg                 : [this.rental.rent_stat_reg],   
             rent_date_reg                 : [this.rental.rent_date_reg],   
@@ -467,6 +482,7 @@ export class RentalComponent implements OnInit, OnDestroy
         rentalSave.rent_status = this.obtenerListStatusRental();
         rentalSave.rent_date_upt = this.registroUtil.obtenerFechaCreacion();
         rentalSave.rent_usur_upt = this.securityService.getUserLogedId();
+
         this._rentalService.updateRental(rentalSave).subscribe(
             data => {
                 if (data.res_service === 'ok') {
@@ -514,7 +530,14 @@ export class RentalComponent implements OnInit, OnDestroy
         };        
         rentalSave.rent_status = this.obtenerListStatusRental();
         rentalSave.rent_date_reg = this.registroUtil.obtenerFechaCreacion();
-        rentalSave.rent_usur_reg = this.securityService.getUserLogedId();        
+        rentalSave.rent_usur_reg = this.securityService.getUserLogedId();   
+
+        rentalSave.rent_days = this.rentalForm.value.rent_days.toString();
+        rentalSave.rent_days_price = this.rentalForm.value.rent_days_price;
+        rentalSave.rent_shipping_delivery = this.rentalForm.value.rent_shipping_delivery;
+        rentalSave.rent_shipping_return = this.rentalForm.value.rent_shipping_return;
+        rentalSave.rent_commission = this.rentalForm.value.rent_commission;
+        rentalSave.rent_total_price = this.rentalForm.value.rent_total_price;        
         this._rentalService.createRental(rentalSave).subscribe(
             data => {                
                 if (data.res_service === 'ok') {
@@ -524,7 +547,7 @@ export class RentalComponent implements OnInit, OnDestroy
                     });
                     const bodyPaymentLink = {
                         rent_id: data.data_result.rent_id,
-                        payment_link: 'https://www.circular.pe/payment/' + data.data_result.rent_id + '/secured'
+                        payment_link: this._servicesConfig.getDomainName() + data.data_result.rent_id + '/secured'
                     };
                     this._rentalService.updatePaymentLink(bodyPaymentLink).subscribe(
                         dataPaymentLink => {
@@ -666,6 +689,38 @@ export class RentalComponent implements OnInit, OnDestroy
                 }
             }
         );
+    }
+
+    changeRangeRental(value): void{        
+        const oneDay = 24 * 60 * 60 * 1000;
+        const dateStart = value.value.begin;
+        const dateEnd = value.value.end;
+        const diffDays = Math.round(Math.abs((dateStart.getTime() - dateEnd.getTime()) / (oneDay))) + 1;        
+        this.rentalForm.controls.rent_days.patchValue(diffDays);
+        this.calculateRentalPrice();
+    }
+
+    calculateRentalPrice(): void {
+
+        let rental_price = 0;
+        let price_w_dely = 0;
+        let comission_price = 0;        
+        if (this.rentalForm.value.rent_days !== '' && 
+            this.rentalForm.value.rent_days_price !== '' && 
+            this.rentalForm.value.rent_shipping_delivery !== '' &&
+            this.rentalForm.value.rent_shipping_return !== '' && 
+            this.rentalForm.value.rent_commission !== '') {
+                rental_price = this.rentalForm.value.rent_days * this.rentalForm.value.rent_days_price;                
+                price_w_dely = Number(this.rentalForm.value.rent_shipping_delivery) + 
+                               Number(this.rentalForm.value.rent_shipping_return) + 
+                               rental_price;
+                comission_price = rental_price * (this.rentalForm.value.rent_commission / 100);
+                this.rental_total_price = (price_w_dely + comission_price).toFixed(2);
+                this.rentalForm.controls.rent_total_price.patchValue(this.rental_total_price);
+                this.viewTotalPrice = true;
+        } else {
+            this.viewTotalPrice = false;
+        }
     }
 
 }

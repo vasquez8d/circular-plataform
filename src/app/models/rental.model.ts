@@ -35,6 +35,14 @@ export class RentalModel {
             status_date: string;
         }
     ];
+
+    rent_days: any;
+    rent_days_price: any;
+    rent_shipping_delivery: any;
+    rent_shipping_return: any;
+    rent_commission: any;
+    rent_total_price: any;
+
     rent_stat_reg: any;
     
     rent_date_reg: any;
@@ -80,5 +88,11 @@ export class RentalModel {
             rent_end: '',
             rent_start: ''
         };    
+        this.rent_days = rental.rent_days || '';
+        this.rent_days_price = rental.rent_days_price || '';
+        this.rent_shipping_delivery = rental.rent_shipping_delivery || '';
+        this.rent_shipping_return = rental.rent_shipping_return || '';
+        this.rent_commission = rental.rent_commission || '';
+        this.rent_total_price = rental.rent_total_price || '';
     }
 }

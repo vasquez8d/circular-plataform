@@ -10,6 +10,10 @@ import { PaymentService } from '../../../../services/payment.service.js';
 import { RentalService } from '../../../../services/rental.service.js';
 import { ActivatedRoute } from '@angular/router';
 import { RentalModel } from '../../../../models/rental.model.js';
+import { S3Service } from '../../../../services/s3.service';
+import { AppCategoryConfig } from '../../../../app-config/app-categorys.config';
+import * as base64Converter from 'base64-arraybuffer';
+import { Product } from '../../../../models/product.model';
 
 @Component({
   selector: 'app-resume',
@@ -36,8 +40,18 @@ export class ResumeComponent implements OnInit, OnDestroy {
   oCulqi: any;
 
   public rental: any;
+  public product = new Product();
+  public productImage = {
+    data: 'any'
+  };
 
   private _unsubscribeAll: Subject<any>;
+
+  public paymentView = true;
+
+  public defaultImage = true; 
+
+  step = 0;
 
   /**
    * Constructor
@@ -50,7 +64,9 @@ export class ResumeComponent implements OnInit, OnDestroy {
     private ngZone: NgZone,
     private _matSnackBar: MatSnackBar,        
     private _paymentService: PaymentService,    
-    private _activateRoute: ActivatedRoute
+    private _activateRoute: ActivatedRoute,
+    private _s3Service: S3Service,
+    private appCategoryConfig: AppCategoryConfig,
   ) {    
     this._fuseConfigService.config = {
       layout: {
@@ -124,8 +140,7 @@ export class ResumeComponent implements OnInit, OnDestroy {
         this._paymentService.detailsRental(bodyRental).subscribe(
           data => {            
             if (data.res_service === 'ok' && data.data_result.Item != null) {
-              this.rental = new RentalModel(data.data_result.Item);
-              console.log(this.rental);
+              this.rental = new RentalModel(data.data_result.Item);              
               let last_status_id = 1;
               if (this.rental.rent_status.length > 0) {
                 this.rental.rent_status.forEach(element => {
@@ -136,13 +151,58 @@ export class ResumeComponent implements OnInit, OnDestroy {
                   }
                 });
               }
+              if (last_status_id === 1 ){                
+                // this.paymentView = false;
+                const body = {
+                    prod_id : this.rental.rent_prod_id
+                };
+                this._paymentService.detailsProduct(body).subscribe(
+                  dataProduct => {                                    
+                    if (dataProduct.res_service === 'ok' && dataProduct.data_result.Item != null) {
+                      this.product = dataProduct.data_result.Item;
+                      console.log(this.product);
+                      this.cargarImagesS3Product(this.product.prod_url_documen);
+                    } else {
+                      console.log('el producto no esta disponible o no existe');
+                      // this.paymentView = true;
+                    }
+                  } 
+                )
+              } else {  
+                console.log('ya fue pagado');
+                // this.paymentView = true;
+              }
             } else {
               console.log('no_existe_rental');
+              // this.paymentView = true;
             }
           }
-        );        
+        );   
       }
     });
+  }
+
+  cargarImagesS3Product(documents): void {  
+    if (documents) {
+            if (documents.length > 0) {
+              const datas3Body = {
+                  app_key: documents[0].image_key,
+                  app_catg_id: this.appCategoryConfig.getProductCategory()
+              };
+              this._s3Service.getImageS3(datas3Body).subscribe(
+                  data => {
+                      if (data.res_service === 'ok') {
+                          const image = {
+                              data: base64Converter.encode(data.data_result.Body.data),
+                              desc: documents[0]
+                          };
+                          this.productImage = image;         
+                          this.defaultImage = false;               
+                      }
+                  }
+              );
+            }
+    }
   }
 
   validateCard(value): void {
@@ -247,4 +307,18 @@ export class ResumeComponent implements OnInit, OnDestroy {
       }
     }
   }
+
+
+  setStep(index: number) {
+    this.step = index;
+  }
+
+  nextStep() {
+    this.step++;
+  }
+
+  prevStep() {
+    this.step--;
+  }  
+
 }

@@ -197,13 +197,51 @@
                                     <input matInput formControlName="rent_id" placeholder="Código del alquiler" required readonly>
                                 </mat-form-field>
                                 <mat-form-field class="w-60-p">
-                                    <input matInput placeholder="Rango de alquiler" [satDatepicker]="picker" (click)="picker.open()" (change)="changeRangeRental($event)"
+                                    <input matInput placeholder="Rango de alquiler" 
+                                           [satDatepicker]="picker" 
+                                           (click)="picker.open()" 
+                                           (dateChange)="changeRangeRental($event)"
                                         formControlName="rent_range_date" readonly>
-                                    <sat-datepicker #picker touchUi (yearSelected)="chosenYearHandler($event)" (monthSelected)="chosenMonthHandler($event, dp)"
-                                        (closedStream)="chosenYearHandler($event)" [rangeMode]="true">
+                                    <sat-datepicker #picker touchUi 
+                                        [rangeMode]="true">
                                     </sat-datepicker>
                                     <sat-datepicker-toggle matSuffix [for]="picker"></sat-datepicker-toggle>
                                 </mat-form-field>
+
+                                <div id="card-container">
+                                    <mat-card class="price-card">
+                                        <mat-card-content>
+                                            <h2 class="example-h2">Cálculo del precio</h2>
+                                            <mat-form-field class="w-20-p">
+                                                <input (click)="picker.open()" matInput placeholder="Días de alquiler" (input)="calculateRentalPrice()" 
+                                                       formControlName="rent_days" readonly>
+                                            </mat-form-field>
+                                            <mat-form-field class="w-20-p">
+                                                <input matInput placeholder="Precio por día" (input)="calculateRentalPrice()" 
+                                                       formControlName="rent_days_price" required [readonly]="rentalPricerReadonly" >
+                                            </mat-form-field>
+                                            <mat-form-field class="w-20-p">
+                                                <input matInput placeholder="Precio por entrega" (input)="calculateRentalPrice()" 
+                                                       formControlName="rent_shipping_delivery" required [readonly]="rentalPricerReadonly">
+                                            </mat-form-field>
+                                            <mat-form-field class="w-20-p">
+                                                <input matInput placeholder="Precio por devolución" (input)="calculateRentalPrice()" 
+                                                       formControlName="rent_shipping_return" required [readonly]="rentalPricerReadonly">
+                                            </mat-form-field>
+                                            <mat-form-field class="w-20-p">
+                                                <input matInput placeholder="% de comisión" (input)="calculateRentalPrice()" 
+                                                       formControlName="rent_commission" required [readonly]="rentalPricerReadonly">
+                                            </mat-form-field>
+                                        </mat-card-content>
+                                    </mat-card>
+                                    <mat-card class="total-price-card" *ngIf="viewTotalPrice">
+                                        <mat-card-content>
+                                            <h2 class="example-h2">Precio total: </h2>
+                                            <h1 class="price-h1"> S/. {{rental_total_price}}</h1>
+                                        </mat-card-content>
+                                    </mat-card> 
+                                </div>
+
                                 <mat-form-field class="w-50-p">
                                     <input matInput formControlName="rent_start_address_rec" placeholder="Dirección de recepción" required>
                                 </mat-form-field>

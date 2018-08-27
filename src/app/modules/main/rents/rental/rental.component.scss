@@ -58,6 +58,21 @@ mat-slider {
   margin-top: 10px;
   margin-bottom: 20px;
 }
+
+.price-card {
+ margin-left: 20px;
+ margin-top: 10px;
+ margin-bottom: 20px;    
+}
+
+.total-price-card {
+ max-width: 300px;
+ min-width: 300px;    
+ margin-left: 20px;
+ margin-top: 10px;
+ margin-bottom: 20px;    
+}
+
 .example-card-mercado {
   max-width: 640px;
   min-width: 640px;
@@ -68,4 +83,8 @@ mat-slider {
 #card-container {
     display: flex;
     flex-flow: row wrap;
+}
+
+.price-h1 {
+    text-align: center;
 }

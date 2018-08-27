@@ -3,7 +3,8 @@ import { Injectable } from '@angular/core';
 @Injectable()
 export class ServicesConfig {
 
-    private publishUrl = 'https://www.circular.pe/';
+    // private domainUrl = 'https://www.circular.pe/payment/';
+    private domainUrl = 'http://localhost:4200/payment/';
 
     urlAuthUser(): string {
         return 'https://lnyep59mb1.execute-api.us-east-1.amazonaws.com/dev';
@@ -33,7 +34,7 @@ export class ServicesConfig {
         return 'https://92z92up3de.execute-api.us-east-1.amazonaws.com/dev';
     }
 
-    currentUrl(): string {
-        return this.publishUrl;
+    getDomainName(): string {
+        return this.domainUrl;
     }
 }

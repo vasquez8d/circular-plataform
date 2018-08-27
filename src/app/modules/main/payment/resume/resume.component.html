@@ -8,20 +8,101 @@
 
         <div id="maintenance-form" [@animate]="{value:'*',params:{duration:'300ms',y:'100px'}}">
 
-            <h1>Alquiler de un Monopolio</h1>   
-            <mat-horizontal-stepper [linear]="true" #stepper (click)="firstClick()">
+            <h1>Alquiler de {{product.prod_nombre}} </h1>   
+            <mat-horizontal-stepper [linear]="true" #stepper (click)="firstClick()" *ngIf="paymentView" fusePerfectScrollbar>
                 <mat-step [stepControl]="resumenFormGroup">
                     <form [formGroup]="resumenFormGroup">
                         <ng-template matStepLabel>Resumen del alquiler</ng-template>
-                        <mat-form-field class="w-100-p">
-                            <input matInput placeholder="Last name, First name" formControlName="firstCtrl">
-                        </mat-form-field>
-                        <div>
-                            <button mat-raised-button color="accent" matStepperNext (click)="firstClick()">
-                                Siguiente
-                                <mat-icon>navigate_next</mat-icon>
-                            </button>
-                        </div>
+
+                                <mat-accordion class="example-headers-align">
+                                    <mat-expansion-panel [expanded]="step === 0" (opened)="setStep(0)" hideToggle="true">
+                                        <mat-expansion-panel-header>
+                                            <mat-panel-title>
+                                                Artículo
+                                            </mat-panel-title>
+                                            <mat-panel-description>
+                                                Información del artículo
+                                                <mat-icon>account_circle</mat-icon>
+                                            </mat-panel-description>
+                                        </mat-expansion-panel-header>
+
+                                        <div class="block_container">
+                                            <div class="bloc1">
+                                                <img *ngIf="!defaultImage" src="data:image/jpg;base64,{{productImage.data}}" class="resume-imagen">
+                                                <img *ngIf="defaultImage" src="assets/images/circular/prodgr_default_300.png" class="resume-imagen">
+                                            </div>  
+                                            <div class="bloc2">
+                                                <mat-form-field class="w-40-p">
+                                                        <textarea matInput                                                                
+                                                            placeholder="Descripción"
+                                                            value="{{product.prod_desc}}"
+                                                            rows="5"
+                                                            readonly>
+                                                        </textarea>
+                                                </mat-form-field>
+                                                <mat-form-field class="w-50-p">
+                                                    <input matInput                                                                
+                                                        placeholder="Tiempo de uso"
+                                                        value="{{product.prod_time_uso.time_value}} {{product.prod_time_uso.time_text}}"
+                                                        readonly>
+                                                </mat-form-field>
+                                                <mat-form-field class="w-50-p">
+                                                    <input matInput                                                                
+                                                        placeholder="Estado de conservación"
+                                                        value="{{product.prod_est_converva.est_text}} - {{product.prod_est_converva.est_desc}}"
+                                                        readonly>
+                                                </mat-form-field>                                              
+                                            </div>
+                                        </div>                                                                            
+                                        
+                                        <mat-action-row>
+                                        <button mat-button color="primary" (click)="nextStep()">Siguiente</button>
+                                        </mat-action-row>
+                                    </mat-expansion-panel>
+
+                                    <mat-expansion-panel [expanded]="step === 1" (opened)="setStep(1)" hideToggle="true">
+                                        <mat-expansion-panel-header>
+                                        <mat-panel-title>
+                                            Envío
+                                        </mat-panel-title>
+                                        <mat-panel-description>
+                                            Información del envío
+                                            <mat-icon>map</mat-icon>
+                                        </mat-panel-description>
+                                        </mat-expansion-panel-header>
+
+                                        <mat-form-field>
+                                        <input matInput placeholder="Country">
+                                        </mat-form-field>
+
+                                        <mat-action-row>
+                                        <button mat-button color="warn" (click)="prevStep()">Anterior</button>
+                                        <button mat-button color="primary" (click)="nextStep()">Siguiente</button>
+                                        </mat-action-row>
+                                    </mat-expansion-panel>
+
+                                    <mat-expansion-panel [expanded]="step === 2" (opened)="setStep(2)" hideToggle="true">
+                                        <mat-expansion-panel-header>
+                                        <mat-panel-title>
+                                            Precio
+                                        </mat-panel-title>
+                                        <mat-panel-description>
+                                            Información del precio
+                                            <mat-icon>date_range</mat-icon>
+                                        </mat-panel-description>
+                                        </mat-expansion-panel-header>
+
+                                        <mat-action-row>
+                                        <button mat-button color="warn" (click)="prevStep()">Anterior</button>
+                                        <button mat-button color="primary" matStepperNext (click)="firstClick()" >Siguiente</button>
+                                        </mat-action-row>
+                                    </mat-expansion-panel>
+                                </mat-accordion>
+
+                                <button mat-raised-button color="accent" matStepperNext (click)="firstClick()" style="margin-top: 20px;">
+                                    Pago del alquiler
+                                    <mat-icon>navigate_next</mat-icon>
+                                </button> 
                     </form>
                 </mat-step>
                 <mat-step [stepControl]="paymentFormGroup">
@@ -111,6 +192,14 @@
                     </div>
                 </mat-step>
             </mat-horizontal-stepper>
+            <mat-card class="example-card" *ngIf="!paymentView">
+                <img mat-card-image src="https://material.angular.io/assets/img/examples/shiba2.jpg" alt="Photo of a Shiba Inu">
+                <mat-card-content>
+                  <p>
+                    El pago ya fue realizado o no existe.
+                  </p>
+                </mat-card-content>
+            </mat-card>
             <div class="my-container">
                 <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '14px' }"></ngx-loading>                
             </div>            
