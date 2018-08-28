@@ -13,6 +13,9 @@ import { S3Service } from '../../../../services/s3.service';
 import { AppCategoryConfig } from '../../../../app-config/app-categorys.config';
 import * as base64Converter from 'base64-arraybuffer';
 import { Product } from '../../../../models/product.model';
+import { RegistroUtil } from '../../../../utils/registro.util.js';
+import { SecurityService } from '../../../../services/security.service.js';
+import { UserModel } from '../../../../models/user.model.js';
 
 @Component({
   selector: 'app-resume',
@@ -40,6 +43,8 @@ export class ResumeComponent implements OnInit, OnDestroy {
 
   public rental = new RentalModel();
   public product = new Product();
+  public borrower = new UserModel();
+
   public productImage = {
     data: 'any'
   };
@@ -53,8 +58,12 @@ export class ResumeComponent implements OnInit, OnDestroy {
   public circular_com_price = '';
 
   public pago_realizado = false;
+  public pago_aceptado = false;
 
   public rent_return_warrancy = '';
+  public paym_message = '';
+
+  public rent_total_price_wo_warranty = '';
 
   step = 0;
 
@@ -72,6 +81,8 @@ export class ResumeComponent implements OnInit, OnDestroy {
     private _activateRoute: ActivatedRoute,
     private _s3Service: S3Service,
     private appCategoryConfig: AppCategoryConfig,
+    private registroUtil: RegistroUtil,
+    private securityService: SecurityService,
   ) {    
     this._fuseConfigService.config = {
       layout: {
@@ -145,7 +156,8 @@ export class ResumeComponent implements OnInit, OnDestroy {
         this._paymentService.detailsRental(bodyRental).subscribe(
           data => {            
             if (data.res_service === 'ok' && data.data_result.Item != null) {
-              this.rental = new RentalModel(data.data_result.Item);              
+              this.rental = new RentalModel(data.data_result.Item);
+              this.rent_total_price_wo_warranty = (Number(this.rental.rent_total_price) - Number(this.rental.rent_warranty)).toFixed(2);              
               let last_status_id = 1;
               if (this.rental.rent_status.length > 0) {
                 this.rental.rent_status.forEach(element => {
@@ -156,8 +168,7 @@ export class ResumeComponent implements OnInit, OnDestroy {
                   }
                 });
               }
-              if (last_status_id === 1 ){                
-                // this.paymentView = false;
+              if (last_status_id === 1 ){
                 const body = {
                     prod_id : this.rental.rent_prod_id
                 };
@@ -169,19 +180,46 @@ export class ResumeComponent implements OnInit, OnDestroy {
                       this.total_days_price = (Number(this.rental.rent_days) * Number(this.rental.rent_days_price)).toFixed(2);
                       this.circular_com_price = (Number(this.total_days_price) * (Number(this.rental.rent_commission / 100))).toFixed(2);
                       this.rent_return_warrancy = this.getDateReturnRentalWarrancy(this.rental.rent_range_date.rent_end);
+                      const bodyUser = {
+                        user_id: this.rental.rent_borrow_id,
+                        catg_ids: [
+                          {
+                            catg_id: this.appCategoryConfig.getBorrowerCategory()
+                          },
+                          {
+                            catg_id: this.appCategoryConfig.getLenderBorrowerCategory()
+                          }
+                        ]
+                      };
+                      this._paymentService.detailsUser(bodyUser).subscribe(
+                        dataBorrower => {                          
+                          if (dataBorrower.res_service === 'ok') {
+                            if (dataBorrower.data_result.Items.length > 0) {
+                              this.borrower = dataBorrower.data_result.Items[0];
+                            } else {
+                              this.paym_message = 'Prestatario - No pudimos cargar correctamente la información, ' +
+                                                  'por favor contáctar con nuestra fan-page.';      
+                              this.paymentView = false;
+                            }
+                          } else {
+                            this.paym_message = 'eNo existe información del prestatario';      
+                            this.paymentView = false;                  
+                          }                                                    
+                        }
+                      );
                     } else {
-                      console.log('el producto no esta disponible o no existe');
-                      // this.paymentView = true;
+                      this.paym_message = 'Producto - No pudimos cargar correctamente la información, por favor contáctar con nuestra fan-page.';     
+                      this.paymentView = false;                 
                     }
                   } 
                 );
-              } else {  
-                console.log('ya fue pagado');
-                // this.paymentView = true;
+              } else {                  
+                this.paym_message = 'El pago ya fue realizado.';
+                this.paymentView = false;
               }
-            } else {
-              console.log('no_existe_rental');
-              // this.paymentView = true;
+            } else {              
+              this.paym_message = 'Alquiler - No pudimos cargar correctamente la información, por favor contáctar con nuestra fan-page. ';
+              this.paymentView = false;
             }
           }
         );   
@@ -235,37 +273,97 @@ export class ResumeComponent implements OnInit, OnDestroy {
   }
   
   createPayment(): void {    
+    this.loading = true;
     if (this.oCulqi.token) {
-
       if (!this.pago_realizado) {
         const dataToken = {
           body: this.oCulqi.token,
-          token_status: 'ok'
+          token_status: 'ok',
+          rent_id: this.rental.rent_id
         };
-        console.log(dataToken);
         this._paymentService.postCreateTokenPayment(dataToken).subscribe(
-          data => {
-            this.pago_realizado = true;
-            console.log(data);
+          data => {            
+            const dataCharge = {
+              paym_date_reg: this.registroUtil.obtenerFechaCreacion(),
+              paym_usu_reg: this.securityService.getUserLogedId(),
+              type: 'rental',
+              paym_id: data.data_result_db.paym_id,
+              description: 'Payment for the rental: ' + this.rental.rent_id,
+              charge: {
+                amount: ((Number(this.rental.rent_total_price) - Number(this.rental.rent_warranty)) * 100).toString(),
+                currency_code: 'PEN',
+                capture: true,
+                email: this.paymentFormGroup.value.email,
+                antifraud_details: {
+                  address: this.borrower.user_address,
+                  address_city: this.borrower.user_ubigeo.ubig_dst,
+                  country_code: 'PE',
+                  first_name: this.borrower.user_names,
+                  last_name: this.borrower.user_full_name1,
+                  phone_number: this.borrower.user_num_phone
+                },
+                source_id: dataToken.body.id
+              }
+            };
+            this._paymentService.postCreateChargePayment(dataCharge).subscribe(
+              dataChargeRes => {
+                console.log(dataChargeRes);
+                if (dataChargeRes.data_result_api.object === 'error') {                  
+                  this._matSnackBar.open(dataChargeRes.data_result_api.user_message, 'Aceptar', {
+                    verticalPosition: 'top',
+                    duration: 5000
+                  });
+                  this.loading = false;
+                  this.oCulqi = null;
+                  this.cardValidate = false;
+                } else {
+                  if (dataChargeRes.data_result_api.outcome.type === 'venta_exitosa') {
+                    this._matSnackBar.open('El pago fue realizado con exito.', 'Aceptar', {
+                      verticalPosition: 'top',
+                      duration: 3000
+                    });
+                    this.loading = false;
+                    this.pago_realizado = true;
+                    this.pago_aceptado = true;
+                    const bodyUpdateStatus = {
+                      status_id: 2,
+                      status_text: 'Pagado',
+                      status_date: this.registroUtil.obtenerFechaCreacion()
+                    };
+                    const currentArrayStatus = this.rental.rent_status;
+                    currentArrayStatus.push(bodyUpdateStatus);
+                    const dataUpdateRental = {
+                      rent_id: this.rental.rent_id,
+                      rent_status: currentArrayStatus
+                    };
+                    this._paymentService.patchUpdateRentalStatus(dataUpdateRental).subscribe(
+                      dataUpdateRentalStatus => {
+                        console.log(dataUpdateRentalStatus);
+                      }
+                    );
+                  } else {
+                    this._matSnackBar.open('El pago fue rechazado.', 'Aceptar', {
+                      verticalPosition: 'top',
+                      duration: 3000
+                    });
+                    this.loading = false;
+                  }
+                }
+              }
+            );
           }
         );
       } else {
+        this._matSnackBar.open('El pago ya fue realizado.', 'Aceptar', {
+          verticalPosition: 'top',
+          duration: 3000
+        });
         console.log('pago_ya_realizado');
       }
-
-      // ,
-      // "metadata": {
-      //   "M": {
-      //     "dni": {
-      //       "S": response.metadata.dni
-      //     }
-      //   }
-      // }
-      // Guardar el token en la BD
     } else {      
       this._matSnackBar.open('No se pudo procesar correctamente tu tarjeta, volver a intentar.', 'Aceptar', {
         verticalPosition: 'top',
-        duration: 3000
+        duration: 5000
       });
       const dataToken = {
         body: this.oCulqi.error,
@@ -277,6 +375,7 @@ export class ResumeComponent implements OnInit, OnDestroy {
         }
       );      
       this.cardValidate = false;
+      this.loading = false;
       this.paymentFormGroup.controls.number.patchValue('');
       this.paymentFormGroup.controls.cvc.patchValue('');
       this.paymentFormGroup.controls.expiry.patchValue('');
@@ -342,4 +441,12 @@ export class ResumeComponent implements OnInit, OnDestroy {
     this.step--;
   }  
 
+  limpiartTokenTarjeta(): void {
+    try {
+      if (this.oCulqi.token) {
+        this.oCulqi = null;
+        this.cardValidate = false;
+      }
+    } catch (ex) {}
+  }
 }

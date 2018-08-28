@@ -164,7 +164,7 @@
                                         </mat-form-field>
                                         <mat-form-field class="w-40-p" style="margin-left:5px; margin-right: 5px;">
                                             <input matInput placeholder="Total a pagar" 
-                                                   value="S/. {{rental.rent_total_price}}"                                                   
+                                                   value="S/. {{rent_total_price_wo_warranty}}"                                                   
                                                    matTooltip="Precio total a pagar del alquiler"
                                                    readonly>
                                             <mat-icon matSuffix>monetization_on</mat-icon>
@@ -234,7 +234,8 @@
                                             <input matInput name="number" 
                                                    placeholder="Número de tarjeta" 
                                                    formControlName="number" 
-                                                   [readonly]="pago_realizado"
+                                                   [readonly]="pago_realizado && pago_aceptado"
+                                                   (change)="limpiartTokenTarjeta()"
                                                    id="card[number]" required>
                                             <mat-icon matSuffix>credit_card</mat-icon>
                                             <mat-error *ngIf="paymentFormGroupErrors.number.required">
@@ -248,7 +249,7 @@
                                                    placeholder="Nombre en la tarjeta" 
                                                    formControlName="name" 
                                                    required
-                                                   [readonly]="pago_realizado">
+                                                   [readonly]="pago_realizado && pago_aceptado">
                                             <mat-icon matSuffix>account_circle</mat-icon>
                                             <mat-error *ngIf="paymentFormGroupErrors.name.required">
                                                 El nombre de la tarjeta es requerido.
@@ -260,7 +261,7 @@
                                             <input matInput name="expiry" 
                                                    placeholder="Fec. expira" 
                                                    (change)="changeFecExp(expiry.value)" 
-                                                   [readonly]="pago_realizado"
+                                                   [readonly]="pago_realizado && pago_aceptado"
                                                    formControlName="expiry"
                                                    required #expiry>
                                             <mat-icon matSuffix>calendar_today</mat-icon>
@@ -272,7 +273,7 @@
                                             <input matInput name="cvc" 
                                                    placeholder="CVC" 
                                                    formControlName="cvc" 
-                                                   [readonly]="pago_realizado"
+                                                   [readonly]="pago_realizado && pago_aceptado"
                                                    required id="card[cvv]">
                                             <mat-icon matSuffix>vpn_key</mat-icon>
                                             <mat-error *ngIf="paymentFormGroupErrors.cvc.required">
@@ -287,7 +288,7 @@
                                             <input matInput name="email" 
                                             placeholder="Correo Electrónico" 
                                             formControlName="email" 
-                                            [readonly]="pago_realizado"
+                                            [readonly]="pago_realizado && pago_aceptado"
                                             required type="email" id="card[email]">
                                             <mat-icon matSuffix>contact_mail</mat-icon>
                                             <mat-error *ngIf="paymentFormGroupErrors.email.required">
@@ -300,7 +301,8 @@
                                             Retroceder
                                             <mat-icon>navigate_before</mat-icon>
                                         </button>
-                                        <button *ngIf="!cardValidate" [disabled]="paymentFormGroup.invalid" button mat-raised-button 
+                                        <button *ngIf="!cardValidate" 
+                                                 [disabled]="paymentFormGroup.invalid" button mat-raised-button 
                                                  color="accent" 
                                                  onclick="my.namespace.validateCard(Culqi)"
                                                  style="margin-left: 10px;">
@@ -313,12 +315,12 @@
                                                 color="accent" 
                                                 (click)="createPayment()"
                                                 style="margin-left: 10px;">
-                                                Pagar S/ 100.00
+                                                Pagar S/ {{this.rental.rent_total_price}}
                                             <mat-icon>credit_card</mat-icon>
                                         </button>
                                         <button mat-button color="accent" 
                                                 button mat-raised-button 
-                                                *ngIf="pago_realizado" 
+                                                *ngIf="pago_realizado && pago_aceptado" 
                                                 [disabled]="paymentFormGroup.invalid"
                                                 style="margin-left: 10px;" 
                                                 matStepperNext>Continuar
@@ -344,7 +346,7 @@
                 <img mat-card-image src="https://material.angular.io/assets/img/examples/shiba2.jpg" alt="Photo of a Shiba Inu">
                 <mat-card-content>
                   <p>
-                    El pago ya fue realizado o no existe.
+                    {{paym_message}}
                   </p>
                 </mat-card-content>
             </mat-card>

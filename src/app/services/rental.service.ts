@@ -13,12 +13,12 @@ export class RentalService implements Resolve<any>
     rental: any;    
 
     onRentalChanged: BehaviorSubject<any>;
-    private DetailsUrl = `${this.globalValues.urlRents()}/details`;
-    private UpdateUrl = `${this.globalValues.urlRents()}/update`;
-    private UpdateLinkUrl = `${this.globalValues.urlRents()}/updatelink`;
-    private UpdateProdUrl = `${this.globalValues.urlRents()}/updateproduct`;
-    private CreateUrl = `${this.globalValues.urlRents()}/create`;    
-    private DeleteUrl = `${this.globalValues.urlRents()}/delete`;
+    private DetailsUrl     = `${this.globalValues.urlRents()}/details`;
+    private UpdateUrl      = `${this.globalValues.urlRents()}/update`;
+    private UpdateLinkUrl  = `${this.globalValues.urlRents()}/update/link`;
+    private UpdateProdUrl  = `${this.globalValues.urlRents()}/update/productstatus`;
+    private CreateUrl      = `${this.globalValues.urlRents()}/create`;    
+    private DeleteUrl      = `${this.globalValues.urlRents()}/delete`;
 
     /**
      * Constructor

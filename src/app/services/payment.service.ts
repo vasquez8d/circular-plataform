@@ -11,8 +11,12 @@ import { tap, catchError } from 'rxjs/operators';
 export class PaymentService {
     
     private postCreateToken    = `${this.globalValues.urlPayments()}/token`;
+    private postCreateCharge   = `${this.globalValues.urlPayments()}/charge`;
+    private postCreateCapture  = `${this.globalValues.urlPayments()}/capture`;
     private DetailsUrl         = `${this.globalValues.urlRents()}/details`;
     private DetailsProductUrl  = `${this.globalValues.urlProducts()}/details`;
+    private DetailsUserUrl     = `${this.globalValues.urlUsers()}/details`;
+    private UpdateRentalStatus = `${this.globalValues.urlRents()}/update/status`;
 
     constructor(
         private _httpClient: HttpClient,
@@ -21,8 +25,22 @@ export class PaymentService {
 
     postCreateTokenPayment(token): Observable<ResponseModel> {
         return this._httpClient.post<ResponseModel>(this.postCreateToken, token).pipe(
-            tap((response: ResponseModel) => this.log(`Resultado postCreateTokenPayment = ${response}`)),
+            tap((response: ResponseModel) => this.log(`Resultado postCreateTokenPayment = ${JSON.stringify(response)}`)),
             catchError(this.handleError<ResponseModel>('postCreateTokenPayment'))
+        );
+    }
+
+    postCreateChargePayment(token): Observable<ResponseModel> {
+        return this._httpClient.post<ResponseModel>(this.postCreateCharge, token).pipe(
+            tap((response: ResponseModel) => this.log(`Resultado postCreateChargePayment = ${JSON.stringify(response)}`)),
+            catchError(this.handleError<ResponseModel>('postCreateChargePayment'))
+        );
+    }
+
+    postCreateCapturePayment(token): Observable<ResponseModel> {
+        return this._httpClient.post<ResponseModel>(this.postCreateCapture, token).pipe(
+            tap((response: ResponseModel) => this.log(`Resultado postCreateCapturePayment = ${JSON.stringify(response)}`)),
+            catchError(this.handleError<ResponseModel>('postCreateCapturePayment'))
         );
     }
 
@@ -40,8 +58,21 @@ export class PaymentService {
         );
     }
 
-    // tslint:disable-next-line:typedef
-    private handleError<T>(operation = 'operation', result?: T) {
+    detailsUser(body): Observable<ResponseModel> {
+        return this._httpClient.post<ResponseModel>(this.DetailsUserUrl, body).pipe(
+            tap((response: ResponseModel) => this.log(`Resultado del detailsUser = ${JSON.stringify(response)}`)),
+            catchError(this.handleError<ResponseModel>('detailsUser'))
+        );
+    }
+    
+    patchUpdateRentalStatus(body): Observable<ResponseModel> {
+        return this._httpClient.patch<ResponseModel>(this.UpdateRentalStatus, body).pipe(
+            tap((response: ResponseModel) => this.log(`Resultado del patchUpdateRentalStatus = ${JSON.stringify(response)}`)),
+            catchError(this.handleError<ResponseModel>('patchUpdateRentalStatus'))
+        );
+    }
+
+    private handleError<T>(operation = 'operation', result?: T): any {
         return (error: any): Observable<T> => {
             console.error(error);
             return of(result as T);
