@@ -42,6 +42,7 @@ export class RentalModel {
     rent_shipping_return: any;
     rent_commission: any;
     rent_total_price: any;
+    rent_warranty: any;
 
     rent_stat_reg: any;
     
@@ -94,5 +95,6 @@ export class RentalModel {
         this.rent_shipping_return = rental.rent_shipping_return || '';
         this.rent_commission = rental.rent_commission || '';
         this.rent_total_price = rental.rent_total_price || '';
+        this.rent_warranty = rental.rent_warranty || '';
     }
 }

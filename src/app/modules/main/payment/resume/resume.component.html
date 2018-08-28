@@ -172,9 +172,49 @@
 
                                         <mat-action-row>
                                         <button mat-button color="warn" (click)="prevStep()">Anterior</button>
+                                        <button mat-button color="primary" (click)="nextStep()">Continuar</button>
+                                        </mat-action-row>
+                                    </mat-expansion-panel>
+
+                                    <mat-expansion-panel [expanded]="step === 3" (opened)="setStep(3)" hideToggle="true">
+                                        <mat-expansion-panel-header>
+                                        <mat-panel-title>
+                                            Garantía
+                                        </mat-panel-title>
+                                        <mat-panel-description>
+                                            Información de la garantía
+                                            <mat-icon>security</mat-icon>
+                                        </mat-panel-description>
+                                        </mat-expansion-panel-header>  
+                                        <div class="div-garantia">
+                                            <p class="text-garantia">
+                                                El siguiente monto es sumado al precio total, este monto cubre la garantía del producto ante 
+                                                cualquier incidente dentro del periodo de alquiler, el mismo sería devuelto finalizado el periodo
+                                                de alquiler si el dueño reporta el artículo en el mismo estado de como lo presto.
+                                            </p>
+                                        </div>
+                                        
+                                        <mat-form-field class="w-30-p" style="margin-left:5px; margin-right: 5px;">
+                                            <input matInput placeholder="Monto de la garantía" 
+                                                   value="S/. {{rental.rent_warranty}}"     
+                                                   matTooltip="Precio por movilizar el artículo hacia tu dirección."                                              
+                                                   readonly>
+                                            <mat-icon matSuffix>monetization_on</mat-icon>
+                                        </mat-form-field>
+                                        <mat-form-field class="w-30-p" style="margin-left:5px; margin-right: 5px;">
+                                            <input matInput placeholder="Fecha aprox. de devolución" 
+                                                   value="{{rent_return_warrancy}}" 
+                                                   matTooltip="Precio para movilizar el artículo hacia su dueño al finalizar el alquiler."                                               
+                                                   readonly>
+                                            <mat-icon matSuffix>date_range</mat-icon>
+                                        </mat-form-field>
+
+                                        <mat-action-row>
+                                        <button mat-button color="warn" (click)="prevStep()">Anterior</button>
                                         <button mat-button color="primary" matStepperNext (click)="firstClick()" >Pagar</button>
                                         </mat-action-row>
                                     </mat-expansion-panel>
+
                                 </mat-accordion>
 
                                 <button mat-raised-button color="accent" matStepperNext (click)="firstClick()" style="margin-top: 20px;">
@@ -191,7 +231,11 @@
                                     <ng-template matStepLabel>Pago del alquiler</ng-template>
                                     <div class="tab-content p-12">
                                         <mat-form-field class="w-100-p card-number">
-                                            <input matInput name="number" placeholder="Número de tarjeta" formControlName="number" id="card[number]" required>
+                                            <input matInput name="number" 
+                                                   placeholder="Número de tarjeta" 
+                                                   formControlName="number" 
+                                                   [readonly]="pago_realizado"
+                                                   id="card[number]" required>
                                             <mat-icon matSuffix>credit_card</mat-icon>
                                             <mat-error *ngIf="paymentFormGroupErrors.number.required">
                                                 El número de tarjeta es requerido
@@ -200,7 +244,11 @@
                                     </div>
                                     <div class="tab-content p-12">
                                         <mat-form-field class="w-100-p card-name">
-                                            <input matInput name="name" placeholder="Nombre en la tarjeta" formControlName="name" required>
+                                            <input matInput name="name" 
+                                                   placeholder="Nombre en la tarjeta" 
+                                                   formControlName="name" 
+                                                   required
+                                                   [readonly]="pago_realizado">
                                             <mat-icon matSuffix>account_circle</mat-icon>
                                             <mat-error *ngIf="paymentFormGroupErrors.name.required">
                                                 El nombre de la tarjeta es requerido.
@@ -209,15 +257,23 @@
                                     </div>
                                     <div class="tab-content p-6">
                                         <mat-form-field class="w-40-p card-fexp" style="margin-left: 5px; margin-right: 5px;">
-                                            <input matInput name="expiry" placeholder="Fec. expira" (change)="changeFecExp(expiry.value)" formControlName="expiry"
-                                                required #expiry>
+                                            <input matInput name="expiry" 
+                                                   placeholder="Fec. expira" 
+                                                   (change)="changeFecExp(expiry.value)" 
+                                                   [readonly]="pago_realizado"
+                                                   formControlName="expiry"
+                                                   required #expiry>
                                             <mat-icon matSuffix>calendar_today</mat-icon>
                                             <mat-error *ngIf="paymentFormGroupErrors.expiry.required">
                                                 La fec. exp. es requerido.
                                             </mat-error>
                                         </mat-form-field>
                                         <mat-form-field class="w-40-p card-cvc" style="margin-left: 5px; margin-right: 5px;">
-                                            <input matInput name="cvc" placeholder="CVC" formControlName="cvc" required id="card[cvv]">
+                                            <input matInput name="cvc" 
+                                                   placeholder="CVC" 
+                                                   formControlName="cvc" 
+                                                   [readonly]="pago_realizado"
+                                                   required id="card[cvv]">
                                             <mat-icon matSuffix>vpn_key</mat-icon>
                                             <mat-error *ngIf="paymentFormGroupErrors.cvc.required">
                                                 El CVC es requerido.
@@ -228,7 +284,11 @@
                                     </div>
                                     <div class="tab-content p-12">
                                         <mat-form-field class="w-100-p card-name">
-                                            <input matInput name="email" placeholder="Correo Electrónico" formControlName="email" required type="email" id="card[email]">
+                                            <input matInput name="email" 
+                                            placeholder="Correo Electrónico" 
+                                            formControlName="email" 
+                                            [readonly]="pago_realizado"
+                                            required type="email" id="card[email]">
                                             <mat-icon matSuffix>contact_mail</mat-icon>
                                             <mat-error *ngIf="paymentFormGroupErrors.email.required">
                                                 El email es requerido.
@@ -247,17 +307,23 @@
                                                  Validar Tarjeta
                                             <mat-icon>check_circle</mat-icon>
                                         </button>
-                                        <button *ngIf="cardValidate" [disabled]="paymentFormGroup.invalid" button mat-raised-button 
+                                        <button *ngIf="cardValidate && !pago_realizado" 
+                                                [disabled]="paymentFormGroup.invalid" 
+                                                button mat-raised-button 
                                                 color="accent" 
                                                 (click)="createPayment()"
                                                 style="margin-left: 10px;">
                                                 Pagar S/ 100.00
                                             <mat-icon>credit_card</mat-icon>
                                         </button>
-                                        <button mat-button color="primary" 
+                                        <button mat-button color="accent" 
+                                                button mat-raised-button 
                                                 *ngIf="pago_realizado" 
-                                                [disabled]="paymentFormGroup.invalid" 
-                                                matStepperNext>Continuar</button>
+                                                [disabled]="paymentFormGroup.invalid"
+                                                style="margin-left: 10px;" 
+                                                matStepperNext>Continuar
+                                                <mat-icon>check_circle</mat-icon>
+                                        </button>
                                     </div>                                     
                             </form>
                         </div>

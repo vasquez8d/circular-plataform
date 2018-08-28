@@ -54,6 +54,8 @@ export class ResumeComponent implements OnInit, OnDestroy {
 
   public pago_realizado = false;
 
+  public rent_return_warrancy = '';
+
   step = 0;
 
   /**
@@ -166,6 +168,7 @@ export class ResumeComponent implements OnInit, OnDestroy {
                       this.cargarImagesS3Product(this.product.prod_url_documen);
                       this.total_days_price = (Number(this.rental.rent_days) * Number(this.rental.rent_days_price)).toFixed(2);
                       this.circular_com_price = (Number(this.total_days_price) * (Number(this.rental.rent_commission / 100))).toFixed(2);
+                      this.rent_return_warrancy = this.getDateReturnRentalWarrancy(this.rental.rent_range_date.rent_end);
                     } else {
                       console.log('el producto no esta disponible o no existe');
                       // this.paymentView = true;
@@ -185,7 +188,15 @@ export class ResumeComponent implements OnInit, OnDestroy {
       }
     });
   }
-
+  getDateReturnRentalWarrancy(pdate): string {    
+    const parts_start = pdate.split('/');
+    const date = new Date(parts_start[2], parts_start[1] - 1, parts_start[0]);    
+    date.setDate(date.getDate() + 2);    
+    const dateFormat = ('00' + date.getDate()).slice(-2) + '/' + 
+    ('00' + (date.getMonth() + 1)).slice(-2) + '/' + 
+    date.getFullYear();
+    return dateFormat;
+  }
   cargarImagesS3Product(documents): void {  
     if (documents) {
             if (documents.length > 0) {

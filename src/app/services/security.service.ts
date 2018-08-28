@@ -10,7 +10,7 @@ import { UserModel } from '../models/user.model';
   providedIn: 'root'
 })
 export class SecurityService {
-  private httpOptions = { headers: new HttpHeaders({ 'Content-Type': 'application/json' }) };
+  private httpOptions = { headers: new HttpHeaders({ 'Content-Type': 'application/json', 'x-api-key': '1TFRraWLki9NIxf3Qat803tdmYZlNy4Y5x7cbGnX'}) };
   private loginUrl = `${this.globalValues.urlAuthUser()}/login`;
 
   constructor(
@@ -20,7 +20,7 @@ export class SecurityService {
 
   login(credentials): Observable<ResponseModel> {
     return this.httpClient.post<ResponseModel>(this.loginUrl, credentials, this.httpOptions).pipe(
-      tap((response: ResponseModel) => this.log(`Resultado del servicio login = ${response.res_service}`)),
+      tap((response: ResponseModel) => this.log(`Resultado del servicio login = ${ JSON.stringify(response) }`)),
       catchError(this.handleError<ResponseModel>('login'))
     );
   }

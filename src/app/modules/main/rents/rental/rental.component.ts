@@ -418,7 +418,7 @@ export class RentalComponent implements OnInit, OnDestroy
             rent_shipping_return          : [this.rental.rent_shipping_return], 
             rent_commission               : [this.rental.rent_commission],   
             rent_total_price              : [this.rental.rent_total_price],      
-
+            rent_warranty                 : [this.rental.rent_warranty],
             payment_link                  : [this.rental.payment_link],
             rent_stat_reg                 : [this.rental.rent_stat_reg],   
             rent_date_reg                 : [this.rental.rent_date_reg],   
@@ -537,7 +537,9 @@ export class RentalComponent implements OnInit, OnDestroy
         rentalSave.rent_shipping_delivery = this.rentalForm.value.rent_shipping_delivery;
         rentalSave.rent_shipping_return = this.rentalForm.value.rent_shipping_return;
         rentalSave.rent_commission = this.rentalForm.value.rent_commission;
-        rentalSave.rent_total_price = this.rentalForm.value.rent_total_price;        
+        rentalSave.rent_total_price = this.rentalForm.value.rent_total_price;  
+        rentalSave.rent_warranty = this.rentalForm.value.rent_warranty;
+              
         this._rentalService.createRental(rentalSave).subscribe(
             data => {                
                 if (data.res_service === 'ok') {
@@ -716,6 +718,7 @@ export class RentalComponent implements OnInit, OnDestroy
                                rental_price;
                 comission_price = rental_price * (this.rentalForm.value.rent_commission / 100);
                 this.rental_total_price = (price_w_dely + comission_price).toFixed(2);
+                this.rental_total_price = (Number(this.rental_total_price) + Number(this.rentalForm.value.rent_warranty)).toFixed(2);
                 this.rentalForm.controls.rent_total_price.patchValue(this.rental_total_price);
                 this.viewTotalPrice = true;
         } else {

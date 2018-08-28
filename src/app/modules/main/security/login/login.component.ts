@@ -90,7 +90,7 @@ export class Login2Component implements OnInit
         this.securityService.login(credenciales).subscribe(
             data => {                
                 if (data.data_result.Count > 0) {
-                    const dataUsuario = data.data_result.Items[0];
+                    const dataUsuario = data.data_result.Items[0];                    
                     if (dataUsuario.user_password === dataForm.user_password){
                         if (dataForm.user_remember) {
                             localStorage.setItem('usuario_circular', JSON.stringify(dataUsuario));
