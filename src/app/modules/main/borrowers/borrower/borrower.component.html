@@ -205,10 +205,16 @@
                                            required>
                                 </mat-form-field>
                                 <mat-form-field class="w-100-p">
-                                    <input matInput                                           
+                                    <input matInput
+                                           type="email"
                                            formControlName="user_email"
+                                           (change)="validateEmail($event)"
                                            placeholder="Correo electrónico"
                                            required>
+                                    <mat-error *ngIf="!borrowerForm.get('user_email').hasError('required') &&
+                                                       borrowerForm.get('user_email').hasError('user_email')">
+                                        Por favor ingresa un correo electrónico válido.
+                                    </mat-error>
                                 </mat-form-field>
                                 <mat-form-field class="w-100-p">
                                     <input matInput                                           
