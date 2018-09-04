@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
+import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { Location } from '@angular/common';
 import { MatSnackBar, MatDialog } from '@angular/material';
 import { Subject } from 'rxjs';
@@ -192,7 +192,7 @@ export class LenderComponent implements OnInit, OnDestroy
                 user_full_name1: [this.lender.user_full_name1],
                 user_full_name2: [this.lender.user_full_name2],
                 user_fec_nac: [user_fec_nac],
-                user_email: [this.lender.user_email],
+                user_email: [this.lender.user_email, Validators.email],
                 user_num_phone: [this.lender.user_num_phone],
                 user_num_doc: [this.lender.user_num_doc],
                 user_tip_doc: [this.lender.user_tip_doc.tip_docum_id],
@@ -491,5 +491,29 @@ export class LenderComponent implements OnInit, OnDestroy
             verticalPosition: 'top',
             duration: 3000
         });
+    }
+
+
+    validateEmail(value): void {
+        try {
+            if (this.lenderForm.controls.user_email.status === 'VALID') {
+                const credenciales = {
+                    user_email: value.target.value
+                };
+                this.securityService.login(credenciales).subscribe(
+                    data => {
+                        if (data.data_result.Count > 0) {
+                            this.lenderForm.controls.user_email.patchValue('');
+                            this._matSnackBar.open('El correo electrónico ya se encuentra utilizado.', 'Aceptar', {
+                                verticalPosition: 'top',
+                                duration: 3000
+                            });
+                        }
+                    }
+                );
+            }
+        } catch (e) {
+            console.log(e);
+        }
     }
 }

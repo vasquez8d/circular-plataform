@@ -1,4 +1,4 @@
-.file_input_div {
+  .file_input_div {
     margin: auto;
     width: 250px;
     height: 40px;
@@ -20,8 +20,8 @@
 
   .product-image {
     overflow: hidden;
-    width: 456px;
-    height: 456px;
+    width: 356px;
+    height: 356px;
     border: 3px solid rgba(0, 0, 0, 0.12);
 
     img {
@@ -29,6 +29,10 @@
         width: auto;
         max-width: none;
     }
+}
+
+.modal-image {
+  max-height: 550px;
 }
 
 .selectImage {

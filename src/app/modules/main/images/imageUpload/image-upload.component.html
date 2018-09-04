@@ -1,9 +1,9 @@
-<div id="forms" class="page-layout simple fullwidth" fxLayout="column" fusePerfectScrollbar>
+<div id="forms" class="page-layout simple modal-image" fxLayout="column" fusePerfectScrollbar>
 
     <!-- CONTENT -->
     <div class="content p-24">
         <div class="h2 mb-24">Agregar un documento</div>                          
-                <div *ngIf="image.data_image != null" class="tab-content p-24">
+                <div *ngIf="image.data_image != null" class="tab-content center center p-24">
                             <div class="product-image" fxlayout="row" fxLayoutAlign="center center">                                            
                                 <img class="media" src="data:image/jpg;base64,{{image.data_image}}">                                       
                             </div>

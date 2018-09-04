@@ -223,6 +223,8 @@
                                 <mat-form-field class="w-100-p">
                                     <input matInput                                           
                                            formControlName="user_email"
+                                           type="email"
+                                           (change)="validateEmail($event)"
                                            placeholder="Correo electrónico"
                                            required>
                                 </mat-form-field>
