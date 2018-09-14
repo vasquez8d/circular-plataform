@@ -144,7 +144,7 @@
                                             {{categ.catg_nombre}}
                                         </mat-option>
                                     </mat-select>  
-                                </mat-form-field>
+                                </mat-form-field>                            
                                 <mat-form-field class="w-100-p">
                                     <textarea matInput
                                            name="prod_desc"
@@ -153,6 +153,34 @@
                                            required
                                            rows="3">
                                     </textarea>
+                                </mat-form-field>
+                                <mat-form-field class="w-30-p">
+                                    <input matInput
+                                    name="prod_nombre"
+                                    formControlName="prod_marca"
+                                    placeholder="Marca del artículo"
+                                    required>
+                                </mat-form-field>
+                                <mat-form-field class="w-20-p">
+                                    <input matInput
+                                    name="prod_nombre"
+                                    formControlName="prod_model"
+                                    placeholder="Modelo del artículo"
+                                    required> 
+                                </mat-form-field>
+                                <mat-form-field class="w-30-p">
+                                    <input matInput
+                                    name="prod_nombre"
+                                    formControlName="prod_color"
+                                    placeholder="Color del artículo"
+                                    >
+                                </mat-form-field>
+                                <mat-form-field class="w-20-p">
+                                    <input matInput
+                                    name="prod_nombre"
+                                    formControlName="prod_serie"
+                                    placeholder="Serie del artículo"
+                                    > 
                                 </mat-form-field>
                                 <mat-form-field class="w-100-p">
 
@@ -186,7 +214,7 @@
                                 <div id="card-container">
                                         <mat-card class="example-card">                                   
                                                 <mat-card-content>
-                                                    <h3>Estado de Conversación: {{prd_est_conversva}}</h3> 
+                                                    <h3>Estado de Conservación: {{prd_est_conversva}}</h3> 
                                                     <section class="example-section">
                                                         <mat-slider
                                                             thumbLabel
@@ -207,7 +235,7 @@
                                             </mat-card>                                     
                                             <mat-card class="example-card">                                   
                                                 <mat-card-content>
-                                                    <h3>Tiempo de uso:</h3> 
+                                                    <h3>Antiguedad:</h3> 
                                                     <section class="example-section">
                                                         <mat-form-field class="w-50-p">
                                                             <input matInput

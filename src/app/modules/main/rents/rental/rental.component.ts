@@ -84,7 +84,9 @@ export class RentalComponent implements OnInit, OnDestroy
     public listRangoTiempos = [];
     
     public viewTotalPrice = false;
-    public rental_total_price = '';
+    public rental_total_price = '0';
+    public rental_total_rent = '0';
+    public rental_total_warrancy = '0';
     public rentalPricerReadonly = false;
     // Private
     private _unsubscribeAll: Subject<any>;
@@ -142,7 +144,9 @@ export class RentalComponent implements OnInit, OnDestroy
                     this.cargarInfoBorrower(rental);
                     this.rentalPricerReadonly = true;         
                     this.viewTotalPrice = true;           
-                    this.rental_total_price = this.rental.rent_total_price;
+                    this.rental_total_price = this.rental.rent_total_price;                    
+                    this.rental_total_rent = (Number(this.rental.rent_total_price) - Number(this.rental.rent_warranty)).toFixed(2);
+                    this.rental_total_warrancy = this.rental.rent_warranty;
                 }
                 else
                 {
@@ -720,6 +724,8 @@ export class RentalComponent implements OnInit, OnDestroy
                 this.rental_total_price = (price_w_dely + comission_price).toFixed(2);
                 this.rental_total_price = (Number(this.rental_total_price) + Number(this.rentalForm.value.rent_warranty)).toFixed(2);
                 this.rentalForm.controls.rent_total_price.patchValue(this.rental_total_price);
+                this.rental_total_rent = (price_w_dely + comission_price).toFixed(2);
+                this.rental_total_warrancy = this.rentalForm.value.rent_warranty;
                 this.viewTotalPrice = true;
         } else {
             this.viewTotalPrice = false;

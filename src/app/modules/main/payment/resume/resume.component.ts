@@ -269,6 +269,10 @@ export class ResumeComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       this.cardValidate = true;
       this.loading = false;
+      this._matSnackBar.open('Tarjeta validada correctamente.', 'Aceptar', {
+        verticalPosition: 'top',
+        duration: 5000
+      });
     }, 10000);
   }
   

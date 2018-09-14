@@ -51,6 +51,7 @@ export class RentsComponent implements OnInit
     ngOnInit(): void
     {
         this.dataSource = new FilesDataSource(this._ecommerceProductsService, this.paginator, this.sort);
+        console.log(this.dataSource);
         fromEvent(this.filter.nativeElement, 'keyup')
             .pipe(
                 takeUntil(this._unsubscribeAll),

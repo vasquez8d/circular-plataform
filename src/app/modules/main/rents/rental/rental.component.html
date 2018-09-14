@@ -240,35 +240,39 @@
                                     </mat-card>
                                     <mat-card class="total-price-card" *ngIf="viewTotalPrice">
                                         <mat-card-content>
-                                            <h2 class="example-h2">Precio total: </h2>
+                                            <h2 class="example-h2">Total alquiler: </h2>
+                                            <h1 class="price-h1"> S/. {{rental_total_rent}}</h1>
+                                            <h2 class="example-h2">Total garantía: </h2>
+                                            <h1 class="price-h1"> S/. {{rental_total_warrancy}}</h1>
+                                            <h2 class="example-h2">Total a pagar: </h2>
                                             <h1 class="price-h1"> S/. {{rental_total_price}}</h1>
                                         </mat-card-content>
                                     </mat-card> 
                                 </div>
 
                                 <mat-form-field class="w-50-p">
-                                    <input matInput formControlName="rent_start_address_rec" placeholder="Dirección de recepción" required>
+                                    <input matInput formControlName="rent_start_address_rec" placeholder="Dirección de origen" required>
                                 </mat-form-field>
                                 <mat-form-field class="w-50-p">
                                     <textarea matInput formControlName="rent_start_address_rec_ref" placeholder="Referencia" required>
                                     </textarea>
                                 </mat-form-field>
                                 <mat-form-field class="w-60-p">
-                                    <mat-select placeholder="Rango de horarios de recepción" formControlName="rent_start_time_range_rec_id" required>
+                                    <mat-select placeholder="Rango de horarios de origen" formControlName="rent_start_time_range_rec_id" required>
                                         <mat-option *ngFor="let rango of listRangoTiempos" [value]="rango.value">
                                             {{rango.text}}
                                         </mat-option>
                                     </mat-select>
                                 </mat-form-field>
                                 <mat-form-field class="w-50-p">
-                                    <input matInput formControlName="rent_end_address_rec" placeholder="Dirección de entrega" required>
+                                    <input matInput formControlName="rent_end_address_rec" placeholder="Dirección de destino" required>
                                 </mat-form-field>
                                 <mat-form-field class="w-50-p">
                                     <textarea matInput formControlName="rent_end_address_rec_ref" placeholder="Referencia" required>
                                     </textarea>
                                 </mat-form-field>
                                 <mat-form-field class="w-60-p">
-                                    <mat-select placeholder="Rango de horarios de entrega" formControlName="rent_end_time_range_rec_id" required>
+                                    <mat-select placeholder="Rango de horarios de destino" formControlName="rent_end_time_range_rec_id" required>
                                         <mat-option *ngFor="let rango of listRangoTiempos" [value]="rango.value">
                                             {{rango.text}}
                                         </mat-option>

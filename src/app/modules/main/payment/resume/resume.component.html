@@ -142,21 +142,21 @@
                                         </div>
 
                                         <mat-form-field class="w-40-p" style="margin-left:5px; margin-right: 5px;">
-                                            <input matInput placeholder="Precio por envío recepción" 
-                                                   value="S/. {{rental.rent_shipping_delivery}}"     
+                                            <input matInput placeholder="Precio por envío origen"
+                                                   value="S/. {{rental.rent_shipping_delivery}}"
                                                    matTooltip="Precio por movilizar el artículo hacia tu dirección."                                              
                                                    readonly>
                                             <mat-icon matSuffix>motorcycle</mat-icon>
                                         </mat-form-field>
                                         <mat-form-field class="w-40-p" style="margin-left:5px; margin-right: 5px;">
-                                            <input matInput placeholder="Precio por envío devolución" 
+                                            <input matInput placeholder="Precio por envío destino" 
                                                    value="S/. {{rental.rent_shipping_return}}"    
                                                    matTooltip="Precio para movilizar el artículo hacia su dueño al finalizar el alquiler."                                               
                                                    readonly>
                                             <mat-icon matSuffix>motorcycle</mat-icon>
                                         </mat-form-field>
                                         <mat-form-field class="w-40-p" style="margin-left:5px; margin-right: 5px;">
-                                            <input matInput placeholder="Comisión Circular" 
+                                            <input matInput placeholder="Fee de servicio circular" 
                                                    value="S/. {{circular_com_price}}"   
                                                    matTooltip="Comisión por procesos operativos de Circular, se calcula en base al total del alquiler."                                                
                                                    readonly>
@@ -201,13 +201,13 @@
                                                    readonly>
                                             <mat-icon matSuffix>monetization_on</mat-icon>
                                         </mat-form-field>
-                                        <mat-form-field class="w-30-p" style="margin-left:5px; margin-right: 5px;">
+                                        <!-- <mat-form-field class="w-30-p" style="margin-left:5px; margin-right: 5px;">
                                             <input matInput placeholder="Fecha aprox. de devolución" 
                                                    value="{{rent_return_warrancy}}" 
                                                    matTooltip="Precio para movilizar el artículo hacia su dueño al finalizar el alquiler."                                               
                                                    readonly>
                                             <mat-icon matSuffix>date_range</mat-icon>
-                                        </mat-form-field>
+                                        </mat-form-field> -->
 
                                         <mat-action-row>
                                         <button mat-button color="warn" (click)="prevStep()">Anterior</button>

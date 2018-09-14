@@ -248,11 +248,9 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
                     catg_id : this._appCategConfig.getLenderBorrowerCategory()
                 }
             ]
-        };
-        console.log(body);
+        };        
         this._userService.detailsUser(body).subscribe(
-            data => {                
-                console.log(data);
+            data => {                                
                 if (data.res_service === 'ok') {
                     if (data.data_result.Count > 0){
                         this.lenderInformation = true;
@@ -273,10 +271,10 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
     }
 
     cargarInfoNewLender(): void {
-        this._activatedRoute.params.subscribe(params => {
+        this._activatedRoute.params.subscribe(params => {            
             if (params.user_id){
                 const body = {
-                    user_id : event,
+                    user_id : params.user_id,
                     catg_ids : [
                         {
                             catg_id : this._appCategConfig.getLenderCategory()
@@ -285,7 +283,7 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
                             catg_id : this._appCategConfig.getLenderBorrowerCategory()
                         }
                     ]
-                };
+                };                
                 this._userService.detailsUser(body).subscribe(
                     data => {                        
                         if (data.res_service === 'ok') {
@@ -381,6 +379,10 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
             prod_id             : [this.product.prod_id],
             prod_nombre         : [this.product.prod_nombre],
             prod_desc           : [this.product.prod_desc],
+            prod_marca          : [this.product.prod_marca],
+            prod_model          : [this.product.prod_model],
+            prod_color          : [this.product.prod_color],
+            prod_serie          : [this.product.prod_serie],
             prod_tags           : [this.product.prod_tags],
 
             prod_est_converva_value   : [this.product.prod_est_converva.est_value],
@@ -456,6 +458,12 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
         };
         productSave.prod_nombre = this.productForm.value.prod_nombre;
         productSave.prod_desc = this.productForm.value.prod_desc;
+
+        productSave.prod_marca = this.productForm.value.prod_marca;
+        productSave.prod_model = this.productForm.value.prod_model;
+        productSave.prod_color = this.productForm.value.prod_color;
+        productSave.prod_serie = this.productForm.value.prod_serie;
+
         productSave.prod_est_converva = {
             est_value: this.productForm.value.prod_est_converva_value,
             est_desc: this.productForm.value.prod_est_converva_desc,
@@ -589,6 +597,12 @@ export class EcommerceProductComponent implements OnInit, OnDestroy
             user_slug: this.lender.user_slug
         };
         productSave.prod_desc = this.productForm.value.prod_desc;
+        
+        productSave.prod_marca = this.productForm.value.prod_marca;
+        productSave.prod_model = this.productForm.value.prod_model;
+        productSave.prod_color = this.productForm.value.prod_color;
+        productSave.prod_serie = this.productForm.value.prod_serie;
+
         productSave.prod_tags = this.productForm.value.prod_tags;
         productSave.prod_est_converva = {
             est_value: this.productForm.value.prod_est_converva_value.toString(),

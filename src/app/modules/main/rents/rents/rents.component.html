@@ -88,7 +88,7 @@
                 <ng-container matColumnDef="rent_status">
                     <mat-header-cell *matHeaderCellDef mat-sort-header>Estado del alquiler</mat-header-cell>
                     <mat-cell *matCellDef="let lender">
-                        <p class="text-truncate">{{lender.rent_status}}</p>
+                        <p class="text-truncate">{{lender.rent_status[lender.rent_status.length - 1].status_text}}</p>
                     </mat-cell>
                 </ng-container>
 

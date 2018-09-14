@@ -52,6 +52,11 @@ export class Product
         val_ref_price: string
     };
 
+    prod_marca: string;
+    prod_model: string;
+    prod_color: string;
+    prod_serie: string;
+    
     /**
      * Constructor
      *
@@ -90,6 +95,9 @@ export class Product
         this.prod_fec_registro = product.prod_fec_registro || '';
         this.prod_usu_registro = product.prod_usu_registro || '';
         this.prod_url_documen = product.prod_url_documen || [];
-
+        this.prod_marca = product.prod_marca || '';
+        this.prod_model = product.prod_model || '';
+        this.prod_color = product.prod_color || '';
+        this.prod_serie = product.prod_serie || '';
     }
 }
